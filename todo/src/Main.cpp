@@ -3,6 +3,7 @@
 #include "Animator.hpp"
 #include "GameState.hpp"
 #include "GameClock.hpp"
+#include "Tweening.hpp"
 #include <iostream>
 #include <stack>
 #include <cmath>
@@ -16,15 +17,6 @@ SDLRenderer renderer;
 
 SDL_Event event;
 
-std::stack<std::shared_ptr<GameState>> gameStack;
-
-template<typename T>
-constexpr void lerp(T &out, double f = 0) {
-    double t = 1.0 - f;
-    out.x[0] = out.x[0] * t + out.x[1] * f;
-    out.y[0] = out.y[0] * t + out.y[1] * f;
-}
-
 const double MS_PER_UPDATE = 15.0;
     // how much time the update step has been given (in ms)
     // this parameter has to be minimized, but if it is too small
@@ -32,6 +24,28 @@ const double MS_PER_UPDATE = 15.0;
     // Also > 0 value
 
 GameClock clock;
+
+struct FirstState : public GameState {
+
+    void handleInput() override {
+        while ( SDL_PollEvent(&event) != 0 ) {
+            if ( event.type == SDL_QUIT ) {
+                globals.isPlaying = false;
+            }
+        }
+        const uint8_t *currentKeyState = SDL_GetKeyboardState(nullptr);
+    }
+
+    bool load() override {
+        return true;
+    }
+
+    void update() override {}
+
+    void render() override {}
+
+    ~FirstState() = default;
+};
 
 bool init() {
     bool result = true;
@@ -56,42 +70,29 @@ bool init() {
     return result;
 }
 
-struct FirstState : public GameState {
-    void handleInput() override {
-        while ( SDL_PollEvent(&event) != 0 ) {
-            if ( event.type == SDL_QUIT ) {
-                globals.is_playing = false;
-            }
-        }
-        const uint8_t *currentKeyState = SDL_GetKeyboardState(nullptr);
-    }
+bool initStates(std::stack<std::shared_ptr<GameState>> &stack) {
+    stack.emplace(new FirstState());
 
-    bool load() override {
-        return true;
-    }
-
-    void update() override {}
-
-    void render() override {}
-
-    ~FirstState() = default;
-};
-
+    return true;
+}
 
 int WinMain() {
+
+    std::stack<std::shared_ptr<GameState>> gameStack;
 
     if ( !init() ) {
         return 1;
     }
 
-    gameStack.emplace(new FirstState());
+    if ( !initStates(gameStack) ) {
+        return 1;
+    }
 
-    while ( !gameStack.empty() ) {
+    while ( globals.isPlaying && !gameStack.empty() ) {
         auto state = gameStack.top();
-        gameStack.pop();
 
         if ( state->load() ) {
-            while ( globals.is_playing ) {
+            while ( globals.isPlaying && state->isPlaying ) {
                 state->handleInput();
 
                 while ( clock.lag >= MS_PER_UPDATE) {
@@ -105,6 +106,8 @@ int WinMain() {
                 clock.tick();
             }
         }
+
+        gameStack.pop();
     }
 
     return 0;
