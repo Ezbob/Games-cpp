@@ -33,7 +33,7 @@ public:
     /**
      * Factory method for creating new textures
      */
-    SDLTexture createTexture();
+    SDLTexture createTexture() const;
 
 private:
     SDL_Window *m_window_parent = nullptr;

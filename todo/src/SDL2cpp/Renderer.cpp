@@ -77,6 +77,6 @@ bool SDLRenderer::setViewPort(SDL_Rect &rect) {
     return CheckError<SDL_GetError>(SDL_RenderSetViewport(m_contained.get(), &rect), "Could not set view port");
 }
 
-SDLTexture SDLRenderer::createTexture() {
+SDLTexture SDLRenderer::createTexture() const {
     return SDLTexture(m_contained.get());
 }
