@@ -7,22 +7,22 @@
 
 namespace sdl2 {
 
-    class SDLTexture;
-    class SDLWindow;
+    class Texture;
+    class Window;
 
-    class SDLRenderer : public SharedContainerBase<SDLRenderer, SDL_Renderer, SDL_DestroyRenderer> {
+    class Renderer : public SharedContainerBase<Renderer, SDL_Renderer, SDL_DestroyRenderer> {
 
     public:
-        SDLRenderer(SDL_Window *window, int index, uint32_t rendererFlags);
-        SDLRenderer();
+        Renderer(SDL_Window *window, int index, uint32_t rendererFlags);
+        Renderer();
 
         void load(SDL_Window *window, int index, uint32_t rendererFlags);
-        void load(SDLWindow &window, int index, uint32_t rendererFlags);
+        void load(Window &window, int index, uint32_t rendererFlags);
         SDL_Texture *createTextureFromSurface(SDL_Surface &surface);
         SDL_Texture *createTextureFromSurface(SDL_Surface *surface);
 
         bool clear();
-        bool copyTexture(SDLTexture &texture, SDL_Rect *src = nullptr, SDL_Rect *dest = nullptr);
+        bool copyTexture(Texture &texture, SDL_Rect *src = nullptr, SDL_Rect *dest = nullptr);
         void updateScreen() const;
         bool setColor(int r, int g, int b, int a = 0xFF);
         bool drawRect(const SDL_Rect *fillRect);
@@ -36,7 +36,7 @@ namespace sdl2 {
         /**
          * Factory method for creating new textures
          */
-        SDLTexture createTexture() const;
+        Texture createTexture() const;
 
     private:
         SDL_Window *m_window_parent = nullptr;

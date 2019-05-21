@@ -5,9 +5,9 @@
 
 namespace sdl2 {
 
-    SDLTexture loadPNG(const SDLRenderer &renderer, const std::string &path, uint8_t r = 0, uint8_t g = 0xFF, uint8_t b = 0xFF);
+    Texture loadPNG(const Renderer &renderer, const std::string &path, uint8_t r = 0, uint8_t g = 0xFF, uint8_t b = 0xFF);
 
-    SDLTexture loadSolidText(const SDLRenderer &renderer, const std::string &text, TTF_Font *font, SDL_Color textColor);
+    Texture loadSolidText(const Renderer &renderer, const std::string &text, TTF_Font *font, SDL_Color textColor);
 }
 
 #endif

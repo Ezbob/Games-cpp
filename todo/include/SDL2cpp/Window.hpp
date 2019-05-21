@@ -8,21 +8,21 @@
 
 namespace sdl2 {
 
-    class SDLRenderer;
+    class Renderer;
 
-    class SDLWindow : public ContainerBase<SDLWindow, SDL_Window, SDL_DestroyWindow> {
+    class Window : public ContainerBase<Window, SDL_Window, SDL_DestroyWindow> {
 
     public:
-        SDLWindow(const char *title, int x, int y, int width, int height, uint32_t flags = SDL_WINDOW_SHOWN);
-        SDLWindow(const char *title, int xy, int width, int height, uint32_t flags = SDL_WINDOW_SHOWN);
-        SDLWindow();
+        Window(const char *title, int x, int y, int width, int height, uint32_t flags = SDL_WINDOW_SHOWN);
+        Window(const char *title, int xy, int width, int height, uint32_t flags = SDL_WINDOW_SHOWN);
+        Window();
 
         void loadWindow(std::string windowName, int x, int y, int width, int height, uint32_t flags);
         void load(SDL_Window *wind);
-        SDLSurface getSurface() const;
+        Surface getSurface() const;
         bool updateScreen() const;
 
-        SDLRenderer getRenderer(int index, uint32_t rendererFlags);
+        Renderer getRenderer(int index, uint32_t rendererFlags);
 
     };
 }

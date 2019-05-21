@@ -4,7 +4,7 @@
 
 using namespace sdl2;
 
-bool SDLGlobals::init(uint32_t init_flags) {
+bool Globals::init(uint32_t init_flags) {
     if ( SDL_Init( m_flags_set ) < 0 ) {
         std::cerr << "Error: SDL could not be initialized: " << SDL_GetError() << std::endl;
         is_initialized = false;
@@ -15,10 +15,10 @@ bool SDLGlobals::init(uint32_t init_flags) {
     return true;
 }
 
-bool SDLGlobals::loadExternLib(SDLExternLibs libsChosen, uint32_t libFlags) {
+bool Globals::loadExternLib(ExternLibs libsChosen, uint32_t libFlags) {
 
     switch (libsChosen) {
-        case SDLExternLibs::SDL_IMAGE:
+        case ExternLibs::SDL_IMAGE:
             if ( !( IMG_Init(libFlags) & libFlags ) ) { // IMG_Init returns the flags set
                 std::cerr << "Error: Could not initialize SDL_Image: " << IMG_GetError() << std::endl;
                 is_initialized = false;
@@ -26,7 +26,7 @@ bool SDLGlobals::loadExternLib(SDLExternLibs libsChosen, uint32_t libFlags) {
                 is_initialized = is_initialized && true;
             }
             break;
-        case SDLExternLibs::SDL_TTF:
+        case ExternLibs::SDL_TTF:
             if ( TTF_Init() == -1 ) {
                 std::cerr << "Error: Could not initialize SDL_TFF: " << TTF_GetError() << std::endl;
                 is_initialized = false;

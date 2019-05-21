@@ -8,11 +8,11 @@
 
 namespace sdl2 {
 
-    class SDLSurface : public SharedContainerBase<SDLSurface, SDL_Surface, SDL_FreeSurface> {
+    class Surface : public SharedContainerBase<Surface, SDL_Surface, SDL_FreeSurface> {
 
     public:
-        SDLSurface(SDL_Surface *surface);
-        SDLSurface();
+        Surface(SDL_Surface *surface);
+        Surface();
 
         void loadBMP(std::string filename);
         void loadPNG(std::string filename);
@@ -31,7 +31,7 @@ namespace sdl2 {
         /**
          * Convert the internal surface pixel format to the other surface's pixelformat
          */
-        void convertToFormat(const SDLSurface &other);
+        void convertToFormat(const Surface &other);
 
         const SDL_PixelFormat *pixelFormat() const;
         void fill(int r, int g, int b);

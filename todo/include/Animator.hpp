@@ -7,7 +7,7 @@
 template<int columns, int rows>
 class SpriteSheetAnimator {
 
-    sdl2::SDLTexture spriteSheetTexture;
+    sdl2::Texture spriteSheetTexture;
     int currentFrame;
     int sprite_width;
     int sprite_height;
@@ -35,7 +35,7 @@ class SpriteSheetAnimator {
     }
 
 public:
-    SpriteSheetAnimator(sdl2::SDLTexture spriteSheet, int sprite_width, int sprite_height, int framerate = 16) : 
+    SpriteSheetAnimator(sdl2::Texture spriteSheet, int sprite_width, int sprite_height, int framerate = 16) : 
         spriteSheetTexture(std::move(spriteSheet)),
         currentFrame(0), sprite_width(sprite_width),
         sprite_height(sprite_height),
@@ -45,7 +45,7 @@ public:
         is_loaded = true;
     }
 
-    SpriteSheetAnimator(sdl2::SDLRenderer &renderer, int sprite_width, int sprite_height, int framerate = 16) : 
+    SpriteSheetAnimator(sdl2::Renderer &renderer, int sprite_width, int sprite_height, int framerate = 16) : 
         spriteSheetTexture(renderer),
         currentFrame(0), sprite_width(sprite_width),
         sprite_height(sprite_height),
@@ -54,7 +54,7 @@ public:
         initFrames();
     }
 
-    void load(sdl2::SDLTexture spriteSheet) {
+    void load(sdl2::Texture spriteSheet) {
         spriteSheetTexture = spriteSheet;
         is_loaded = true;
     }

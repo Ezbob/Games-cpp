@@ -8,24 +8,24 @@
 
 namespace sdl2 {
 
-    enum class SDLExternLibs {
+    enum class ExternLibs {
         SDL_IMAGE = 1,
         SDL_TTF
     };
 
-    struct SDLGlobals {
+    struct Globals {
 
         bool init(uint32_t init_flags);
-        bool loadExternLib(SDLExternLibs libsChosen, uint32_t libFlags = 0);
+        bool loadExternLib(ExternLibs libsChosen, uint32_t libFlags = 0);
 
-        ~SDLGlobals() {
+        ~Globals() {
             SDL_Quit();
-            uint32_t imageFeature = static_cast<uint32_t>(SDLExternLibs::SDL_IMAGE);
+            uint32_t imageFeature = static_cast<uint32_t>(ExternLibs::SDL_IMAGE);
             if ( (m_libs_set & imageFeature) == imageFeature ) {
                 IMG_Quit();
             }
 
-            uint32_t fontFeature = static_cast<uint32_t>(SDLExternLibs::SDL_TTF);
+            uint32_t fontFeature = static_cast<uint32_t>(ExternLibs::SDL_TTF);
             if ( (m_libs_set & fontFeature) == fontFeature ) {
                 TTF_Quit();
             }

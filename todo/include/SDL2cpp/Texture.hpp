@@ -9,18 +9,18 @@
 
 namespace sdl2 {
 
-    class SDLRenderer;
+    class Renderer;
 
-    class SDLTexture : public SharedContainerBase<SDLTexture, SDL_Texture, SDL_DestroyTexture> {
+    class Texture : public SharedContainerBase<Texture, SDL_Texture, SDL_DestroyTexture> {
 
     public:
-        SDLTexture(SDLRenderer &renderer);
-        SDLTexture(SDL_Renderer *renderer);
+        Texture(Renderer &renderer);
+        Texture(SDL_Renderer *renderer);
 
         void load(SDL_Texture *texture, int w, int h);
         void load(SDL_Texture *texture);
         void load(SDL_Surface *surface);
-        void load(SDLSurface &surface);
+        void load(Surface &surface);
 
         int getHeight() const {
             return m_height;
