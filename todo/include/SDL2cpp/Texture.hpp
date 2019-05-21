@@ -7,7 +7,7 @@
 #include "SDL2cpp/MemoryContainer.hpp"
 
 
-namespace sdl2cpp {
+namespace sdl2 {
 
     class SDLRenderer;
 

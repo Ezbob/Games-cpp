@@ -6,7 +6,7 @@
 #include "SDL_ttf.h"
 #include <cstddef>
 
-namespace sdl2cpp {
+namespace sdl2 {
 
     enum class SDLExternLibs {
         SDL_IMAGE = 1,

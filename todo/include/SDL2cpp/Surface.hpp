@@ -6,7 +6,7 @@
 #include <memory>
 #include "SDL2cpp/MemoryContainer.hpp"
 
-namespace sdl2cpp {
+namespace sdl2 {
 
     class SDLSurface : public SharedContainerBase<SDLSurface, SDL_Surface, SDL_FreeSurface> {
 

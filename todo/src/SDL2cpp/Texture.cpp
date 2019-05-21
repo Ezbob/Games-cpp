@@ -2,7 +2,7 @@
 #include "SDL2cpp/Texture.hpp"
 #include <memory>
 
-using namespace sdl2cpp;
+using namespace sdl2;
 
 SDLTexture::SDLTexture(SDLRenderer &renderer) : m_renderer((SDL_Renderer *) renderer), m_width(0), m_height(0) {}
 SDLTexture::SDLTexture(SDL_Renderer *renderer) : m_renderer(renderer), m_width(0), m_height(0) {}

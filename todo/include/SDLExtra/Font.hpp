@@ -5,7 +5,7 @@
 #include "SDL2cpp/MemoryContainer.hpp"
 #include <string>
 
-namespace sdl2cpp {
+namespace sdl2 {
 
     class TTFFont : public ContainerBase<TTFFont, TTF_Font, TTF_CloseFont> {
 

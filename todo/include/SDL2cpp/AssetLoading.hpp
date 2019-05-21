@@ -3,7 +3,7 @@
 
 #include "SDL.hpp"
 
-namespace sdl2cpp {
+namespace sdl2 {
 
     SDLTexture loadPNG(const SDLRenderer &renderer, const std::string &path, uint8_t r = 0, uint8_t g = 0xFF, uint8_t b = 0xFF);
 

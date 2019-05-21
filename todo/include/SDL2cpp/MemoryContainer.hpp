@@ -5,7 +5,7 @@
 #include <iostream>
 #include "SDL2cpp/ErrorCheck.hpp"
 
-namespace sdl2cpp {
+namespace sdl2 {
 
     template<typename T>
     using FreeingFunction_t = void (*)(T *);

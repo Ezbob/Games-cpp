@@ -10,9 +10,9 @@
 const int SCREEN_WIDTH = 840;
 const int SCREEN_HEIGHT = 480;
 
-sdl2cpp::SDLGlobals globals;
-sdl2cpp::SDLWindow window;
-sdl2cpp::SDLRenderer renderer;
+sdl2::SDLGlobals globals;
+sdl2::SDLWindow window;
+sdl2::SDLRenderer renderer;
 
 SDL_Event event;
 
@@ -50,8 +50,8 @@ bool init() {
     bool result = true;
 
     if ( globals.init(SDL_INIT_VIDEO | SDL_INIT_TIMER) ) {
-        globals.loadExternLib(sdl2cpp::SDLExternLibs::SDL_IMAGE, IMG_INIT_PNG);
-        globals.loadExternLib(sdl2cpp::SDLExternLibs::SDL_TTF);
+        globals.loadExternLib(sdl2::SDLExternLibs::SDL_IMAGE, IMG_INIT_PNG);
+        globals.loadExternLib(sdl2::SDLExternLibs::SDL_TTF);
         window.loadWindow("SDL Tutorial",
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,

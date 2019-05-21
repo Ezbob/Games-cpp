@@ -3,7 +3,7 @@
 #include "SDL2cpp/ErrorCheck.hpp"
 #include "SDL2cpp/Surface.hpp"
 
-using namespace sdl2cpp;
+using namespace sdl2;
 
 SDLSurface::SDLSurface(SDL_Surface *surface) {
     m_contained = std::shared_ptr<SDL_Surface>(surface, SDL_FreeSurface);

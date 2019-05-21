@@ -4,7 +4,7 @@
 #include "SDL.h"
 #include <iostream>
 
-namespace sdl2cpp {
+namespace sdl2 {
 
     using ErrorGetterFunction_t = const char *(*)();
 
