@@ -9,6 +9,6 @@
 #include "SDL2cpp/Renderer.hpp"
 #include "SDL2cpp/Texture.hpp"
 #include "SDL2cpp/Surface.hpp"
-
+#include "SDL2cpp/AssetLoading.hpp"
 
 #endif

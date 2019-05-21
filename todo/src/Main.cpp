@@ -26,6 +26,8 @@ GameClock clock;
 
 struct FirstState : public GameState {
 
+    sdl2::Texture background = renderer.createTexture();
+
     void handleInput() override {
         while ( SDL_PollEvent(&event) != 0 ) {
             if ( event.type == SDL_QUIT ) {
@@ -36,12 +38,17 @@ struct FirstState : public GameState {
     }
 
     bool load() override {
-        return true;
+        background = sdl2::loadPNG(renderer, "assets/landscape.png");
+        return background.isLoaded();
     }
 
     void update() override {}
 
-    void render() override {}
+    void render() override {
+        background.render();
+
+        renderer.updateScreen();
+    }
 
     ~FirstState() = default;
 };

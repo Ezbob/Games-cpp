@@ -20,6 +20,7 @@ namespace sdl2 {
         void load(SDL_Texture *texture, int w, int h);
         void load(SDL_Texture *texture);
         void load(SDL_Surface *surface);
+        void load(Texture &&texture);
         void load(Surface &surface);
 
         int getHeight() const {

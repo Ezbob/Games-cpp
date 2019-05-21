@@ -1,9 +1,12 @@
 #ifndef HEADER_GUARD_7438d22a99cec6e2475b167f3b35a0c3
 #define HEADER_GUARD_7438d22a99cec6e2475b167f3b35a0c3
 
-#include "SDL.hpp"
+#include "sdl2cpp/Texture.hpp"
+#include "sdl2cpp/Renderer.hpp"
 
 namespace sdl2 {
+
+    class Texture;
 
     Texture loadPNG(const Renderer &renderer, const std::string &path, uint8_t r = 0, uint8_t g = 0xFF, uint8_t b = 0xFF);
 

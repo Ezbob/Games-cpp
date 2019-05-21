@@ -48,6 +48,16 @@ void Texture::load(Surface &surface) {
     m_width = surface.getWidth();
 }
 
+void Texture::load(sdl2::Texture &&texture) {
+    m_contained.swap(texture.m_contained);
+    if (m_contained == nullptr) {
+        std::cerr << "Error: Could not load texture: " << SDL_GetError() << std::endl;
+        return;
+    }
+    m_height = texture.getHeight();
+    m_width = texture.getWidth();
+}
+
 void Texture::render(const int x, const int y) {
     SDL_Rect quad = {x, y, m_width, m_height};
     CheckError<SDL_GetError>(SDL_RenderCopy(m_renderer, m_contained.get(), nullptr, &quad), "Cloud not render texture");

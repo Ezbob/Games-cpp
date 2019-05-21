@@ -1,30 +1,32 @@
 #include "SDL2cpp/AssetLoading.hpp"
 
-using namespace sdl2;
+namespace sdl2 {
+    Texture loadPNG(const Renderer &renderer, const std::string &path, uint8_t r, uint8_t g, uint8_t b) {
+        Texture texture = renderer.createTexture();
 
-Texture loadPNG(const Renderer &renderer, const std::string &path, uint8_t r = 0, uint8_t g = 0xFF, uint8_t b = 0xFF) {
-    Texture texture = renderer.createTexture();
+        Surface loadedSurface;
+        loadedSurface.loadPNG(path);
+        if ( loadedSurface.isLoaded() ) {
+            loadedSurface.setKeyColor(SDL_TRUE, SDL_MapRGB( loadedSurface.pixelFormat(), r, g, b ));
+            texture.load(loadedSurface);
+        }
 
-    Surface loadedSurface;
-    loadedSurface.loadPNG(path);
-    if ( loadedSurface.isLoaded() ) {
-        loadedSurface.setKeyColor(SDL_TRUE, SDL_MapRGB( loadedSurface.pixelFormat(), r, g, b ));
-        texture.load(loadedSurface);
+        return texture;
     }
 
-    return texture;
-}
+    Texture loadSolidText(const Renderer &renderer, const std::string &text, TTF_Font *font, SDL_Color textColor) {
+        Texture texture = renderer.createTexture();
 
-Texture loadSolidText(const Renderer &renderer, const std::string &text, TTF_Font *font, SDL_Color textColor) {
-    Texture texture = renderer.createTexture();
+        Surface surface;
 
-    Surface surface;
+        surface.load(TTF_RenderText_Solid(font, text.c_str(), textColor));
 
-    surface.load(TTF_RenderText_Solid(font, text.c_str(), textColor));
+        if (surface.isLoaded()) {
+            texture.load(surface);
+        }
 
-    if (surface.isLoaded()) {
-        texture.load(surface);
+        return texture;
     }
-
-    return texture;
 }
+
+

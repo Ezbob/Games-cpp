@@ -12,12 +12,12 @@ set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
 set(SOURCES
     src/Main.cpp
+    src/SDL2cpp/AssetLoading.cpp
     src/SDL2cpp/Renderer.cpp
     src/SDL2cpp/Texture.cpp
     src/SDL2cpp/Window.cpp
     src/SDL2cpp/Surface.cpp
     src/SDL2cpp/Globals.cpp
-    src/SDL2cpp/AssetLoading.cpp
     src/SDLExtra/Font.cpp
 )
 
