@@ -6,14 +6,13 @@
 #include "Tweening.hpp"
 #include <iostream>
 #include <stack>
-#include <cmath>
 
 const int SCREEN_WIDTH = 840;
 const int SCREEN_HEIGHT = 480;
 
-SDLGlobals globals;
-SDLWindow window;
-SDLRenderer renderer;
+sdl2cpp::SDLGlobals globals;
+sdl2cpp::SDLWindow window;
+sdl2cpp::SDLRenderer renderer;
 
 SDL_Event event;
 
@@ -51,8 +50,8 @@ bool init() {
     bool result = true;
 
     if ( globals.init(SDL_INIT_VIDEO | SDL_INIT_TIMER) ) {
-        globals.loadExternLib(SDLExternLibs::SDL_IMAGE, IMG_INIT_PNG);
-        globals.loadExternLib(SDLExternLibs::SDL_TTF);
+        globals.loadExternLib(sdl2cpp::SDLExternLibs::SDL_IMAGE, IMG_INIT_PNG);
+        globals.loadExternLib(sdl2cpp::SDLExternLibs::SDL_TTF);
         window.loadWindow("SDL Tutorial",
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,

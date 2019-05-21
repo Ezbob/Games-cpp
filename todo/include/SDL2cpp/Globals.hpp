@@ -6,34 +6,36 @@
 #include "SDL_ttf.h"
 #include <cstddef>
 
-enum class SDLExternLibs {
-    SDL_IMAGE = 1,
-    SDL_TTF
-};
+namespace sdl2cpp {
 
-struct SDLGlobals {
+    enum class SDLExternLibs {
+        SDL_IMAGE = 1,
+        SDL_TTF
+    };
 
-    bool init(uint32_t init_flags);
-    bool loadExternLib(SDLExternLibs libsChosen, uint32_t libFlags = 0);
+    struct SDLGlobals {
 
-    ~SDLGlobals() {
-        SDL_Quit();
-        uint32_t imageFeature = static_cast<uint32_t>(SDLExternLibs::SDL_IMAGE);
-        if ( (m_libs_set & imageFeature) == imageFeature ) {
-            IMG_Quit();
+        bool init(uint32_t init_flags);
+        bool loadExternLib(SDLExternLibs libsChosen, uint32_t libFlags = 0);
+
+        ~SDLGlobals() {
+            SDL_Quit();
+            uint32_t imageFeature = static_cast<uint32_t>(SDLExternLibs::SDL_IMAGE);
+            if ( (m_libs_set & imageFeature) == imageFeature ) {
+                IMG_Quit();
+            }
+
+            uint32_t fontFeature = static_cast<uint32_t>(SDLExternLibs::SDL_TTF);
+            if ( (m_libs_set & fontFeature) == fontFeature ) {
+                TTF_Quit();
+            }
         }
 
-        uint32_t fontFeature = static_cast<uint32_t>(SDLExternLibs::SDL_TTF);
-        if ( (m_libs_set & fontFeature) == fontFeature ) {
-            TTF_Quit();
-        }
-    }
-
-    uint32_t m_libs_set = 0;
-    uint32_t m_flags_set = 0;
-    bool is_initialized = false;
-    bool isPlaying = true;
-};
-
+        uint32_t m_libs_set = 0;
+        uint32_t m_flags_set = 0;
+        bool is_initialized = false;
+        bool isPlaying = true;
+    };
+}
 
 #endif

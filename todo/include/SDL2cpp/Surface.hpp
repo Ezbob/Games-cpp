@@ -6,35 +6,39 @@
 #include <memory>
 #include "SDL2cpp/MemoryContainer.hpp"
 
-class SDLSurface : public SharedContainerBase<SDLSurface, SDL_Surface, SDL_FreeSurface> {
+namespace sdl2cpp {
 
-public:
-    SDLSurface(SDL_Surface *surface);
-    SDLSurface();
+    class SDLSurface : public SharedContainerBase<SDLSurface, SDL_Surface, SDL_FreeSurface> {
 
-    void loadBMP(std::string filename);
-    void loadPNG(std::string filename);
-    void loadSolidText(std::string text, TTF_Font &font, SDL_Color color = {0, 0, 0});
+    public:
+        SDLSurface(SDL_Surface *surface);
+        SDLSurface();
 
-    int setKeyColor(int flags, uint32_t color);
+        void loadBMP(std::string filename);
+        void loadPNG(std::string filename);
+        void loadSolidText(std::string text, TTF_Font &font, SDL_Color color = {0, 0, 0});
 
-    int getHeight() const {
-        return m_contained->h;
-    }
+        int setKeyColor(int flags, uint32_t color);
 
-    int getWidth() const {
-        return m_contained->w;
-    }
+        int getHeight() const {
+            return m_contained->h;
+        }
 
-    /**
-     * Convert the internal surface pixel format to the other surface's pixelformat
-     */
-    void convertToFormat(const SDLSurface &other);
+        int getWidth() const {
+            return m_contained->w;
+        }
 
-    const SDL_PixelFormat *pixelFormat() const;
-    void fill(int r, int g, int b);
-    uint32_t rgbColor(int r, int g, int b) const;
+        /**
+         * Convert the internal surface pixel format to the other surface's pixelformat
+         */
+        void convertToFormat(const SDLSurface &other);
 
-};
+        const SDL_PixelFormat *pixelFormat() const;
+        void fill(int r, int g, int b);
+        uint32_t rgbColor(int r, int g, int b) const;
+
+    };
+
+}
 
 #endif

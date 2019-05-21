@@ -4,39 +4,44 @@
 #include "SDL.hpp"
 #include "SDL2cpp/MemoryContainer.hpp"
 
-class SDLTexture;
-class SDLWindow;
 
-class SDLRenderer : public SharedContainerBase<SDLRenderer, SDL_Renderer, SDL_DestroyRenderer> {
+namespace sdl2cpp {
 
-public:
-    SDLRenderer(SDL_Window *window, int index, uint32_t rendererFlags);
-    SDLRenderer();
+    class SDLTexture;
+    class SDLWindow;
 
-    void load(SDL_Window *window, int index, uint32_t rendererFlags);
-    void load(SDLWindow &window, int index, uint32_t rendererFlags);
-    SDL_Texture *createTextureFromSurface(SDL_Surface &surface);
-    SDL_Texture *createTextureFromSurface(SDL_Surface *surface);
+    class SDLRenderer : public SharedContainerBase<SDLRenderer, SDL_Renderer, SDL_DestroyRenderer> {
 
-    bool clear();
-    bool copyTexture(SDLTexture &texture, SDL_Rect *src = nullptr, SDL_Rect *dest = nullptr);
-    void updateScreen() const;
-    bool setColor(int r, int g, int b, int a = 0xFF);
-    bool drawRect(const SDL_Rect *fillRect);
-    bool drawRect(const SDL_Rect &fillRect);
-    bool fillRect(const SDL_Rect *fillRect);
-    bool fillRect(const SDL_Rect &fillRect);
-    bool drawLine(int x1, int y1, int x2, int y2);
-    bool drawPoint(int x, int y);
-    bool setViewPort(SDL_Rect &rect);
+    public:
+        SDLRenderer(SDL_Window *window, int index, uint32_t rendererFlags);
+        SDLRenderer();
 
-    /**
-     * Factory method for creating new textures
-     */
-    SDLTexture createTexture() const;
+        void load(SDL_Window *window, int index, uint32_t rendererFlags);
+        void load(SDLWindow &window, int index, uint32_t rendererFlags);
+        SDL_Texture *createTextureFromSurface(SDL_Surface &surface);
+        SDL_Texture *createTextureFromSurface(SDL_Surface *surface);
 
-private:
-    SDL_Window *m_window_parent = nullptr;
-};
+        bool clear();
+        bool copyTexture(SDLTexture &texture, SDL_Rect *src = nullptr, SDL_Rect *dest = nullptr);
+        void updateScreen() const;
+        bool setColor(int r, int g, int b, int a = 0xFF);
+        bool drawRect(const SDL_Rect *fillRect);
+        bool drawRect(const SDL_Rect &fillRect);
+        bool fillRect(const SDL_Rect *fillRect);
+        bool fillRect(const SDL_Rect &fillRect);
+        bool drawLine(int x1, int y1, int x2, int y2);
+        bool drawPoint(int x, int y);
+        bool setViewPort(SDL_Rect &rect);
+
+        /**
+         * Factory method for creating new textures
+         */
+        SDLTexture createTexture() const;
+
+    private:
+        SDL_Window *m_window_parent = nullptr;
+    };
+
+}
 
 #endif

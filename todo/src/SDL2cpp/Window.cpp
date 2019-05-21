@@ -3,6 +3,8 @@
 #include "SDL2cpp/Renderer.hpp"
 #include "SDL.h"
 
+using namespace sdl2cpp;
+
 SDLWindow::SDLWindow(const char *title, int x, int y, int width, int height, uint32_t flags) {
     m_contained = CheckNullError<SDL_Window, SDL_GetError>(SDL_CreateWindow(
         title, x, y, width, height, flags

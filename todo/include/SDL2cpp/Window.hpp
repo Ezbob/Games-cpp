@@ -6,22 +6,25 @@
 #include "Surface.hpp"
 #include "SDL2cpp/MemoryContainer.hpp"
 
-class SDLRenderer;
+namespace sdl2cpp {
 
-class SDLWindow : public ContainerBase<SDLWindow, SDL_Window, SDL_DestroyWindow> {
+    class SDLRenderer;
 
-public:
-    SDLWindow(const char *title, int x, int y, int width, int height, uint32_t flags = SDL_WINDOW_SHOWN);
-    SDLWindow(const char *title, int xy, int width, int height, uint32_t flags = SDL_WINDOW_SHOWN);
-    SDLWindow();
+    class SDLWindow : public ContainerBase<SDLWindow, SDL_Window, SDL_DestroyWindow> {
 
-    void loadWindow(std::string windowName, int x, int y, int width, int height, uint32_t flags);
-    void load(SDL_Window *wind);
-    SDLSurface getSurface() const;
-    bool updateScreen() const;
+    public:
+        SDLWindow(const char *title, int x, int y, int width, int height, uint32_t flags = SDL_WINDOW_SHOWN);
+        SDLWindow(const char *title, int xy, int width, int height, uint32_t flags = SDL_WINDOW_SHOWN);
+        SDLWindow();
 
-    SDLRenderer getRenderer(int index, uint32_t rendererFlags);
+        void loadWindow(std::string windowName, int x, int y, int width, int height, uint32_t flags);
+        void load(SDL_Window *wind);
+        SDLSurface getSurface() const;
+        bool updateScreen() const;
 
-};
+        SDLRenderer getRenderer(int index, uint32_t rendererFlags);
+
+    };
+}
 
 #endif

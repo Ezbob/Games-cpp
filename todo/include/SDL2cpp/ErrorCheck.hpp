@@ -4,23 +4,25 @@
 #include "SDL.h"
 #include <iostream>
 
-using ErrorGetterFunction_t = const char *(*)();
+namespace sdl2cpp {
 
-template<typename T, ErrorGetterFunction_t ErrorGetter>
-T *CheckNullError(T *returned, const char *message) {
-    if ( returned == nullptr ) { 
-        std::cerr << "Error: " << message << ": " << ErrorGetter() << std::endl; 
+    using ErrorGetterFunction_t = const char *(*)();
+
+    template<typename T, ErrorGetterFunction_t ErrorGetter>
+    T *CheckNullError(T *returned, const char *message) {
+        if ( returned == nullptr ) { 
+            std::cerr << "Error: " << message << ": " << ErrorGetter() << std::endl; 
+        }
+        return returned;
     }
-    return returned;
-}
 
-template<ErrorGetterFunction_t ErrorGetter>
-int CheckError(int success, const char *message) {
-    if ( success != 0 ) { 
-        std::cerr << "Error: " << message << ": " << ErrorGetter() << std::endl; 
+    template<ErrorGetterFunction_t ErrorGetter>
+    int CheckError(int success, const char *message) {
+        if ( success != 0 ) { 
+            std::cerr << "Error: " << message << ": " << ErrorGetter() << std::endl; 
+        }
+        return success == 0;
     }
-    return success == 0;
 }
-
 
 #endif

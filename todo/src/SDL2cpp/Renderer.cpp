@@ -4,6 +4,8 @@
 #include "SDL.h"
 #include <memory>
 
+using namespace sdl2cpp;
+
 SDLRenderer::SDLRenderer(SDL_Window *window, int index, uint32_t rendererFlags) {
     m_contained = std::shared_ptr<SDL_Renderer>(SDL_CreateRenderer(window, index, rendererFlags), SDL_DestroyRenderer);
     m_window_parent = window;

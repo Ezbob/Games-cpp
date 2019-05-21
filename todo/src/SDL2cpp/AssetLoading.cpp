@@ -1,4 +1,6 @@
-#include "SDL2cpp/AssertLoading.hpp"
+#include "SDL2cpp/AssetLoading.hpp"
+
+using namespace sdl2cpp;
 
 SDLTexture loadPNG(const SDLRenderer &renderer, const std::string &path, uint8_t r = 0, uint8_t g = 0xFF, uint8_t b = 0xFF) {
     SDLTexture texture = renderer.createTexture();

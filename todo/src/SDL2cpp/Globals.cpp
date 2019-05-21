@@ -2,6 +2,8 @@
 #include "SDL2cpp/Globals.hpp"
 #include <iostream>
 
+using namespace sdl2cpp;
+
 bool SDLGlobals::init(uint32_t init_flags) {
     if ( SDL_Init( m_flags_set ) < 0 ) {
         std::cerr << "Error: SDL could not be initialized: " << SDL_GetError() << std::endl;

@@ -150,6 +150,33 @@ src/Main.cpp.s:
 	$(MAKE) -f CMakeFiles/game.dir/build.make CMakeFiles/game.dir/src/Main.cpp.s
 .PHONY : src/Main.cpp.s
 
+src/SDL2cpp/AssetLoading.obj: src/SDL2cpp/AssetLoading.cpp.obj
+
+.PHONY : src/SDL2cpp/AssetLoading.obj
+
+# target to build an object file
+src/SDL2cpp/AssetLoading.cpp.obj:
+	$(MAKE) -f CMakeFiles/game.dir/build.make CMakeFiles/game.dir/src/SDL2cpp/AssetLoading.cpp.obj
+.PHONY : src/SDL2cpp/AssetLoading.cpp.obj
+
+src/SDL2cpp/AssetLoading.i: src/SDL2cpp/AssetLoading.cpp.i
+
+.PHONY : src/SDL2cpp/AssetLoading.i
+
+# target to preprocess a source file
+src/SDL2cpp/AssetLoading.cpp.i:
+	$(MAKE) -f CMakeFiles/game.dir/build.make CMakeFiles/game.dir/src/SDL2cpp/AssetLoading.cpp.i
+.PHONY : src/SDL2cpp/AssetLoading.cpp.i
+
+src/SDL2cpp/AssetLoading.s: src/SDL2cpp/AssetLoading.cpp.s
+
+.PHONY : src/SDL2cpp/AssetLoading.s
+
+# target to generate assembly for a file
+src/SDL2cpp/AssetLoading.cpp.s:
+	$(MAKE) -f CMakeFiles/game.dir/build.make CMakeFiles/game.dir/src/SDL2cpp/AssetLoading.cpp.s
+.PHONY : src/SDL2cpp/AssetLoading.cpp.s
+
 src/SDL2cpp/Globals.obj: src/SDL2cpp/Globals.cpp.obj
 
 .PHONY : src/SDL2cpp/Globals.obj
@@ -324,6 +351,9 @@ help:
 	@echo "... src/Main.obj"
 	@echo "... src/Main.i"
 	@echo "... src/Main.s"
+	@echo "... src/SDL2cpp/AssetLoading.obj"
+	@echo "... src/SDL2cpp/AssetLoading.i"
+	@echo "... src/SDL2cpp/AssetLoading.s"
 	@echo "... src/SDL2cpp/Globals.obj"
 	@echo "... src/SDL2cpp/Globals.i"
 	@echo "... src/SDL2cpp/Globals.s"

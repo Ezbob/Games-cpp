@@ -5,10 +5,14 @@
 #include "SDL2cpp/MemoryContainer.hpp"
 #include <string>
 
-class TTFFont : public ContainerBase<TTFFont, TTF_Font, TTF_CloseFont> {
+namespace sdl2cpp {
 
-public:
-    void loadTTF(const std::string filepath, int ptsize);
-};
+    class TTFFont : public ContainerBase<TTFFont, TTF_Font, TTF_CloseFont> {
+
+    public:
+        void loadTTF(const std::string filepath, int ptsize);
+    };
+
+}
 
 #endif

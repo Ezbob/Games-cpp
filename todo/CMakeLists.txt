@@ -17,6 +17,7 @@ set(SOURCES
     src/SDL2cpp/Window.cpp
     src/SDL2cpp/Surface.cpp
     src/SDL2cpp/Globals.cpp
+    src/SDL2cpp/AssetLoading.cpp
     src/SDLExtra/Font.cpp
 )
 
