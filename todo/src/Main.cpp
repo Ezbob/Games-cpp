@@ -3,9 +3,11 @@
 #include "Animator.hpp"
 #include "GameState.hpp"
 #include "GameClock.hpp"
+#include "Actor.hpp"
 #include "Tweening.hpp"
 #include <iostream>
 #include <stack>
+
 
 const int SCREEN_WIDTH = 840;
 const int SCREEN_HEIGHT = 480;
@@ -24,9 +26,15 @@ const double MS_PER_UPDATE = 15.0;
 
 GameClock clock;
 
+struct Man : public Actor<Man> {
+    SpriteSheetAnimator<2, 1> spriteAnimation{renderer, 200, 100};
+
+};
+
 struct FirstState : public GameState {
 
     sdl2::Texture background = renderer.createTexture();
+    Man manActor;
 
     void handleInput() override {
         while ( SDL_PollEvent(&event) != 0 ) {
@@ -39,7 +47,9 @@ struct FirstState : public GameState {
 
     bool load() override {
         background = sdl2::loadPNG(renderer, "assets/landscape.png");
-        return background.isLoaded();
+        manActor.spriteAnimation.load(sdl2::loadPNG(renderer, "assets/man.png"));
+
+        return background.isLoaded() && manActor.spriteAnimation.isLoaded();
     }
 
     void update() override {}

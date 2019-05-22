@@ -15,7 +15,6 @@ class SpriteSheetAnimator {
     int numberOfFrames = columns * rows;
 
     bool is_running = false;
-    bool is_loaded = false;
 
     SDL_RendererFlip flip = SDL_FLIP_NONE;
 
@@ -42,7 +41,6 @@ public:
         framerate(framerate) {
 
         initFrames();
-        is_loaded = true;
     }
 
     SpriteSheetAnimator(sdl2::Renderer &renderer, int sprite_width, int sprite_height, int framerate = 16) : 
@@ -54,13 +52,12 @@ public:
         initFrames();
     }
 
-    void load(sdl2::Texture spriteSheet) {
+    void load(sdl2::Texture &&spriteSheet) {
         spriteSheetTexture = spriteSheet;
-        is_loaded = true;
     }
 
     bool isLoaded() {
-        return is_loaded;
+        return spriteSheetTexture.isLoaded();
     }
 
     void run() {
