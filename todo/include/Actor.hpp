@@ -3,11 +3,10 @@
 
 #include <array>
 
-template<typename Derived, int N_Stored_Coordinates = 2>
-class Actor {
-    std::array<double, N_Stored_Coordinates> world_x; // stores both this state and the next
-    std::array<double, N_Stored_Coordinates> world_y;
-    bool is_visible = true;
+struct Actor {
+    double worldX; // stores both this state and the next
+    double worldY;
+    bool isVisible = true;
 };
 
 #endif

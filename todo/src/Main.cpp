@@ -16,7 +16,6 @@ sdl2::Globals globals;
 sdl2::Window window;
 sdl2::Renderer renderer;
 
-SDL_Event event;
 
 const double MS_PER_UPDATE = 15.0;
     // how much time the update step has been given (in ms)
@@ -26,9 +25,37 @@ const double MS_PER_UPDATE = 15.0;
 
 GameClock clock;
 
-struct Man : public Actor<Man> {
-    SpriteSheetAnimator<2, 1> spriteAnimation{renderer, 200, 100};
+struct Man : public Actor {
+    SpriteSheetAnimator<4, 1> spriteAnimation{renderer, 64, 205, 7};
 
+    bool isMoving = false;
+
+    Man() {
+        worldX = 215.0;
+        worldY = 225.0;
+    }
+
+    void left() {
+        worldX -= 2;
+
+        spriteAnimation.unflip();
+        spriteAnimation.run();
+        isMoving = true;
+    }
+
+    void right() {
+        worldX += 2;
+
+        spriteAnimation.flipHorizontal();
+        spriteAnimation.run();
+        isMoving = true;
+    }
+
+    void stop() {
+        spriteAnimation.stop();
+        spriteAnimation.gotoFrame(0);
+        isMoving = false;
+    }
 };
 
 struct FirstState : public GameState {
@@ -36,13 +63,20 @@ struct FirstState : public GameState {
     sdl2::Texture background = renderer.createTexture();
     Man manActor;
 
+    const uint8_t *key_state;
+    SDL_Event event;
+
     void handleInput() override {
         while ( SDL_PollEvent(&event) != 0 ) {
             if ( event.type == SDL_QUIT ) {
                 globals.isPlaying = false;
             }
         }
-        const uint8_t *currentKeyState = SDL_GetKeyboardState(nullptr);
+        key_state = SDL_GetKeyboardState(nullptr);
+
+        if ( key_state[SDL_SCANCODE_ESCAPE] ) {
+            globals.isPlaying = false;
+        }
     }
 
     bool load() override {
@@ -52,10 +86,22 @@ struct FirstState : public GameState {
         return background.isLoaded() && manActor.spriteAnimation.isLoaded();
     }
 
-    void update() override {}
+    void update() override {
+        if ( key_state[SDL_SCANCODE_LEFT] ) {
+            manActor.left();
+        } else if ( key_state[SDL_SCANCODE_RIGHT] ) {
+            manActor.right();
+        } else {
+            manActor.stop();
+        }
+
+        manActor.spriteAnimation.tick();
+    }
 
     void render() override {
         background.render();
+
+        manActor.spriteAnimation.render(manActor.worldX, manActor.worldY);
 
         renderer.updateScreen();
     }
@@ -78,7 +124,6 @@ bool init() {
 
         renderer = window.getRenderer(-1, SDL_RENDERER_ACCELERATED);
         renderer.setColor(0xFF, 0xFF, 0xFF, 0xFF);
-        //SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest"); // basically the anti-aliasing
     }
 
     result = globals.is_initialized && window.isLoaded();
