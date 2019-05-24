@@ -4,8 +4,7 @@
 #include <array>
 
 struct Actor {
-    double worldX; // stores both this state and the next
-    double worldY;
+    std::array<double, 2> worldPos;
     bool isVisible = true;
 };
 

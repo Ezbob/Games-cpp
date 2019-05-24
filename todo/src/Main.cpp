@@ -28,33 +28,46 @@ GameClock clock;
 struct Man : public Actor {
     SpriteSheetAnimator<4, 1> spriteAnimation{renderer, 64, 205, 7};
 
-    bool isMoving = false;
+    double acceleration = 0.5;
+    double maxVelocity = 7.0;
+
+    double velocity[2] = { 0, 0 };
 
     Man() {
-        worldX = 215.0;
-        worldY = 225.0;
+        worldPos[0] = 215.0;
+        worldPos[1] = 225.0;
     }
 
     void left() {
-        worldX -= 2;
+        velocity[0] += acceleration;
+        worldPos[0] -= velocity[0];
 
         spriteAnimation.unflip();
         spriteAnimation.run();
-        isMoving = true;
     }
 
     void right() {
-        worldX += 2;
+        velocity[0] += acceleration;
+        worldPos[0] += velocity[0];
 
         spriteAnimation.flipHorizontal();
         spriteAnimation.run();
-        isMoving = true;
     }
 
     void stop() {
+        velocity[0] = std::min(1 / velocity[0], 0.0);
+
         spriteAnimation.stop();
         spriteAnimation.gotoFrame(0);
-        isMoving = false;
+    }
+
+    void update() {
+        velocity[0] = std::min(velocity[0], maxVelocity);
+        spriteAnimation.tick();
+    }
+
+    void render() {
+        spriteAnimation.render(worldPos[0], worldPos[1]);
     }
 };
 
@@ -87,21 +100,23 @@ struct FirstState : public GameState {
     }
 
     void update() override {
-        if ( key_state[SDL_SCANCODE_LEFT] ) {
+
+        if ( key_state[SDL_SCANCODE_LEFT] && key_state[SDL_SCANCODE_RIGHT] ) {
+            manActor.stop();
+        } else if ( key_state[SDL_SCANCODE_LEFT] ) {
             manActor.left();
         } else if ( key_state[SDL_SCANCODE_RIGHT] ) {
             manActor.right();
         } else {
             manActor.stop();
         }
-
-        manActor.spriteAnimation.tick();
+        manActor.update();
     }
 
     void render() override {
         background.render();
 
-        manActor.spriteAnimation.render(manActor.worldX, manActor.worldY);
+        manActor.render();
 
         renderer.updateScreen();
     }
