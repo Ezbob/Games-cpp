@@ -11,7 +11,7 @@ namespace sdl2 {
 
     class Renderer;
 
-    class Texture : public SharedContainerBase<Texture, SDL_Texture, SDL_DestroyTexture> {
+    class Texture : public SharedContainerBase<SDL_Texture, SDL_DestroyTexture> {
 
     public:
         Texture(Renderer &renderer);

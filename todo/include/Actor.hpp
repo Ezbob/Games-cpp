@@ -4,7 +4,7 @@
 #include <array>
 
 struct Actor {
-    std::array<double, 2> worldPos;
+    std::array<double, 2> worldPos = {0., 0.};
     bool isVisible = true;
 };
 

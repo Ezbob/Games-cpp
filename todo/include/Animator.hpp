@@ -43,11 +43,12 @@ public:
         initFrames();
     }
 
-    SpriteSheetAnimator(sdl2::Renderer &renderer, int sprite_width, int sprite_height, int framerate = 16) : 
-        spriteSheetTexture(renderer),
-        currentFrame(0), sprite_width(sprite_width),
-        sprite_height(sprite_height),
-        framerate(framerate) {
+    SpriteSheetAnimator(sdl2::Renderer &renderer, int sprite_width, int sprite_height, int framerate = 16) 
+        : spriteSheetTexture(renderer)
+        , currentFrame(0)
+        , sprite_width(sprite_width)
+        , sprite_height(sprite_height)
+        , framerate(framerate) {
 
         initFrames();
     }
@@ -80,7 +81,7 @@ public:
         flip = SDL_FLIP_NONE;
     }
 
-    void tick() {
+    void update() {
         if (is_running) {
             ++currentFrame;
 

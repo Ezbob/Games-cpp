@@ -8,7 +8,7 @@
 
 namespace sdl2 {
 
-    class Surface : public SharedContainerBase<Surface, SDL_Surface, SDL_FreeSurface> {
+    class Surface : public SharedContainerBase<SDL_Surface, SDL_FreeSurface> {
 
     public:
         Surface(SDL_Surface *surface);
@@ -16,7 +16,7 @@ namespace sdl2 {
 
         void loadBMP(std::string filename);
         void loadPNG(std::string filename);
-        void loadSolidText(std::string text, TTF_Font &font, SDL_Color color = {0, 0, 0});
+        void loadSolidText(std::string text, TTF_Font &font, SDL_Color color = {0, 0, 0, 0});
 
         int setKeyColor(int flags, uint32_t color);
 

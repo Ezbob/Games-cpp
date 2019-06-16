@@ -13,8 +13,6 @@ Renderer::Renderer(SDL_Window *window, int index, uint32_t rendererFlags) {
     CheckNullError<SDL_Renderer, SDL_GetError>(m_contained.get(), "Could not initialize renderer");
 }
 
-Renderer::Renderer() {}
-
 void Renderer::load(SDL_Window *window, int index, uint32_t rendererFlags) {
     m_contained = std::shared_ptr<SDL_Renderer>(SDL_CreateRenderer(window, index, rendererFlags), SDL_DestroyRenderer);
     m_window_parent = window;
@@ -49,6 +47,45 @@ void Renderer::updateScreen() const {
 
 bool Renderer::setColor(int r, int g, int b, int a) {
     return CheckError<SDL_GetError>(SDL_SetRenderDrawColor(m_contained.get(), r, g, b, a), "Could not set renderer color");
+}
+
+bool Renderer::setColor(sdl2::Colors color) {
+    uint8_t r = 0x0, g = 0x0, b = 0x0;
+
+    switch (color) {
+    case Colors::WHITE:
+        r = 0xff;
+        g = 0xff;
+        b = 0xff;
+        break;
+
+    case Colors::RED:
+        r = 0xff;
+        break;
+
+    case Colors::BLUE:
+        b = 0xff;
+        break;
+
+    case Colors::GREEN:
+        g = 0xff;
+        break;
+
+    case Colors::YELLOW:
+        r = 0xff;
+        g = 0xff;
+        break;
+
+    case Colors::CYAN:
+        g = 0xff;
+        b = 0xff;
+        break;
+
+    case Colors::BLACK:
+        break;
+    }
+
+    return CheckError<SDL_GetError>(SDL_SetRenderDrawColor(m_contained.get(), r, g, b, 0xff), "Could not set renderer color");
 }
 
 bool Renderer::drawRect(const SDL_Rect *fillRect) {

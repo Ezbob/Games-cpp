@@ -7,82 +7,67 @@
 #include "Tweening.hpp"
 #include <iostream>
 #include <stack>
+#include <array>
 
 
 const int SCREEN_WIDTH = 840;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_HEIGHT = 840;
 
 sdl2::Globals globals;
 sdl2::Window window;
 sdl2::Renderer renderer;
 
 
-const double MS_PER_UPDATE = 15.0;
+const double MS_PER_UPDATE = 16.0;
     // how much time the update step has been given (in ms)
     // this parameter has to be minimized, but if it is too small
     // then the game update (physics, AI, etc) will never catch up.
     // Also > 0 value
+const double dt = 1 / MS_PER_UPDATE;
 
 GameClock clock;
-
-struct Man : public Actor {
-    SpriteSheetAnimator<4, 1> spriteAnimation{renderer, 64, 205, 7};
-
-    double acceleration = 0.5;
-    double maxVelocity = 7.0;
-
-    double velocity[2] = { 0, 0 };
-
-    Man() {
-        worldPos[0] = 215.0;
-        worldPos[1] = 225.0;
-    }
-
-    void left() {
-        velocity[0] += acceleration;
-        worldPos[0] -= velocity[0];
-
-        spriteAnimation.unflip();
-        spriteAnimation.run();
-    }
-
-    void right() {
-        velocity[0] += acceleration;
-        worldPos[0] += velocity[0];
-
-        spriteAnimation.flipHorizontal();
-        spriteAnimation.run();
-    }
-
-    void stop() {
-        velocity[0] = std::min(1 / velocity[0], 0.0);
-
-        spriteAnimation.stop();
-        spriteAnimation.gotoFrame(0);
-    }
-
-    void update() {
-        velocity[0] = std::min(velocity[0], maxVelocity);
-        spriteAnimation.tick();
-    }
-
-    void render() {
-        spriteAnimation.render(worldPos[0], worldPos[1]);
-    }
-};
 
 struct FirstState : public GameState {
 
     sdl2::Texture background = renderer.createTexture();
-    Man manActor;
 
-    const uint8_t *key_state;
-    SDL_Event event;
+    const uint8_t *key_state = nullptr;
+    SDL_Event event = {0};
+
+    std::array<SDL_Rect, 64> rects = {{0, 0, 0, 0}};
+
+    SDL_Rect p = {40, 40, 60, 60};
+    Tweening2DPoint<double> pmove = Tweening2DPoint<double>({40., 40., 40., 40.});
+
+    bool is_down = false;
+    double dt = 0;
 
     void handleInput() override {
         while ( SDL_PollEvent(&event) != 0 ) {
             if ( event.type == SDL_QUIT ) {
                 globals.isPlaying = false;
+            } else if ( event.type == SDL_KEYDOWN ) {
+                SDL_Keycode code = event.key.keysym.sym;
+                auto repeat = event.key.repeat;
+
+                if ( !repeat ) {
+                    switch ( code ) {
+                        case SDLK_DOWN:
+                            pmove.yNext() += 100.;
+                            break;
+                        case SDLK_UP:
+                            pmove.yNext() -= 100.;
+                            break;
+                        case SDLK_LEFT:
+                            pmove.xNext() -= 100.;
+                            break;
+                        case SDLK_RIGHT:
+                            pmove.xNext() += 100.;
+                            break;
+                        default:
+                            break;
+                    }
+                }
             }
         }
         key_state = SDL_GetKeyboardState(nullptr);
@@ -93,35 +78,39 @@ struct FirstState : public GameState {
     }
 
     bool load() override {
-        background = sdl2::loadPNG(renderer, "assets/landscape.png");
-        manActor.spriteAnimation.load(sdl2::loadPNG(renderer, "assets/man.png"));
+        int i = 0, row = 8;
+        for (auto &r : rects) {
+            r.h = 100;
+            r.w = 100;
 
-        return background.isLoaded() && manActor.spriteAnimation.isLoaded();
+            r.x = r.w * (i % row) + 20;
+            r.y = r.h * (i / row) + 20;
+
+            i++;
+        }
+
+        return true;
     }
 
     void update() override {
 
-        if ( key_state[SDL_SCANCODE_LEFT] && key_state[SDL_SCANCODE_RIGHT] ) {
-            manActor.stop();
-        } else if ( key_state[SDL_SCANCODE_LEFT] ) {
-            manActor.left();
-        } else if ( key_state[SDL_SCANCODE_RIGHT] ) {
-            manActor.right();
-        } else {
-            manActor.stop();
-        }
-        manActor.update();
+        pmove.lerp(0.06);
+        pmove.fillRect(p);
     }
 
     void render() override {
-        background.render();
 
-        manActor.render();
+        renderer.setColor(sdl2::Colors::WHITE);
+        renderer.fillRect({0, 0, SCREEN_WIDTH, SCREEN_HEIGHT});
+
+        renderer.setColor(sdl2::Colors::BLACK);
+        renderer.drawRects(rects);
+
+        renderer.setColor(sdl2::Colors::GREEN);
+        renderer.fillRect(p);
 
         renderer.updateScreen();
     }
-
-    ~FirstState() = default;
 };
 
 bool init() {
@@ -130,15 +119,18 @@ bool init() {
     if ( globals.init(SDL_INIT_VIDEO | SDL_INIT_TIMER) ) {
         globals.loadExternLib(sdl2::ExternLibs::SDL_IMAGE, IMG_INIT_PNG);
         globals.loadExternLib(sdl2::ExternLibs::SDL_TTF);
-        window.loadWindow("SDL Tutorial",
+
+        window.loadWindow(
+            "SDL Tutorial",
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
             SCREEN_WIDTH,
             SCREEN_HEIGHT,
-            SDL_WINDOW_SHOWN);
+            SDL_WINDOW_SHOWN
+        );
 
-        renderer = window.getRenderer(-1, SDL_RENDERER_ACCELERATED);
-        renderer.setColor(0xFF, 0xFF, 0xFF, 0xFF);
+        renderer = window.getRenderer(SDL_RENDERER_ACCELERATED);
+        renderer.setColor(sdl2::Colors::BLACK);
     }
 
     result = globals.is_initialized && window.isLoaded();
@@ -171,7 +163,7 @@ int WinMain() {
             while ( globals.isPlaying && state->isPlaying ) {
                 state->handleInput();
 
-                while ( clock.lag >= MS_PER_UPDATE) {
+                while ( clock.lag >= MS_PER_UPDATE ) {
                     state->update();
                     clock.lag -= MS_PER_UPDATE;
                 }

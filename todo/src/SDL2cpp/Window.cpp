@@ -37,6 +37,6 @@ void Window::loadWindow(std::string windowName, int x, int y, int width, int hei
         "Window could not be loaded");
 }
 
-Renderer Window::getRenderer(int index, uint32_t rendererFlags) {
+Renderer Window::getRenderer(uint32_t rendererFlags, int index) {
     return Renderer(m_contained, index, rendererFlags);
 }

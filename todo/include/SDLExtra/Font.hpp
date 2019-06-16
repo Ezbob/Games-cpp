@@ -7,8 +7,7 @@
 
 namespace sdl2 {
 
-    class TTFFont : public ContainerBase<TTFFont, TTF_Font, TTF_CloseFont> {
-
+    class TTFFont : public ContainerBase<TTF_Font, TTF_CloseFont> {
     public:
         void loadTTF(const std::string filepath, int ptsize);
     };

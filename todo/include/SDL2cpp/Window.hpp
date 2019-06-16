@@ -10,7 +10,7 @@ namespace sdl2 {
 
     class Renderer;
 
-    class Window : public ContainerBase<Window, SDL_Window, SDL_DestroyWindow> {
+    class Window : public ContainerBase<SDL_Window, SDL_DestroyWindow> {
 
     public:
         Window(const char *title, int x, int y, int width, int height, uint32_t flags = SDL_WINDOW_SHOWN);
@@ -22,7 +22,7 @@ namespace sdl2 {
         Surface getSurface() const;
         bool updateScreen() const;
 
-        Renderer getRenderer(int index, uint32_t rendererFlags);
+        Renderer getRenderer(uint32_t rendererFlags, int index = -1);
 
     };
 }

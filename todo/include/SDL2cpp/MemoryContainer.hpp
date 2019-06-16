@@ -14,12 +14,11 @@ namespace sdl2 {
     * The SDL_Window type "inherites" from this base, because it is an incomplete type,
     * and Windows generally outlives most other object of a game. 
     */
-    template<class Derived, typename ContainedType, FreeingFunction_t<ContainedType> FreeingFunction>
+    template<typename ContainedType, FreeingFunction_t<ContainedType> FreeingFunction>
     class ContainerBase {
 
     protected:
         constexpr static FreeingFunction_t<ContainedType> freeingFunction = FreeingFunction;
-
         ContainedType *m_contained = nullptr;
 
     public:
@@ -49,7 +48,7 @@ namespace sdl2 {
         }
     };
 
-    template<class Derived, typename ContainedType, FreeingFunction_t<ContainedType> FreeingFunction>
+    template<typename ContainedType, FreeingFunction_t<ContainedType> FreeingFunction>
     class SharedContainerBase {
 
     protected:
@@ -57,6 +56,8 @@ namespace sdl2 {
         std::shared_ptr<ContainedType> m_contained = nullptr;
 
     public:
+        SharedContainerBase() = default;
+
         explicit operator ContainedType *() const {
             return m_contained.get();
         }
