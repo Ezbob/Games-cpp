@@ -23,7 +23,6 @@ const double MS_PER_UPDATE = 16.0;
     // this parameter has to be minimized, but if it is too small
     // then the game update (physics, AI, etc) will never catch up.
     // Also > 0 value
-const double dt = 1 / MS_PER_UPDATE;
 
 GameClock clock;
 
@@ -40,7 +39,6 @@ struct FirstState : public GameState {
     Tweening2DPoint<double> pmove = Tweening2DPoint<double>({40., 40., 40., 40.});
 
     bool is_down = false;
-    double dt = 0;
 
     void handleInput() override {
         while ( SDL_PollEvent(&event) != 0 ) {
@@ -53,16 +51,40 @@ struct FirstState : public GameState {
                 if ( !repeat ) {
                     switch ( code ) {
                         case SDLK_DOWN:
-                            pmove.yNext() += 100.;
+                            if (
+                                p.y <= (SCREEN_HEIGHT - 200)
+                            ) {
+                                pmove.yNext() += 100.;
+                            } else {
+                                pmove.y() += 20.;
+                            }
                             break;
                         case SDLK_UP:
-                            pmove.yNext() -= 100.;
+                            if (
+                                p.y >= p.h
+                            ) {
+                                pmove.yNext() -= 100.;
+                            } else {
+                                pmove.y() -= 20.;
+                            }
+                            break;
+                       case SDLK_RIGHT:
+                            if (
+                                p.x <= (SCREEN_WIDTH - 200)
+                            ) {
+                                pmove.xNext() += 100.;
+                            } else {
+                                pmove.x() += 20.;
+                            }
                             break;
                         case SDLK_LEFT:
-                            pmove.xNext() -= 100.;
-                            break;
-                        case SDLK_RIGHT:
-                            pmove.xNext() += 100.;
+                            if (
+                                p.x >= p.w
+                            ) {
+                                pmove.xNext() -= 100.;
+                            } else {
+                                pmove.x() -= 20.;
+                            }
                             break;
                         default:
                             break;
@@ -94,7 +116,7 @@ struct FirstState : public GameState {
 
     void update() override {
 
-        pmove.lerp(0.06);
+        pmove.lerp(0.16);
         pmove.fillRect(p);
     }
 
