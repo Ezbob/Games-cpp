@@ -8,51 +8,23 @@
 #include <functional>
 #include <array>
 
-template<typename T>
-class Tweening2DPoint {
-    T _data[4] = {0};
 
-public:
+struct Tweening2DPoint {
 
-    explicit Tweening2DPoint(const std::array<T, 4> &input) {
-        for (std::size_t i = 0; i < 4 ; ++i)
-            _data[i] = input[i];
-    }
+    double x = 0;
+    double y = 0;
+    double xNext = 0;
+    double yNext = 0;
 
-    explicit Tweening2DPoint(const T (&input)[4]) {
-        for (std::size_t i = 0; i < 4 ; ++i)
-            _data[i] = input[i];
-    }
-
-    T &operator [](std::size_t i) {
-        return _data[i];
-    }
-
-    T &xNext() {
-        return _data[1];
-    }
-
-    T &yNext() {
-        return _data[3];
-    }
-
-    T &x() {
-        return _data[0];
-    }
-
-    T &y() {
-        return _data[2];
-    }
-
-    void fillRect(SDL_Rect &rect) {
-        rect.x = _data[0];
-        rect.y = _data[2];
+    void fill(SDL_Rect &rect) {
+        rect.x = x;
+        rect.y = y;
     }
 
     void lerp(double f = 0) {
         double t = 1.0 - f;
-        _data[0] = _data[0] * t + _data[1] * f;
-        _data[2] = _data[2] * t + _data[3] * f;
+        x = x * t + xNext * f;
+        y = y * t + yNext * f;
     }
 };
 

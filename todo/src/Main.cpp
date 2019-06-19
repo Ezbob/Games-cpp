@@ -9,6 +9,11 @@
 #include <stack>
 #include <array>
 
+#if _WIN32
+    #define MAIN_NAME WinMain
+#else
+    #define MAIN_NAME main
+#endif
 
 const int SCREEN_WIDTH = 840;
 const int SCREEN_HEIGHT = 840;
@@ -36,9 +41,9 @@ struct FirstState : public GameState {
     std::array<SDL_Rect, 64> rects = {{0, 0, 0, 0}};
 
     SDL_Rect p = {40, 40, 60, 60};
-    Tweening2DPoint<double> pmove = Tweening2DPoint<double>({40., 40., 40., 40.});
+    Tweening2DPoint pmove = {40., 40., 40., 40.};
 
-    bool is_down = false;
+    int checkerRectDim = 100;
 
     void handleInput() override {
         while ( SDL_PollEvent(&event) != 0 ) {
@@ -52,38 +57,38 @@ struct FirstState : public GameState {
                     switch ( code ) {
                         case SDLK_DOWN:
                             if (
-                                p.y <= (SCREEN_HEIGHT - 200)
+                                p.y <= (SCREEN_HEIGHT - p.h - checkerRectDim)
                             ) {
-                                pmove.yNext() += 100.;
+                                pmove.yNext += checkerRectDim;
                             } else {
-                                pmove.y() += 20.;
+                                pmove.y += 20.;
                             }
                             break;
                         case SDLK_UP:
                             if (
                                 p.y >= p.h
                             ) {
-                                pmove.yNext() -= 100.;
+                                pmove.yNext -= checkerRectDim;
                             } else {
-                                pmove.y() -= 20.;
+                                pmove.y -= 20.;
                             }
                             break;
                        case SDLK_RIGHT:
                             if (
-                                p.x <= (SCREEN_WIDTH - 200)
+                                p.x <= (SCREEN_WIDTH - p.w - checkerRectDim)
                             ) {
-                                pmove.xNext() += 100.;
+                                pmove.xNext += checkerRectDim;
                             } else {
-                                pmove.x() += 20.;
+                                pmove.x += 20.;
                             }
                             break;
                         case SDLK_LEFT:
                             if (
                                 p.x >= p.w
                             ) {
-                                pmove.xNext() -= 100.;
+                                pmove.xNext -= checkerRectDim;
                             } else {
-                                pmove.x() -= 20.;
+                                pmove.x -= 20.;
                             }
                             break;
                         default:
@@ -102,8 +107,8 @@ struct FirstState : public GameState {
     bool load() override {
         int i = 0, row = 8;
         for (auto &r : rects) {
-            r.h = 100;
-            r.w = 100;
+            r.h = checkerRectDim;
+            r.w = checkerRectDim;
 
             r.x = r.w * (i % row) + 20;
             r.y = r.h * (i / row) + 20;
@@ -117,7 +122,7 @@ struct FirstState : public GameState {
     void update() override {
 
         pmove.lerp(0.16);
-        pmove.fillRect(p);
+        pmove.fill(p);
     }
 
     void render() override {
@@ -166,7 +171,7 @@ bool initStates(std::stack<std::shared_ptr<GameState>> &stack) {
     return true;
 }
 
-int WinMain() {
+int MAIN_NAME() {
 
     std::stack<std::shared_ptr<GameState>> gameStack;
 

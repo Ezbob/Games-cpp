@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 
 SET(EXEC "game")
 
-project(${EXEC})
+project("Game tutorial")
 set(${EXEC}_VERSION_MAJOR 0)
 set(${EXEC}_VERSION_MINOR 1)
 
