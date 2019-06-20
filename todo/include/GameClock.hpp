@@ -4,16 +4,17 @@
 #include "SDL.h"
 
 struct GameClock {
+    double msPerUpdate = 16.0;
     uint64_t now = SDL_GetPerformanceCounter();
     uint64_t last = 0;
-    double elapsed = 0.0;
-    double lag = 0.0;
+    double frameElapsed = 0.0;
+    double updateLag = 0.0;
 
     void tick() {
         last = now;
         now = SDL_GetPerformanceCounter();
-        elapsed = (now - last) * 1000 / (double) SDL_GetPerformanceFrequency();
-        lag += elapsed;
+        frameElapsed = ((now - last) * 1000) / (double) SDL_GetPerformanceFrequency();
+        updateLag += frameElapsed;
     }
 };
 

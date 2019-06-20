@@ -22,15 +22,6 @@ sdl2::Globals globals;
 sdl2::Window window;
 sdl2::Renderer renderer;
 
-
-const double MS_PER_UPDATE = 16.0;
-    // how much time the update step has been given (in ms)
-    // this parameter has to be minimized, but if it is too small
-    // then the game update (physics, AI, etc) will never catch up.
-    // Also > 0 value
-
-GameClock clock;
-
 struct FirstState : public GameState {
 
     sdl2::Texture background = renderer.createTexture();
@@ -48,7 +39,7 @@ struct FirstState : public GameState {
     void handleInput() override {
         while ( SDL_PollEvent(&event) != 0 ) {
             if ( event.type == SDL_QUIT ) {
-                globals.isPlaying = false;
+                isPlaying = false;
             } else if ( event.type == SDL_KEYDOWN ) {
                 SDL_Keycode code = event.key.keysym.sym;
                 auto repeat = event.key.repeat;
@@ -100,7 +91,7 @@ struct FirstState : public GameState {
         key_state = SDL_GetKeyboardState(nullptr);
 
         if ( key_state[SDL_SCANCODE_ESCAPE] ) {
-            globals.isPlaying = false;
+            isPlaying = false;
         }
     }
 
@@ -140,15 +131,17 @@ struct FirstState : public GameState {
     }
 };
 
-bool init() {
-    bool result = true;
+auto gameStateProcessor = GameStateProcessor::init([](GameStateStack &stack) {
+    stack.emplace(new FirstState());
+});
 
+bool sdlInit() {
     if ( globals.init(SDL_INIT_VIDEO | SDL_INIT_TIMER) ) {
         globals.loadExternLib(sdl2::ExternLibs::SDL_IMAGE, IMG_INIT_PNG);
         globals.loadExternLib(sdl2::ExternLibs::SDL_TTF);
 
         window.loadWindow(
-            "SDL Tutorial",
+            "Checkers game",
             SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOWPOS_UNDEFINED,
             SCREEN_WIDTH,
@@ -160,50 +153,16 @@ bool init() {
         renderer.setColor(sdl2::Colors::BLACK);
     }
 
-    result = globals.is_initialized && window.isLoaded();
-
-    return result;
-}
-
-bool initStates(std::stack<std::shared_ptr<GameState>> &stack) {
-    stack.emplace(new FirstState());
-
-    return true;
+    return globals.is_initialized && window.isLoaded();
 }
 
 int MAIN_NAME() {
 
-    std::stack<std::shared_ptr<GameState>> gameStack;
-
-    if ( !init() ) {
+    if ( !sdlInit() ) {
         return 1;
     }
 
-    if ( !initStates(gameStack) ) {
-        return 1;
-    }
-
-    while ( globals.isPlaying && !gameStack.empty() ) {
-        auto state = gameStack.top();
-
-        if ( state->load() ) {
-            while ( globals.isPlaying && state->isPlaying ) {
-                state->handleInput();
-
-                while ( clock.lag >= MS_PER_UPDATE ) {
-                    state->update();
-                    clock.lag -= MS_PER_UPDATE;
-                }
-
-                state->prerender();
-                state->render();
-
-                clock.tick();
-            }
-        }
-
-        gameStack.pop();
-    }
+    gameStateProcessor.processStates();
 
     return 0;
 }

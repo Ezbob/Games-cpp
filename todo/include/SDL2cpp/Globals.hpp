@@ -34,7 +34,6 @@ namespace sdl2 {
         uint32_t m_libs_set = 0;
         uint32_t m_flags_set = 0;
         bool is_initialized = false;
-        bool isPlaying = true;
     };
 }
 
