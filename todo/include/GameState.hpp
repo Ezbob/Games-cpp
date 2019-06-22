@@ -2,6 +2,7 @@
 #define HEADER_GUARD_a17e097f8bd12c4c14b2c994eb545006
 
 #include <stack>
+#include <array>
 #include <memory>
 #include <functional>
 #include "GameClock.hpp"
@@ -23,14 +24,14 @@ class GameStateProcessor {
     GameClock clock;
 
 public:
-    static GameStateProcessor init(std::function<void (GameStateStack &)> initFunction) {
+    static GameStateProcessor create(std::function<void (GameStateStack &)> initFunction) {
         GameStateProcessor gp;
         initFunction(gp.gameStates);
         return gp;
     }
 
-    static GameStateProcessor init() {
-        return GameStateProcessor();
+    void initStates(std::function<void (GameStateStack &)> initFunction) {
+        initFunction(gameStates);
     }
 
     void processStates() {

@@ -22,9 +22,12 @@ sdl2::Globals globals;
 sdl2::Window window;
 sdl2::Renderer renderer;
 
+GameStateProcessor gameStateProcessor;
+
 struct FirstState : public GameState {
 
     sdl2::Texture background = renderer.createTexture();
+    const GameClock *clock = gameStateProcessor.getClock();
 
     const uint8_t *key_state = nullptr;
     SDL_Event event = {0};
@@ -131,10 +134,6 @@ struct FirstState : public GameState {
     }
 };
 
-auto gameStateProcessor = GameStateProcessor::init([](GameStateStack &stack) {
-    stack.emplace(new FirstState());
-});
-
 bool sdlInit() {
     if ( globals.init(SDL_INIT_VIDEO | SDL_INIT_TIMER) ) {
         globals.loadExternLib(sdl2::ExternLibs::SDL_IMAGE, IMG_INIT_PNG);
@@ -161,6 +160,10 @@ int MAIN_NAME() {
     if ( !sdlInit() ) {
         return 1;
     }
+
+    gameStateProcessor.initStates([](auto &stack) {
+        stack.emplace(new FirstState());
+    });
 
     gameStateProcessor.processStates();
 
