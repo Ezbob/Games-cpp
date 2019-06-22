@@ -39,49 +39,49 @@ include rules.ninja
 build cmake_object_order_depends_target_game: phony || CMakeFiles/game.dir
 build CMakeFiles/game.dir/src/Main.cpp.obj: CXX_COMPILER__game src/Main.cpp || cmake_object_order_depends_target_game
   DEP_FILE = CMakeFiles\game.dir\src\Main.cpp.obj.d
-  FLAGS = -g -Wall -Wextra -g
+  FLAGS = -g -Wall -Wextra -g   -std=gnu++17
   INCLUDES = -Ilibs/SDL2-2.0.9/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_image-2.0.4/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include/SDL2 -Iinclude
   OBJECT_DIR = CMakeFiles\game.dir
   OBJECT_FILE_DIR = CMakeFiles\game.dir\src
 build CMakeFiles/game.dir/src/SDL2cpp/AssetLoading.cpp.obj: CXX_COMPILER__game src/SDL2cpp/AssetLoading.cpp || cmake_object_order_depends_target_game
   DEP_FILE = CMakeFiles\game.dir\src\SDL2cpp\AssetLoading.cpp.obj.d
-  FLAGS = -g -Wall -Wextra -g
+  FLAGS = -g -Wall -Wextra -g   -std=gnu++17
   INCLUDES = -Ilibs/SDL2-2.0.9/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_image-2.0.4/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include/SDL2 -Iinclude
   OBJECT_DIR = CMakeFiles\game.dir
   OBJECT_FILE_DIR = CMakeFiles\game.dir\src\SDL2cpp
 build CMakeFiles/game.dir/src/SDL2cpp/Renderer.cpp.obj: CXX_COMPILER__game src/SDL2cpp/Renderer.cpp || cmake_object_order_depends_target_game
   DEP_FILE = CMakeFiles\game.dir\src\SDL2cpp\Renderer.cpp.obj.d
-  FLAGS = -g -Wall -Wextra -g
+  FLAGS = -g -Wall -Wextra -g   -std=gnu++17
   INCLUDES = -Ilibs/SDL2-2.0.9/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_image-2.0.4/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include/SDL2 -Iinclude
   OBJECT_DIR = CMakeFiles\game.dir
   OBJECT_FILE_DIR = CMakeFiles\game.dir\src\SDL2cpp
 build CMakeFiles/game.dir/src/SDL2cpp/Texture.cpp.obj: CXX_COMPILER__game src/SDL2cpp/Texture.cpp || cmake_object_order_depends_target_game
   DEP_FILE = CMakeFiles\game.dir\src\SDL2cpp\Texture.cpp.obj.d
-  FLAGS = -g -Wall -Wextra -g
+  FLAGS = -g -Wall -Wextra -g   -std=gnu++17
   INCLUDES = -Ilibs/SDL2-2.0.9/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_image-2.0.4/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include/SDL2 -Iinclude
   OBJECT_DIR = CMakeFiles\game.dir
   OBJECT_FILE_DIR = CMakeFiles\game.dir\src\SDL2cpp
 build CMakeFiles/game.dir/src/SDL2cpp/Window.cpp.obj: CXX_COMPILER__game src/SDL2cpp/Window.cpp || cmake_object_order_depends_target_game
   DEP_FILE = CMakeFiles\game.dir\src\SDL2cpp\Window.cpp.obj.d
-  FLAGS = -g -Wall -Wextra -g
+  FLAGS = -g -Wall -Wextra -g   -std=gnu++17
   INCLUDES = -Ilibs/SDL2-2.0.9/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_image-2.0.4/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include/SDL2 -Iinclude
   OBJECT_DIR = CMakeFiles\game.dir
   OBJECT_FILE_DIR = CMakeFiles\game.dir\src\SDL2cpp
 build CMakeFiles/game.dir/src/SDL2cpp/Surface.cpp.obj: CXX_COMPILER__game src/SDL2cpp/Surface.cpp || cmake_object_order_depends_target_game
   DEP_FILE = CMakeFiles\game.dir\src\SDL2cpp\Surface.cpp.obj.d
-  FLAGS = -g -Wall -Wextra -g
+  FLAGS = -g -Wall -Wextra -g   -std=gnu++17
   INCLUDES = -Ilibs/SDL2-2.0.9/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_image-2.0.4/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include/SDL2 -Iinclude
   OBJECT_DIR = CMakeFiles\game.dir
   OBJECT_FILE_DIR = CMakeFiles\game.dir\src\SDL2cpp
 build CMakeFiles/game.dir/src/SDL2cpp/Globals.cpp.obj: CXX_COMPILER__game src/SDL2cpp/Globals.cpp || cmake_object_order_depends_target_game
   DEP_FILE = CMakeFiles\game.dir\src\SDL2cpp\Globals.cpp.obj.d
-  FLAGS = -g -Wall -Wextra -g
+  FLAGS = -g -Wall -Wextra -g   -std=gnu++17
   INCLUDES = -Ilibs/SDL2-2.0.9/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_image-2.0.4/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include/SDL2 -Iinclude
   OBJECT_DIR = CMakeFiles\game.dir
   OBJECT_FILE_DIR = CMakeFiles\game.dir\src\SDL2cpp
 build CMakeFiles/game.dir/src/SDLExtra/Font.cpp.obj: CXX_COMPILER__game src/SDLExtra/Font.cpp || cmake_object_order_depends_target_game
   DEP_FILE = CMakeFiles\game.dir\src\SDLExtra\Font.cpp.obj.d
-  FLAGS = -g -Wall -Wextra -g
+  FLAGS = -g -Wall -Wextra -g   -std=gnu++17
   INCLUDES = -Ilibs/SDL2-2.0.9/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_image-2.0.4/x86_64-w64-mingw32/include/SDL2 -Ilibs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include/SDL2 -Iinclude
   OBJECT_DIR = CMakeFiles\game.dir
   OBJECT_FILE_DIR = CMakeFiles\game.dir\src\SDLExtra
