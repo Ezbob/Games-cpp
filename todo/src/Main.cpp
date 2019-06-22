@@ -40,11 +40,12 @@ struct FirstState : public GameState {
     int checkerRectDim = 100;
 
     void handleInput() override {
+        int x, y;
         while ( SDL_PollEvent(&event) != 0 ) {
             if ( event.type == SDL_QUIT ) {
                 isPlaying = false;
             } else if ( event.type == SDL_KEYDOWN ) {
-                SDL_Keycode code = event.key.keysym.sym;
+                auto code = event.key.keysym.sym;
                 auto repeat = event.key.repeat;
 
                 if ( !repeat ) {
@@ -87,6 +88,19 @@ struct FirstState : public GameState {
                             break;
                         default:
                             break;
+                    }
+                }
+            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                auto mouseButtonState = SDL_GetMouseState(&x, &y);
+                if ( mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT) ) {
+                    for (auto rect : rects) {
+                        
+                        if ( (rect.x <= x && x <= rect.x + rect.w) &&
+                             (rect.y <= y && y <= rect.y + rect.h) 
+                        ) {
+                            pmove.xNext = rect.x + 20;
+                            pmove.yNext = rect.y + 20;
+                        }
                     }
                 }
             }
