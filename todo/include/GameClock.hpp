@@ -13,7 +13,7 @@ struct GameClock {
     void tick() {
         last = now;
         now = SDL_GetPerformanceCounter();
-        frameElapsed = ((now - last) * 1000) / (double) SDL_GetPerformanceFrequency();
+        frameElapsed = ((now - last) * 1000) / static_cast<double>(SDL_GetPerformanceFrequency());
         updateLag += frameElapsed;
     }
 };
