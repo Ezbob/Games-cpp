@@ -8,7 +8,6 @@ data = {
     "R": ([], "Render time"),
     "U": ([], "Update time"),
     "I": ([], "Input time"),
-    "L": ([], "Load time")
 }
 
 def parse(openedfile):

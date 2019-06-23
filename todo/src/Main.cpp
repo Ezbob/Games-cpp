@@ -3,7 +3,6 @@
 #include "Animator.hpp"
 #include "GameState.hpp"
 #include "GameClock.hpp"
-#include "Actor.hpp"
 #include "Tweening.hpp"
 #include <iostream>
 #include <stack>

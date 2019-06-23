@@ -7,6 +7,10 @@
 #include <functional>
 #include "GameClock.hpp"
 
+#if _STATS
+    #define _STATS_MS_DIFF(starttime) static_cast<double>(((SDL_GetPerformanceCounter() - starttime) * 1000) / static_cast<double>(SDL_GetPerformanceFrequency()))
+#endif
+
 struct GameState {
     virtual ~GameState() {};
     virtual void handleInput() = 0;
@@ -40,17 +44,17 @@ public:
         #endif
 
         while ( !gameStates.empty() ) {
-
-            if ( auto state = gameStates.top(); state->load() ) {
+            auto state = gameStates.top();
+            if (  state->load() ) {
                 while ( state->isPlaying ) {
                     #if _STATS
-                    auto istart =  SDL_GetPerformanceCounter();
+                    auto istart = SDL_GetPerformanceCounter();
                     #endif
 
                     state->handleInput();
 
                     #if _STATS
-                    itime = (double) ((SDL_GetPerformanceCounter() - istart) * 1000) / (double) SDL_GetPerformanceFrequency();
+                    itime = _STATS_MS_DIFF(istart);
                     auto ustart = SDL_GetPerformanceCounter();
                     #endif
 
@@ -60,14 +64,14 @@ public:
                     }
 
                     #if _STATS
-                    utime = (double) ((SDL_GetPerformanceCounter() - ustart) * 1000) / (double) SDL_GetPerformanceFrequency();
+                    utime = _STATS_MS_DIFF(ustart);
                     auto rstart = SDL_GetPerformanceCounter();
                     #endif
 
                     state->render();
 
                     #if _STATS
-                    rtime = (double) ((SDL_GetPerformanceCounter() - rstart) * 1000) / (double) SDL_GetPerformanceFrequency();
+                    rtime = _STATS_MS_DIFF(rstart);
                     #endif
 
                     clock.tick();

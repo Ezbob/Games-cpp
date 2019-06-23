@@ -9,7 +9,7 @@ set(${EXEC}_VERSION_MINOR 1)
 set(CMAKE_CXX_STANDARD 17)
 
 set(STATS_ENV "")
-if($ENV{ENABLED_STATS})
+if($ENV{ENABLE_STATS})
     set(STATS_ENV "-D_STATS")
 endif()
 
