@@ -22,7 +22,7 @@ sdl2::Globals globals;
 sdl2::Window window;
 sdl2::Renderer renderer;
 
-GameStateProcessor gameStateProcessor;
+GameStateProcessor gameStateProcessor { 18. };
 
 struct FirstState : public GameState {
 
@@ -39,8 +39,11 @@ struct FirstState : public GameState {
 
     int checkerRectDim = 100;
 
+    bool has_clicked = false;
+    int x, y;
+
     void handleInput() override {
-        int x, y;
+
         while ( SDL_PollEvent(&event) != 0 ) {
             if ( event.type == SDL_QUIT ) {
                 isPlaying = false;
@@ -94,12 +97,12 @@ struct FirstState : public GameState {
                 auto mouseButtonState = SDL_GetMouseState(&x, &y);
                 if ( mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT) ) {
                     for (auto rect : rects) {
-                        
                         if ( (rect.x <= x && x <= rect.x + rect.w) &&
-                             (rect.y <= y && y <= rect.y + rect.h) 
+                                (rect.y <= y && y <= rect.y + rect.h)
                         ) {
                             pmove.xNext = rect.x + 20;
                             pmove.yNext = rect.y + 20;
+                            has_clicked = true;
                         }
                     }
                 }
@@ -129,12 +132,11 @@ struct FirstState : public GameState {
 
     void update() override {
 
-        pmove.lerp(0.16);
+        pmove.lerp(0.06);
         pmove.fill(p);
     }
 
     void render() override {
-
         renderer.setColor(sdl2::Colors::WHITE);
         renderer.fillRect({0, 0, SCREEN_WIDTH, SCREEN_HEIGHT});
 
@@ -162,8 +164,9 @@ bool sdlInit() {
             SDL_WINDOW_SHOWN
         );
 
-        renderer = window.getRenderer(SDL_RENDERER_ACCELERATED);
-        renderer.setColor(sdl2::Colors::BLACK);
+        renderer = window.getRenderer(0);
+
+        renderer.setColor(sdl2::Colors::WHITE);
     }
 
     return globals.is_initialized && window.isLoaded();

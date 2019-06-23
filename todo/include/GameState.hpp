@@ -24,10 +24,8 @@ class GameStateProcessor {
     GameClock clock;
 
 public:
-    static GameStateProcessor create(std::function<void (GameStateStack &)> initFunction) {
-        GameStateProcessor gp;
-        initFunction(gp.gameStates);
-        return gp;
+    GameStateProcessor(double msPerFrame = 16.) {
+        clock.msPerUpdate = msPerFrame;
     }
 
     void initStates(std::function<void (GameStateStack &)> initFunction) {
@@ -35,20 +33,52 @@ public:
     }
 
     void processStates() {
+        #if _STATS
+        double rtime = 0.0;
+        double utime = 0.0;
+        double itime = 0.0;
+        #endif
+
         while ( !gameStates.empty() ) {
 
             if ( auto state = gameStates.top(); state->load() ) {
                 while ( state->isPlaying ) {
+                    #if _STATS
+                    auto istart =  SDL_GetPerformanceCounter();
+                    #endif
+
                     state->handleInput();
 
-                    while ( clock.updateLag >= clock.msPerUpdate ) {
+                    #if _STATS
+                    itime = (double) ((SDL_GetPerformanceCounter() - istart) * 1000) / (double) SDL_GetPerformanceFrequency();
+                    auto ustart = SDL_GetPerformanceCounter();
+                    #endif
+
+                    while ( clock.updateLag >= clock.msPerUpdate ) {   
                         state->update();
                         clock.updateLag -= clock.msPerUpdate;
                     }
 
+                    #if _STATS
+                    utime = (double) ((SDL_GetPerformanceCounter() - ustart) * 1000) / (double) SDL_GetPerformanceFrequency();
+                    auto rstart = SDL_GetPerformanceCounter();
+                    #endif
+
                     state->render();
 
+                    #if _STATS
+                    rtime = (double) ((SDL_GetPerformanceCounter() - rstart) * 1000) / (double) SDL_GetPerformanceFrequency();
+                    #endif
+
                     clock.tick();
+
+                    #if _STATS
+                    std::cout <<
+                        "I " << itime << "\n" <<
+                        "U " << utime << "\n" <<
+                        "R " << rtime << "\n" <<
+                        "F " << clock.frameElapsed << "\n";
+                    #endif
                 }
             }
 
