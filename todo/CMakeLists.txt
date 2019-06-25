@@ -1,11 +1,9 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.14)
 
 project("game")
 
-SET(EXEC ${PROJECT_NAME})
-
-set(${EXEC}_VERSION_MAJOR 0)
-set(${EXEC}_VERSION_MINOR 1)
+set(${PROJECT_NAME}_VERSION_MAJOR 0)
+set(${PROJECT_NAME}_VERSION_MINOR 1)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -36,9 +34,9 @@ set(INCLUDE_DIRS
     "${PROJECT_SOURCE_DIR}/include"
 )
 
-add_executable(${EXEC} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_include_directories(${EXEC} PRIVATE ${INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
 
 if(WIN32)
 # I use the gcc toolchain even on windows
@@ -64,24 +62,24 @@ if(WIN32)
       SDL2_ttf
      )
 
-  target_link_directories(${EXEC} PRIVATE ${SDL_LINK_DIRS})
-  target_link_libraries(${EXEC} PRIVATE ${SDL_LIBS})
-  target_include_directories(${EXEC} PRIVATE ${SDL_INCLUDE_DIRS})
+  target_link_directories(${PROJECT_NAME} PRIVATE ${SDL_LINK_DIRS})
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL_LIBS})
+  target_include_directories(${PROJECT_NAME} PRIVATE ${SDL_INCLUDE_DIRS})
 
 else()
 # on ubuntu we use the cmake modules to find the libraries and the header include dirs
 
   find_package(SDL2 REQUIRED)
   target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_INCLUDE_DIRS})
-  target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_LIBRARIES})
 
   find_package(SDL2_image REQUIRED)
   target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_IMAGE_INCLUDE_DIRS})
-  target_link_libraries(${PROJECT_NAME} ${SDL2_IMAGE_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_IMAGE_LIBRARIES})
 
   find_package(SDL2_ttf REQUIRED)
   target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_TTF_INCLUDE_DIRS})
-  target_link_libraries(${PROJECT_NAME} ${SDL2_TTF_LIBRARIES})
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_TTF_LIBRARIES})
 
 endif(WIN32)
 
