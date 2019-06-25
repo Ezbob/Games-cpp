@@ -1,8 +1,8 @@
 #ifndef HEADER_GUARD_ae78126d2bc5ee4610e84cb0f11eac44
 #define HEADER_GUARD_ae78126d2bc5ee4610e84cb0f11eac44
 
-#include "SDL.h"
-#include "SDL_ttf.h"
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_ttf.h"
 #include <memory>
 #include "SDL2cpp/MemoryContainer.hpp"
 

@@ -1,7 +1,7 @@
 #ifndef HEADER_GUARD_aed9ee4c025f13329af83560b1a51946
 #define HEADER_GUARD_aed9ee4c025f13329af83560b1a51946
 
-#include "SDL.h"
+#include "SDL2/SDL.h"
 #include <iostream>
 
 namespace sdl2 {

@@ -3,7 +3,7 @@
 
 // Forward header for the main SDL wrapper stuff
 
-#include "SDL.h"
+#include "SDL2/SDL.h"
 
 #include "SDL2cpp/Globals.hpp"
 #include "SDL2cpp/Window.hpp"

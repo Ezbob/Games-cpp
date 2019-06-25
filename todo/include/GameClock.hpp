@@ -1,7 +1,7 @@
 #ifndef HEADER_GUARD_6406329bbe77dff507947b3443ad5aa2
 #define HEADER_GUARD_6406329bbe77dff507947b3443ad5aa2
 
-#include "SDL.h"
+#include "SDL2/SDL.h"
 
 struct GameClock {
     double msPerUpdate = 16.0;

@@ -1,4 +1,4 @@
-#include "SDL.h"
+#include "SDL2/SDL.h"
 #include "SDL2cpp/Texture.hpp"
 #include <memory>
 

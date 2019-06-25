@@ -2,7 +2,7 @@
 #define HEADER_GUARD_08570ec71d9036246ac3d05623b1f7bb
 
 #include "ErrorCheck.hpp"
-#include "SDL.h"
+#include "SDL2/SDL.h"
 #include "Surface.hpp"
 #include "SDL2cpp/MemoryContainer.hpp"
 

@@ -1,7 +1,7 @@
 #ifndef HEADER_GUARD_d69be7fb91c8ba1ea03207db1b3d944a
 #define HEADER_GUARD_d69be7fb91c8ba1ea03207db1b3d944a
 
-#include "SDL.h"
+#include "SDL2/SDL.h"
 #include <iostream>
 #include <limits>
 #include <type_traits>

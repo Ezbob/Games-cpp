@@ -4,7 +4,7 @@
 
 #include <cstddef>
 #include <array>
-#include "SDL.h"
+#include "SDL2/SDL.h"
 
 template<std::size_t N>
 class Position2DKDTree {

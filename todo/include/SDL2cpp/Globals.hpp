@@ -1,9 +1,9 @@
 #ifndef HEADER_GUARD_7f5035ba17841c33d97ad3913dd17572
 #define HEADER_GUARD_7f5035ba17841c33d97ad3913dd17572
 
-#include "SDL.h"
-#include "SDL_image.h"
-#include "SDL_ttf.h"
+#include "SDL2/SDL.h"
+#include "SDL2/SDL_image.h"
+#include "SDL2/SDL_ttf.h"
 #include <cstddef>
 
 namespace sdl2 {

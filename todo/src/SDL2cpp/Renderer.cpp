@@ -1,7 +1,7 @@
 #include "SDL2cpp/Renderer.hpp"
 #include "SDL2cpp/Texture.hpp"
 #include "SDL2cpp/ErrorCheck.hpp"
-#include "SDL.h"
+#include "SDL2/SDL.h"
 #include <memory>
 
 using namespace sdl2;

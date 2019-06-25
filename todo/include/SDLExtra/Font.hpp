@@ -1,7 +1,7 @@
 #ifndef HEADER_GUARD_9d0f70840337db3e8dfc9f59e0796fbd
 #define HEADER_GUARD_9d0f70840337db3e8dfc9f59e0796fbd
 
-#include "SDL_ttf.h"
+#include "SDL2/SDL_ttf.h"
 #include "SDL2cpp/MemoryContainer.hpp"
 #include <string>
 

@@ -1,6 +1,6 @@
 #include "SDLExtra/Font.hpp"
 #include "SDL2cpp/ErrorCheck.hpp"
-#include "SDL_ttf.h"
+#include "SDL2/SDL_ttf.h"
 
 using namespace sdl2;
 
