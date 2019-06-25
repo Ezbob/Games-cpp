@@ -1,8 +1,8 @@
 #ifndef HEADER_GUARD_7438d22a99cec6e2475b167f3b35a0c3
 #define HEADER_GUARD_7438d22a99cec6e2475b167f3b35a0c3
 
-#include "sdl2cpp/Texture.hpp"
-#include "sdl2cpp/Renderer.hpp"
+#include "SDL2cpp/Texture.hpp"
+#include "SDL2cpp/Renderer.hpp"
 
 namespace sdl2 {
 

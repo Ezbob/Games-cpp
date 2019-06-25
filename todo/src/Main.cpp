@@ -7,6 +7,7 @@
 #include <iostream>
 #include <stack>
 #include <array>
+#include "Kdtree.hpp"
 
 #if _WIN32
     #define MAIN_NAME WinMain
