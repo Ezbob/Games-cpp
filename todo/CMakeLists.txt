@@ -1,9 +1,10 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.12)
 
-project("game")
-
-set(${PROJECT_NAME}_VERSION_MAJOR 0)
-set(${PROJECT_NAME}_VERSION_MINOR 1)
+project("game"
+    VERSION 0.1
+    DESCRIPTION "A trying out SDL"
+    LANGUAGES CXX
+)
 
 set(CMAKE_CXX_STANDARD 17)
 
