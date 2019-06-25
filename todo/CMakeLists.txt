@@ -14,6 +14,7 @@ if($ENV{ENABLE_STATS})
     set(STATS_ENV "-D_STATS")
 endif()
 
+# Also look for Find-cmake modules here
 LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${STATS_ENV} -Wall -Wextra -g")
@@ -40,6 +41,8 @@ add_executable(${EXEC} ${SOURCES})
 target_include_directories(${EXEC} PRIVATE ${INCLUDE_DIRS})
 
 if(WIN32)
+# I use the gcc toolchain even on windows
+# so this branch just checks for the included libs
   set(SDL_INCLUDE_DIRS
       "${PROJECT_SOURCE_DIR}/libs/SDL2-2.0.9/x86_64-w64-mingw32/include"
       "${PROJECT_SOURCE_DIR}/libs/SDL2_image-2.0.4/x86_64-w64-mingw32/include"
@@ -66,18 +69,16 @@ if(WIN32)
   target_include_directories(${EXEC} PRIVATE ${SDL_INCLUDE_DIRS})
 
 else()
+# on ubuntu we use the cmake modules to find the libraries and the header include dirs
 
-  # Find and link SDL2
   find_package(SDL2 REQUIRED)
   target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_INCLUDE_DIRS})
   target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARIES})
 
-  # Find and link SDL2_image
   find_package(SDL2_image REQUIRED)
   target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_IMAGE_INCLUDE_DIRS})
   target_link_libraries(${PROJECT_NAME} ${SDL2_IMAGE_LIBRARIES})
 
-  # Find and link SDL2_gfx
   find_package(SDL2_ttf REQUIRED)
   target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_TTF_INCLUDE_DIRS})
   target_link_libraries(${PROJECT_NAME} ${SDL2_TTF_LIBRARIES})
