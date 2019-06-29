@@ -8,13 +8,16 @@ project("game"
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(STATS_ENV "")
-if($ENV{ENABLE_STATS})
+if(${ENABLE_STATS})
     set(STATS_ENV "-D_STATS")
+elseif($ENV{ENABLE_STATS})
+    set(STATS_ENV "-D_STATS")
+else()
+    set(STATS_ENV "")
 endif()
 
 # Also look for Find-cmake modules here
-LIST(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/sdl2")
+set(CMAKE_MODULE_PATH  ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/sdl2")
 
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${STATS_ENV} -Wall -Wextra -g")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
