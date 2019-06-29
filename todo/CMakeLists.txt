@@ -43,47 +43,47 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDE_DIRS})
 
 if(WIN32)
-# I use the gcc toolchain even on windows
-# so this branch just checks for the included libs
-  set(SDL_INCLUDE_DIRS
-      "${PROJECT_SOURCE_DIR}/libs/SDL2-2.0.9/x86_64-w64-mingw32/include"
-      "${PROJECT_SOURCE_DIR}/libs/SDL2_image-2.0.4/x86_64-w64-mingw32/include"
-      "${PROJECT_SOURCE_DIR}/libs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include"
-      "${PROJECT_SOURCE_DIR}/libs/SDL2-2.0.9/x86_64-w64-mingw32/include/SDL2"
-      "${PROJECT_SOURCE_DIR}/libs/SDL2_image-2.0.4/x86_64-w64-mingw32/include/SDL2"
-      "${PROJECT_SOURCE_DIR}/libs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include/SDL2"
-     )
+    # I use the gcc toolchain even on windows
+    # so this branch just checks for the included libs
+    set(SDL_INCLUDE_DIRS
+        "${PROJECT_SOURCE_DIR}/libs/SDL2-2.0.9/x86_64-w64-mingw32/include"
+        "${PROJECT_SOURCE_DIR}/libs/SDL2_image-2.0.4/x86_64-w64-mingw32/include"
+        "${PROJECT_SOURCE_DIR}/libs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include"
+        "${PROJECT_SOURCE_DIR}/libs/SDL2-2.0.9/x86_64-w64-mingw32/include/SDL2"
+        "${PROJECT_SOURCE_DIR}/libs/SDL2_image-2.0.4/x86_64-w64-mingw32/include/SDL2"
+        "${PROJECT_SOURCE_DIR}/libs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include/SDL2"
+    )
 
-  set(SDL_LINK_DIRS
-      "${PROJECT_SOURCE_DIR}/libs/SDL2-2.0.9/x86_64-w64-mingw32/lib"
-      "${PROJECT_SOURCE_DIR}/libs/SDL2_image-2.0.4/x86_64-w64-mingw32/lib"
-      "${PROJECT_SOURCE_DIR}/libs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/lib"
-     )
+    set(SDL_LINK_DIRS
+        "${PROJECT_SOURCE_DIR}/libs/SDL2-2.0.9/x86_64-w64-mingw32/lib"
+        "${PROJECT_SOURCE_DIR}/libs/SDL2_image-2.0.4/x86_64-w64-mingw32/lib"
+        "${PROJECT_SOURCE_DIR}/libs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/lib"
+    )
 
-  SET(SDL_LIBS
-      SDL2
-      SDL2_image
-      SDL2_ttf
-     )
+    set(SDL_LIBS
+        SDL2
+        SDL2_image
+        SDL2_ttf
+    )
 
-  target_link_directories(${PROJECT_NAME} PRIVATE ${SDL_LINK_DIRS})
-  target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL_LIBS})
-  target_include_directories(${PROJECT_NAME} PRIVATE ${SDL_INCLUDE_DIRS})
+    target_link_directories(${PROJECT_NAME} PRIVATE ${SDL_LINK_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL_LIBS})
+    target_include_directories(${PROJECT_NAME} PRIVATE ${SDL_INCLUDE_DIRS})
 
 else()
-# on ubuntu we use the cmake modules to find the libraries and the header include dirs
+    # on ubuntu we use the cmake modules to find the libraries and the header include dirs
 
-  find_package(SDL2 REQUIRED)
-  target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_INCLUDE_DIRS})
-  target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_LIBRARIES})
+    find_package(SDL2 REQUIRED)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_LIBRARIES})
 
-  find_package(SDL2_image REQUIRED)
-  target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_IMAGE_INCLUDE_DIRS})
-  target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_IMAGE_LIBRARIES})
+    find_package(SDL2_image REQUIRED)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_IMAGE_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_IMAGE_LIBRARIES})
 
-  find_package(SDL2_ttf REQUIRED)
-  target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_TTF_INCLUDE_DIRS})
-  target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_TTF_LIBRARIES})
+    find_package(SDL2_ttf REQUIRED)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${SDL2_TTF_INCLUDE_DIRS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL2_TTF_LIBRARIES})
 
 endif(WIN32)
 

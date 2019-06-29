@@ -14,7 +14,7 @@ release: $(BUILD_DIR_RELEASE)
 
 $(BUILD_DIR_DEBUG):
 	@mkdir -p $@
-	@cd $@ && cmake -DCMAKE_BUILD_TYPE=Debug -G ${BUILD_TOOL_CMAKE} ../../
+	@cd $@ && cmake -DCMAKE_BUILD_TYPE=Debug -DENABLE_STATS=1 -G ${BUILD_TOOL_CMAKE} ../../
 
 $(BUILD_DIR_RELEASE):
 	@mkdir -p $@
