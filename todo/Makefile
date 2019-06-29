@@ -1,24 +1,30 @@
 BUILD_TOOL=ninja
 BUILD_TOOL_CMAKE="Ninja"
-BUILD_DIR=build
+BUILD_DIR_PREFIX=build
+BUILD_DIR_RELEASE=${BUILD_DIR_PREFIX}/release
+BUILD_DIR_DEBUG=${BUILD_DIR_PREFIX}/debug
 
-CMAKE_VARS=
+all: debug
 
-.PHONY: all _build clean statsbuild
-
-all: _build
-
-_build: $(BUILD_DIR)
+debug: $(BUILD_DIR_DEBUG)
 	@cd $^ && ${BUILD_TOOL}
 
-$(BUILD_DIR):
+release: $(BUILD_DIR_RELEASE)
+	@cd $^ && ${BUILD_TOOL}
+
+$(BUILD_DIR_DEBUG):
 	@mkdir -p $@
-	@cd $(BUILD_DIR) && cmake -G ${BUILD_TOOL_CMAKE} ..
+	@cd $@ && cmake -DCMAKE_BUILD_TYPE=Debug -G ${BUILD_TOOL_CMAKE} ../../
+
+$(BUILD_DIR_RELEASE):
+	@mkdir -p $@
+	@cd $@ && cmake -DCMAKE_BUILD_TYPE=Release -G ${BUILD_TOOL_CMAKE} ../../
 
 clean:
-	$(RM) -rf ${BUILD_DIR}
+	$(RM) -rf ${BUILD_DIR_PREFIX}
 
 help:
 	@echo "Available targets:"
-	@echo "  - all: Builds binaries in the '${BUILD_DIR}' directory"
-	@echo "  - clean: Removes the '${BUILD_DIR}' directory"
+	@echo "  - release: Builds release binaries in the '${BUILD_DIR_RELEASE}' directory"
+	@echo "  - debug: Builds debug binaries in the '${BUILD_DIR_DEBUG}' directory"
+	@echo "  - clean: Removes the build directories"
