@@ -22,7 +22,7 @@ namespace sdl2 {
         Surface getSurface() const;
         bool updateScreen() const;
 
-        Renderer getRenderer(uint32_t rendererFlags, int index = -1);
+        Renderer getRenderer(uint32_t rendererFlags = 0, int index = -1);
 
     };
 }

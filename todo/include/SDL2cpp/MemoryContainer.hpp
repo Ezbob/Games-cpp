@@ -8,17 +8,17 @@
 namespace sdl2 {
 
     template<typename T>
-    using FreeingFunction_t = void (*)(T *);
+    using FreeingFunctionType = void (*)(T *);
 
     /*
     * The SDL_Window type "inherites" from this base, because it is an incomplete type,
     * and Windows generally outlives most other object of a game. 
     */
-    template<typename ContainedType, FreeingFunction_t<ContainedType> FreeingFunction>
+    template<typename ContainedType, FreeingFunctionType<ContainedType> FreeingFunction>
     class ContainerBase {
 
     protected:
-        constexpr static FreeingFunction_t<ContainedType> freeingFunction = FreeingFunction;
+        constexpr static FreeingFunctionType<ContainedType> freeingFunction = FreeingFunction;
         ContainedType *m_contained = nullptr;
 
     public:
@@ -48,11 +48,11 @@ namespace sdl2 {
         }
     };
 
-    template<typename ContainedType, FreeingFunction_t<ContainedType> FreeingFunction>
+    template<typename ContainedType, FreeingFunctionType<ContainedType> FreeingFunction>
     class SharedContainerBase {
 
     protected:
-        constexpr static FreeingFunction_t<ContainedType> freeingFunction = FreeingFunction;
+        constexpr static FreeingFunctionType<ContainedType> freeingFunction = FreeingFunction;
         std::shared_ptr<ContainedType> m_contained = nullptr;
 
     public:
