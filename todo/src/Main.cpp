@@ -27,7 +27,8 @@ GameStateProcessor gameStateProcessor { 18. };
 
 struct Checker {
     sdl2::Colors color = sdl2::Colors::GREEN;
-    int playerId = 0;
+    SDL_Rect *grid = nullptr;
+    bool isEmpty = true;
     SDL_Rect p;
     Tweening2DPoint pmove;
 
@@ -35,15 +36,15 @@ struct Checker {
         : color(playerColor)
         , p{x, y, w, h}
         , pmove{
-            static_cast<double>(x), 
-            static_cast<double>(y), 
+            static_cast<double>(x),
+            static_cast<double>(y),
             static_cast<double>(x),
             static_cast<double>(y)
-          } 
+          }
         {}
-    
+
     Checker() {}
-    
+
     void move() {
         pmove.lerp(0.06);
         pmove.fill(p);
@@ -68,31 +69,48 @@ struct FirstState : public GameState {
 
     //Checker c {40, 40};
 
+    Checker *selected = nullptr;
+
     int checkerRectDim = 100;
     int x, y;
-    bool isPlayer1Playing = true;
+    sdl2::Colors playingColor = sdl2::Colors::GREEN;
 
     void handleInput() override {
 
         while ( SDL_PollEvent(&event) != 0 ) {
             if ( event.type == SDL_QUIT ) {
                 isPlaying = false;
-            } 
-            /*
+            }
             else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 auto mouseButtonState = SDL_GetMouseState(&x, &y);
                 if ( mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT) ) {
-                    for (auto rect : rects) {
-                        if ( (rect.x <= x && x <= rect.x + rect.w) &&
-                                (rect.y <= y && y <= rect.y + rect.h)
-                        ) {
-                            c.pmove.xNext = rect.x + 20;
-                            c.pmove.yNext = rect.y + 20;
+
+                    if (selected == nullptr) {
+                        for (auto &checker : checkers) {
+                            if ( (checker.p.x <= x && x <= checker.p.x + checker.p.w) &&
+                                (checker.p.y <= y && y <= checker.p.y + checker.p.h) &&
+                                playingColor == checker.color ) {
+                                    selected = &checker;
+                            }
+                        }
+                    } else {
+                        for (auto &rect : rects) {
+                            if ( (rect.x <= x && x <= rect.x + rect.w) &&
+                                (rect.y <= y && y <= rect.y + rect.h) ) {
+                                selected->pmove.xNext = static_cast<double>(rect.x + 20);
+                                selected->pmove.yNext = static_cast<double>(rect.y + 20);
+
+                                if (playingColor == sdl2::Colors::GREEN) {
+                                    playingColor = sdl2::Colors::RED;
+                                } else {
+                                    playingColor = sdl2::Colors::GREEN;
+                                }
+                                selected = nullptr;
+                            }
                         }
                     }
                 }
             }
-            */
         }
         key_state = SDL_GetKeyboardState(nullptr);
 
@@ -115,22 +133,33 @@ struct FirstState : public GameState {
 
             if ( i % (row * 2) == 0 && dy < ((SCREEN_HEIGHT / 2) - r.h) ) {
                 for (auto j = 0; j < row; ++j)
-                    if (j % 2 == 0)
-                        checkers.emplace_back(Checker(sdl2::Colors::GREEN, (r.w * (j % row)) + 40, r.y + 20));
+                    if (j % 2 == 0) {
+                        auto c = Checker(sdl2::Colors::GREEN, (r.w * (j % row)) + 40, r.y + 20);
+                        c.grid = &r;
+                        checkers.emplace_back(c);
+                    }
+
             } else if ( i % (row * 2 - 1) == 0 && dy < ((SCREEN_HEIGHT / 2) - r.h * 2) ) {
                 for (auto j = 0; j < row - 1; ++j)
-                    if (j % 2 == 0)
-                        checkers.emplace_back(Checker(sdl2::Colors::GREEN, (r.w * (j % row)) + 140, r.y + 20));
-            }
-
-            if ( i % (row * 2) == 0 && dy > ((SCREEN_HEIGHT / 2)) ) {
+                    if (j % 2 == 0) {
+                        auto c = Checker(sdl2::Colors::GREEN, (r.w * (j % row)) + 140, r.y + 20);
+                        c.grid = &r;
+                        checkers.emplace_back(c);
+                    }
+            } else if ( i % (row * 2) == 0 && dy > ((SCREEN_HEIGHT / 2)) ) {
                 for (auto j = 0; j < row; ++j)
-                    if (j % 2 == 0)
-                        checkers.emplace_back(Checker(sdl2::Colors::RED, (r.w * (j % row)) + 40, r.y + 20));
+                    if (j % 2 == 0) {
+                        auto c = Checker(sdl2::Colors::RED, (r.w * (j % row)) + 40, r.y + 20);
+                        c.grid = &r;
+                        checkers.emplace_back(c);
+                    }
             } else if ( i % (row * 2 - 1) == 0 && dy > ((SCREEN_HEIGHT / 2)) ) {
                 for (auto j = 0; j < row - 1; ++j)
-                    if (j % 2 == 0)
-                        checkers.emplace_back(Checker(sdl2::Colors::RED, (r.w * (j % row)) + 140, r.y + 20));
+                    if (j % 2 == 0) {
+                        auto c = Checker(sdl2::Colors::RED, (r.w * (j % row)) + 140, r.y + 20);
+                        c.grid = &r;
+                        checkers.emplace_back(c);
+                    }
             }
 
             i++;
@@ -140,7 +169,7 @@ struct FirstState : public GameState {
     }
 
     void update() override {
-        for (auto c : checkers) c.move();
+        for (auto &c : checkers) c.move();
     }
 
     void render() override {
@@ -150,7 +179,7 @@ struct FirstState : public GameState {
         renderer.setColor(sdl2::Colors::BLACK);
         renderer.drawRects(rects);
 
-        for (auto c : checkers) c.draw();
+        for (auto &c : checkers) c.draw();
 
         renderer.updateScreen();
     }
