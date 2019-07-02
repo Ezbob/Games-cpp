@@ -25,9 +25,14 @@ struct Tweening2DPoint {
     double xNext = 0;
     double yNext = 0;
 
-    void fill(SDL_Rect &rect) {
+    void fillRect(SDL_Rect &rect) {
         rect.x = x;
         rect.y = y;
+    }
+
+    void fillRect(SDL_Rect *rect) {
+        rect->x = x;
+        rect->y = y;
     }
 
     /*
