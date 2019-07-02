@@ -25,19 +25,16 @@ sdl2::Renderer renderer;
 
 GameStateProcessor gameStateProcessor { 18. };
 
-struct GridCell;
-
 struct Checker {
     sdl2::Colors color = sdl2::Colors::GREEN;
-    struct GridCell *grid = nullptr;
-    bool isEmpty = true;
-    SDL_Rect *p = nullptr;
-    Tweening2DPoint pmove;
+    int atIndex = 0;
+    SDL_Rect *position = nullptr;
+    Tweening2DPoint positionTweener;
 
     Checker(sdl2::Colors playerColor, SDL_Rect *p, int x, int y)
         : color(playerColor)
-        , p(p)
-        , pmove{
+        , position(p)
+        , positionTweener{
             static_cast<double>(x),
             static_cast<double>(y),
             static_cast<double>(x),
@@ -47,27 +44,24 @@ struct Checker {
 
     Checker() {}
 
+    void updateNextPosition(int x, int y) {
+        positionTweener.xNext = x;
+        positionTweener.yNext = y;
+    }
+
     void move() {
-        pmove.lerp(0.06);
-        pmove.fillRect(p);
-    }
-
-    void draw() {
-        renderer.setColor(color);
-        renderer.fillRect(p);
+        positionTweener.lerp(0.06);
+        positionTweener.fillRect(position);
     }
 };
 
-struct GridCell {
-    SDL_Rect *dim;
-    int i;
-};
 
 struct FirstState : public GameState {
     const GameClock *clock = gameStateProcessor.getClock();
 
     const uint8_t *key_state = nullptr;
     SDL_Event event = {0};
+    int x, y;
 
     // these can be used to draw in batch
     std::array<SDL_Rect, 64> rects = {{0, 0, 0, 0}};
@@ -75,17 +69,19 @@ struct FirstState : public GameState {
     std::vector<SDL_Rect> redChecks{32};
 
     // metainfo structs that points to rects
-    std::array<GridCell, 64> cells;
     std::vector<Checker> checkers;
 
     Checker *selected = nullptr;
 
     int n_rows = 8;
-
     int checkerCellDim = 100; // h/w of the cell that can contain a checker
     int checkerDim = 60; // h/w of the rect that is inside a cell
-    int x, y;
+
     sdl2::Colors playingColor = sdl2::Colors::GREEN;
+
+    bool contains(const SDL_Rect &r, const int x, const int y) const {
+        return (r.x <= x && x <= r.x + r.w) && (r.y <= y && y <= r.y + r.h);
+    }
 
     void handleInput() override {
 
@@ -99,47 +95,37 @@ struct FirstState : public GameState {
 
                     if (selected == nullptr) {
                         for (auto &checker : checkers) {
-                            auto &grid = checker.grid;
-
-                            if ( (grid->dim->x <= x && x <= grid->dim->x + grid->dim->w) &&
-                                (grid->dim->y <= y && y <= grid->dim->y + grid->dim->h) &&
-                                playingColor == checker.color ) {
-
+                            auto &r = rects[checker.atIndex];
+                            if ( contains(r, x, y) && playingColor == checker.color ) {
                                 selected = &checker;
                             }
                         }
                     } else {
-
-                        auto &selectedGrid = selected->grid;
+                        int selectedGridIndex = selected->atIndex;
                         auto escape = false;
 
                         // looking through the neighbourhood and switching out the pointer to
                         // the cell only if the mouse was within a neighbour cell
                         for (int i = -1; i <= 1 && !escape; ++i) {
                             for (int j = -1; j <= 1 && !escape; ++j) {
-                                int neighbour_i = (selectedGrid->i + (n_rows * j) + i);
-                                if (
-                                    neighbour_i >= 0 &&
-                                    neighbour_i < static_cast<int>(cells.size())
-                                ) {
-                                    auto &r = rects[neighbour_i];
+                                int nextIndex = (selectedGridIndex + (n_rows * j) + i);
 
-                                    if ((r.x <= x && x <= r.x + r.w) &&
-                                        (r.y <= y && y <= r.y + r.h)) {
-                                        selected->pmove.xNext = r.x + 20;
-                                        selected->pmove.yNext = r.y + 20;
+                                if ( 0 <= nextIndex && nextIndex < static_cast<int>(rects.size()) && nextIndex != selectedGridIndex ) {
+                                    auto &r = rects[nextIndex];
 
-                                        selected->grid = &cells[neighbour_i];
-                                        selected = nullptr;
+                                    if ( contains(r, x, y) ) {
+                                        selected->updateNextPosition(r.x + 20, r.y + 20);
+
+                                        selected->atIndex = nextIndex;
                                         if (playingColor == sdl2::Colors::GREEN) {
                                             playingColor = sdl2::Colors::RED;
                                         } else {
                                             playingColor = sdl2::Colors::GREEN;
                                         }
+                                        selected = nullptr;
                                         escape = true;
                                         break;
                                     }
-
                                 }
                             }
                         }
@@ -157,7 +143,6 @@ struct FirstState : public GameState {
     bool load() override {
         int i = 0, row = n_rows;
         for ( auto &r : rects ) {
-            auto &cell = cells[i];
             r.h = checkerCellDim;
             r.w = checkerCellDim;
 
@@ -166,10 +151,6 @@ struct FirstState : public GameState {
 
             r.x = dx + 20;
             r.y = dy + 20;
-
-            cell.dim = &rects[i];
-            cell.i = i;
-
             i++;
         }
 
@@ -177,7 +158,6 @@ struct FirstState : public GameState {
             for (int j = 0; j < n_rows; ++j) {
 
                 auto flatindex = i * static_cast<int>(n_rows) + j;
-                auto &cell = cells[flatindex];
                 auto &r = rects[flatindex];
 
                 // GREEN upper player
@@ -185,7 +165,7 @@ struct FirstState : public GameState {
                     if (j % 2 == 0) {
                         greenChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
                         auto c = Checker(sdl2::Colors::GREEN, &greenChecks[greenChecks.size() - 1], (r.w * (j % n_rows)) + 40, r.y + 20);
-                        c.grid = &cell;
+                        c.atIndex = flatindex;
                         checkers.emplace_back(c);
                         continue;
                     }
@@ -193,7 +173,7 @@ struct FirstState : public GameState {
                     if (j % 2 != 0) {
                         greenChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
                         auto c = Checker(sdl2::Colors::GREEN, &greenChecks[greenChecks.size() - 1], (r.w * (j % n_rows)) + 40, r.y + 20);
-                        c.grid = &cell;
+                        c.atIndex = flatindex;
                         checkers.emplace_back(c);
                         continue;
                     }
@@ -204,7 +184,7 @@ struct FirstState : public GameState {
                     if (j % 2 == 0) {
                         redChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
                         auto c = Checker(sdl2::Colors::RED, &redChecks[redChecks.size() - 1], (r.w * (j % n_rows)) + 40, r.y + 20);
-                        c.grid = &cell;
+                        c.atIndex = flatindex;
                         checkers.emplace_back(c);
                         continue;
                     }
@@ -212,7 +192,7 @@ struct FirstState : public GameState {
                     if (j % 2 != 0) {
                         redChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
                         auto c = Checker(sdl2::Colors::RED, &redChecks[redChecks.size() - 1], (r.w * (j % n_rows)) + 40, r.y + 20);
-                        c.grid = &cell;
+                        c.atIndex = flatindex;
                         checkers.emplace_back(c);
                         continue;
                     }
