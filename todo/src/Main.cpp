@@ -25,9 +25,11 @@ sdl2::Renderer renderer;
 
 GameStateProcessor gameStateProcessor { 18. };
 
+struct GridCell;
+
 struct Checker {
     sdl2::Colors color = sdl2::Colors::GREEN;
-    SDL_Rect *grid = nullptr;
+    struct GridCell *grid = nullptr;
     bool isEmpty = true;
     SDL_Rect p;
     Tweening2DPoint pmove;
@@ -56,6 +58,10 @@ struct Checker {
     }
 };
 
+struct GridCell {
+    SDL_Rect *dim;
+    int i;
+};
 
 struct FirstState : public GameState {
     const GameClock *clock = gameStateProcessor.getClock();
@@ -63,13 +69,14 @@ struct FirstState : public GameState {
     const uint8_t *key_state = nullptr;
     SDL_Event event = {0};
 
-    std::array<SDL_Rect, 64> rects = {{0, 0, 0, 0}};
+    std::array<SDL_Rect, 64> rects = {{0, 0, 0, 0}}; // this can be used to draw in batch
+    std::array<GridCell, 64> cells;
 
     std::vector<Checker> checkers;
 
-    //Checker c {40, 40};
-
     Checker *selected = nullptr;
+
+    int n_rows = 8;
 
     int checkerRectDim = 100;
     int x, y;
@@ -90,22 +97,35 @@ struct FirstState : public GameState {
                             if ( (checker.p.x <= x && x <= checker.p.x + checker.p.w) &&
                                 (checker.p.y <= y && y <= checker.p.y + checker.p.h) &&
                                 playingColor == checker.color ) {
-                                    selected = &checker;
+                                selected = &checker;
+                                std::cout << "selected\n";
                             }
                         }
                     } else {
-                        for (auto &rect : rects) {
-                            if ( (rect.x <= x && x <= rect.x + rect.w) &&
-                                (rect.y <= y && y <= rect.y + rect.h) ) {
-                                selected->pmove.xNext = static_cast<double>(rect.x + 20);
-                                selected->pmove.yNext = static_cast<double>(rect.y + 20);
 
-                                if (playingColor == sdl2::Colors::GREEN) {
-                                    playingColor = sdl2::Colors::RED;
-                                } else {
-                                    playingColor = sdl2::Colors::GREEN;
+                        auto &selectedGrid = selected->grid;
+
+                        for (int i = -1; i <= 1; ++i) {
+                            for (int j = -1; j <= 1; ++j) {
+                                int neighbour_i = (selectedGrid->i + (n_rows * j) + i);
+                                std::cout << selectedGrid->i << " + " << (n_rows *j) << " + " << i << " = " << neighbour_i << "\n";
+                                if (
+                                    neighbour_i >= 0 &&
+                                    neighbour_i < static_cast<int>(cells.size()) // &&
+                                    //std::abs(neighbour_i - selectedGrid->i) <= 2
+                                ) {
+                                    //std::cout << "here " << neighbour_i << "\n";
+                                    auto &r = rects[neighbour_i];
+
+                                    if ((r.x <= x && x <= r.x + r.w) &&
+                                        (r.y <= y && y <= r.y + r.h)) {
+                                        selected->pmove.xNext = r.x + 20;
+                                        selected->pmove.yNext = r.y + 20;
+                                        std::cout << "Found neighbour cell\n";
+                                        selected = nullptr;
+                                    }
+
                                 }
-                                selected = nullptr;
                             }
                         }
                     }
@@ -120,8 +140,9 @@ struct FirstState : public GameState {
     }
 
     bool load() override {
-        int i = 0, row = 8;
+        int i = 0, row = n_rows;
         for ( auto &r : rects ) {
+            auto &cell = cells[i];
             r.h = checkerRectDim;
             r.w = checkerRectDim;
 
@@ -131,38 +152,53 @@ struct FirstState : public GameState {
             r.x = dx + 20;
             r.y = dy + 20;
 
-            if ( i % (row * 2) == 0 && dy < ((SCREEN_HEIGHT / 2) - r.h) ) {
-                for (auto j = 0; j < row; ++j)
-                    if (j % 2 == 0) {
-                        auto c = Checker(sdl2::Colors::GREEN, (r.w * (j % row)) + 40, r.y + 20);
-                        c.grid = &r;
-                        checkers.emplace_back(c);
-                    }
-
-            } else if ( i % (row * 2 - 1) == 0 && dy < ((SCREEN_HEIGHT / 2) - r.h * 2) ) {
-                for (auto j = 0; j < row - 1; ++j)
-                    if (j % 2 == 0) {
-                        auto c = Checker(sdl2::Colors::GREEN, (r.w * (j % row)) + 140, r.y + 20);
-                        c.grid = &r;
-                        checkers.emplace_back(c);
-                    }
-            } else if ( i % (row * 2) == 0 && dy > ((SCREEN_HEIGHT / 2)) ) {
-                for (auto j = 0; j < row; ++j)
-                    if (j % 2 == 0) {
-                        auto c = Checker(sdl2::Colors::RED, (r.w * (j % row)) + 40, r.y + 20);
-                        c.grid = &r;
-                        checkers.emplace_back(c);
-                    }
-            } else if ( i % (row * 2 - 1) == 0 && dy > ((SCREEN_HEIGHT / 2)) ) {
-                for (auto j = 0; j < row - 1; ++j)
-                    if (j % 2 == 0) {
-                        auto c = Checker(sdl2::Colors::RED, (r.w * (j % row)) + 140, r.y + 20);
-                        c.grid = &r;
-                        checkers.emplace_back(c);
-                    }
-            }
+            cell.dim = &rects[i];
+            cell.i = i;
 
             i++;
+        }
+
+        for (int i = 0; i < n_rows; ++i) {
+            for (int j = 0; j < n_rows; ++j) {
+
+                auto flatindex = i * static_cast<int>(n_rows) + j;
+                auto &cell = cells[flatindex];
+                auto &r = rects[flatindex];
+
+
+                // GREEN upper player
+                if ( i % 2 == 0 && i < (n_rows / 2) ) {
+                    if (j % 2 == 0) {
+                        auto c = Checker(sdl2::Colors::GREEN, (r.w * (j % n_rows)) + 40, r.y + 20);
+                        c.grid = &cell;
+                        checkers.emplace_back(c);
+                    }
+                }
+
+                if ( i % 2 != 0 && i < (n_rows / 2) - 1) {
+                    if (j % 2 != 0) {
+                        auto c = Checker(sdl2::Colors::GREEN, (r.w * (j % n_rows)) + 40, r.y + 20);
+                        c.grid = &cell;
+                        checkers.emplace_back(c);
+                    }
+                }
+
+                // RED lower player
+                if ( i % 2 == 0 && i > (n_rows / 2) ) {
+                    if (j % 2 == 0) {
+                        auto c = Checker(sdl2::Colors::RED, (r.w * (j % row)) + 40, r.y + 20);
+                        c.grid = &cell;
+                        checkers.emplace_back(c);
+                    }
+                }
+                if ( i % 2 != 0 && i > (n_rows / 2) ) {
+                    if (j % 2 != 0) {
+                        auto c = Checker(sdl2::Colors::RED, (r.w * (j % row)) + 40, r.y + 20);
+                        c.grid = &cell;
+                        checkers.emplace_back(c);
+                    }
+                }
+            }
         }
 
         return true;
