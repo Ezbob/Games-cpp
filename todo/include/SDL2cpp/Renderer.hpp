@@ -4,6 +4,7 @@
 #include "SDL.hpp"
 #include "SDL2cpp/MemoryContainer.hpp"
 #include <array>
+#include <vector>
 
 
 namespace sdl2 {
@@ -46,12 +47,20 @@ namespace sdl2 {
             return CheckError<SDL_GetError>(SDL_RenderDrawRects(m_contained.get(), rects.data(), N), "Could not fill rectangle");
         }
 
+        bool drawRects(const std::vector<SDL_Rect> &rects) {
+            return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), rects.data(), rects.size()), "Could not fill rectangle");
+        }
+
         bool fillRect(const SDL_Rect *fillRect);
         bool fillRect(const SDL_Rect &fillRect);
 
         template<std::size_t N>
         bool fillRects(const std::array<SDL_Rect, N> &fillRect) {
             return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), fillRect.data(), N), "Could not fill rectangle");
+        }
+
+        bool fillRects(const std::vector<SDL_Rect> &fillRect) {
+            return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), fillRect.data(), fillRect.size()), "Could not fill rectangle");
         }
 
         bool drawLine(int x1, int y1, int x2, int y2);

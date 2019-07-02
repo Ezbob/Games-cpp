@@ -94,35 +94,45 @@ struct FirstState : public GameState {
 
                     if (selected == nullptr) {
                         for (auto &checker : checkers) {
-                            if ( (checker.p.x <= x && x <= checker.p.x + checker.p.w) &&
-                                (checker.p.y <= y && y <= checker.p.y + checker.p.h) &&
+                            auto &grid = checker.grid;
+
+                            if ( (grid->dim->x <= x && x <= grid->dim->x + grid->dim->w) &&
+                                (grid->dim->y <= y && y <= grid->dim->y + grid->dim->h) &&
                                 playingColor == checker.color ) {
+
                                 selected = &checker;
-                                std::cout << "selected\n";
                             }
                         }
                     } else {
 
                         auto &selectedGrid = selected->grid;
+                        auto escape = false;
 
-                        for (int i = -1; i <= 1; ++i) {
-                            for (int j = -1; j <= 1; ++j) {
+                        // looking through the neighbourhood and switching out the pointer to
+                        // the cell only if the mouse was within a neighbour cell
+                        for (int i = -1; i <= 1 && !escape; ++i) {
+                            for (int j = -1; j <= 1 && !escape; ++j) {
                                 int neighbour_i = (selectedGrid->i + (n_rows * j) + i);
-                                std::cout << selectedGrid->i << " + " << (n_rows *j) << " + " << i << " = " << neighbour_i << "\n";
                                 if (
                                     neighbour_i >= 0 &&
-                                    neighbour_i < static_cast<int>(cells.size()) // &&
-                                    //std::abs(neighbour_i - selectedGrid->i) <= 2
+                                    neighbour_i < static_cast<int>(cells.size())
                                 ) {
-                                    //std::cout << "here " << neighbour_i << "\n";
                                     auto &r = rects[neighbour_i];
 
                                     if ((r.x <= x && x <= r.x + r.w) &&
                                         (r.y <= y && y <= r.y + r.h)) {
                                         selected->pmove.xNext = r.x + 20;
                                         selected->pmove.yNext = r.y + 20;
-                                        std::cout << "Found neighbour cell\n";
+
+                                        selected->grid = &cells[neighbour_i];
                                         selected = nullptr;
+                                        if (playingColor == sdl2::Colors::GREEN) {
+                                            playingColor = sdl2::Colors::RED;
+                                        } else {
+                                            playingColor = sdl2::Colors::GREEN;
+                                        }
+                                        escape = true;
+                                        break;
                                     }
 
                                 }
@@ -215,7 +225,7 @@ struct FirstState : public GameState {
         renderer.setColor(sdl2::Colors::BLACK);
         renderer.drawRects(rects);
 
-        for (auto &c : checkers) c.draw();
+        for(auto &c : checkers) c.draw();
 
         renderer.updateScreen();
     }
