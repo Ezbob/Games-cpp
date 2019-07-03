@@ -28,17 +28,18 @@ GameStateProcessor gameStateProcessor { 18. };
 struct Checker {
     sdl2::Colors color = sdl2::Colors::GREEN;
     int atIndex = 0;
+    double lerpDegree = 0.06;
     SDL_Rect *position = nullptr;
     Tweening2DPoint positionTweener;
 
-    Checker(sdl2::Colors playerColor, SDL_Rect *p, int x, int y)
+    Checker(sdl2::Colors playerColor, SDL_Rect &p)
         : color(playerColor)
-        , position(p)
+        , position(&p)
         , positionTweener{
-            static_cast<double>(x),
-            static_cast<double>(y),
-            static_cast<double>(x),
-            static_cast<double>(y)
+            static_cast<double>(p.x),
+            static_cast<double>(p.y),
+            static_cast<double>(p.x),
+            static_cast<double>(p.y)
           }
         {}
 
@@ -50,11 +51,15 @@ struct Checker {
     }
 
     void move() {
-        positionTweener.lerp(0.06);
+        positionTweener.lerp(lerpDegree);
         positionTweener.fillRect(position);
     }
 };
 
+struct GridCell {
+    SDL_Rect *container;
+    Checker *occubant;
+};
 
 struct FirstState : public GameState {
     const GameClock *clock = gameStateProcessor.getClock();
@@ -65,6 +70,7 @@ struct FirstState : public GameState {
 
     // these can be used to draw in batch
     std::array<SDL_Rect, 64> rects = {{0, 0, 0, 0}};
+    std::array<GridCell, 64> cells;
     std::vector<SDL_Rect> greenChecks{32};
     std::vector<SDL_Rect> redChecks{32};
 
@@ -83,6 +89,10 @@ struct FirstState : public GameState {
         return (r.x <= x && x <= r.x + r.w) && (r.y <= y && y <= r.y + r.h);
     }
 
+    bool contains(const SDL_Rect *r, const int x, const int y) const {
+        return (r->x <= x && x <= r->x + r->w) && (r->y <= y && y <= r->y + r->h);
+    }
+
     void handleInput() override {
 
         while ( SDL_PollEvent(&event) != 0 ) {
@@ -91,43 +101,11 @@ struct FirstState : public GameState {
             }
             else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 auto mouseButtonState = SDL_GetMouseState(&x, &y);
-                if ( mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT) ) {
-
-                    if (selected == nullptr) {
-                        for (auto &checker : checkers) {
-                            auto &r = rects[checker.atIndex];
-                            if ( contains(r, x, y) && playingColor == checker.color ) {
-                                selected = &checker;
-                            }
-                        }
-                    } else {
-                        int selectedGridIndex = selected->atIndex;
-                        auto escape = false;
-
-                        // looking through the neighbourhood and switching out the pointer to
-                        // the cell only if the mouse was within a neighbour cell
-                        for (int i = -1; i <= 1 && !escape; ++i) {
-                            for (int j = -1; j <= 1 && !escape; ++j) {
-                                int nextIndex = (selectedGridIndex + (n_rows * j) + i);
-
-                                if ( 0 <= nextIndex && nextIndex < static_cast<int>(rects.size()) && nextIndex != selectedGridIndex ) {
-                                    auto &r = rects[nextIndex];
-
-                                    if ( contains(r, x, y) ) {
-                                        selected->updateNextPosition(r.x + 20, r.y + 20);
-
-                                        selected->atIndex = nextIndex;
-                                        if (playingColor == sdl2::Colors::GREEN) {
-                                            playingColor = sdl2::Colors::RED;
-                                        } else {
-                                            playingColor = sdl2::Colors::GREEN;
-                                        }
-                                        selected = nullptr;
-                                        escape = true;
-                                        break;
-                                    }
-                                }
-                            }
+                if ( (mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT)) && selected == nullptr ) {
+                    for (auto &checker : checkers) {
+                        auto &r = rects[checker.atIndex];
+                        if ( contains(r, x, y) && playingColor == checker.color ) {
+                            selected = &checker;
                         }
                     }
                 }
@@ -151,6 +129,8 @@ struct FirstState : public GameState {
 
             r.x = dx + 20;
             r.y = dy + 20;
+
+            cells[i].container = &r;
             i++;
         }
 
@@ -164,17 +144,19 @@ struct FirstState : public GameState {
                 if ( i % 2 == 0 && i < (n_rows / 2) ) {
                     if (j % 2 == 0) {
                         greenChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
-                        auto c = Checker(sdl2::Colors::GREEN, &greenChecks[greenChecks.size() - 1], (r.w * (j % n_rows)) + 40, r.y + 20);
+                        auto c = Checker(sdl2::Colors::GREEN, greenChecks[greenChecks.size() - 1]);
                         c.atIndex = flatindex;
                         checkers.emplace_back(c);
+                        cells[flatindex].occubant = &checkers[checkers.size() - 1];
                         continue;
                     }
                 } else if ( i % 2 != 0 && i < (n_rows / 2) - 1) {
                     if (j % 2 != 0) {
                         greenChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
-                        auto c = Checker(sdl2::Colors::GREEN, &greenChecks[greenChecks.size() - 1], (r.w * (j % n_rows)) + 40, r.y + 20);
+                        auto c = Checker(sdl2::Colors::GREEN, greenChecks[greenChecks.size() - 1]);
                         c.atIndex = flatindex;
                         checkers.emplace_back(c);
+                        cells[flatindex].occubant = &checkers[checkers.size() - 1];
                         continue;
                     }
                 }
@@ -183,17 +165,19 @@ struct FirstState : public GameState {
                 if ( i % 2 == 0 && i > (n_rows / 2) ) {
                     if (j % 2 == 0) {
                         redChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
-                        auto c = Checker(sdl2::Colors::RED, &redChecks[redChecks.size() - 1], (r.w * (j % n_rows)) + 40, r.y + 20);
+                        auto c = Checker(sdl2::Colors::RED, redChecks[redChecks.size() - 1]);
                         c.atIndex = flatindex;
                         checkers.emplace_back(c);
+                        cells[flatindex].occubant = &checkers[checkers.size() - 1];
                         continue;
                     }
                 } else if ( i % 2 != 0 && i > (n_rows / 2) ) {
                     if (j % 2 != 0) {
                         redChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
-                        auto c = Checker(sdl2::Colors::RED, &redChecks[redChecks.size() - 1], (r.w * (j % n_rows)) + 40, r.y + 20);
+                        auto c = Checker(sdl2::Colors::RED, redChecks[redChecks.size() - 1]);
                         c.atIndex = flatindex;
                         checkers.emplace_back(c);
+                        cells[flatindex].occubant = &checkers[checkers.size() - 1];
                         continue;
                     }
                 }
@@ -204,7 +188,43 @@ struct FirstState : public GameState {
     }
 
     void update() override {
-        for (auto &c : checkers) c.move();
+        if (selected != nullptr) {
+            // we have selected a checker
+            int selectedGridIndex = selected->atIndex;
+            auto escape = false;
+
+            // looking through the neighbourhood and switching out the pointer to
+            // the cell only if the mouse was within a neighbour cell
+            for (int i = -1; i <= 1 && !escape; ++i) {
+                for (int j = -1; j <= 1 && !escape; ++j) {
+                    if (i == 0 || j == 0) continue;
+                    int nextIndex = (selectedGridIndex + (n_rows * j) + i);
+
+                    if ( 0 <= nextIndex && nextIndex < static_cast<int>(rects.size()) && nextIndex != selectedGridIndex ) {
+                        auto &targetCell = cells[nextIndex];
+
+                        if ( contains(targetCell.container, x, y) && targetCell.occubant == nullptr ) {
+                            selected->updateNextPosition(targetCell.container->x + 20, targetCell.container->y + 20);
+                            selected->atIndex = nextIndex;
+
+                            cells[selectedGridIndex].occubant = nullptr;
+                            targetCell.occubant = selected;
+
+                            if (playingColor == sdl2::Colors::GREEN) {
+                                playingColor = sdl2::Colors::RED;
+                            } else {
+                                playingColor = sdl2::Colors::GREEN;
+                            }
+                            selected = nullptr;
+                            escape = true;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        for (auto &c : checkers)
+            c.move();
     }
 
     void render() override {
