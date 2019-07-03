@@ -109,11 +109,19 @@ bool Renderer::drawLine(int x1, int y1, int x2, int y2) {
 }
 
 bool Renderer::drawPoint(int x, int y) {
-    return CheckError<SDL_GetError>(SDL_RenderDrawPoint(m_contained.get(), x, y), "Could not draw point"); 
+    return CheckError<SDL_GetError>(SDL_RenderDrawPoint(m_contained.get(), x, y), "Could not draw point");
 }
 
 bool Renderer::setViewPort(SDL_Rect &rect) {
     return CheckError<SDL_GetError>(SDL_RenderSetViewport(m_contained.get(), &rect), "Could not set view port");
+}
+
+bool Renderer::drawRects(const std::vector<SDL_Rect> &rects) {
+    return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), rects.data(), rects.size()), "Could not fill rectangle");
+}
+
+bool Renderer::fillRects(const std::vector<SDL_Rect> &fillRect) {
+    return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), fillRect.data(), fillRect.size()), "Could not fill rectangle");
 }
 
 Texture Renderer::createTexture() const {
