@@ -25,44 +25,44 @@ sdl2::Renderer renderer;
 
 GameStateProcessor gameStateProcessor { 18. };
 
-struct Checker {
-    sdl2::Colors color = sdl2::Colors::GREEN;
-    int atIndex = 0;
-    double lerpDegree = 0.06;
-    SDL_Rect *position = nullptr;
-    Tweening2DPoint positionTweener;
-
-    Checker(sdl2::Colors playerColor, SDL_Rect &p)
-        : color(playerColor)
-        , position(&p)
-        , positionTweener{
-            static_cast<double>(p.x),
-            static_cast<double>(p.y),
-            static_cast<double>(p.x),
-            static_cast<double>(p.y)
-          }
-        {}
-
-    Checker() {}
-
-    void updateNextPosition(int x, int y) {
-        positionTweener.xNext = x;
-        positionTweener.yNext = y;
-    }
-
-    void move() {
-        positionTweener.lerp(lerpDegree);
-        positionTweener.fillRect(position);
-    }
-};
-
-struct GridCell {
-    SDL_Rect *container;
-    Checker *occubant;
-};
-
-struct FirstState : public GameState {
+class FirstState : public GameState {
     const GameClock *clock = gameStateProcessor.getClock();
+
+    struct Checker {
+        sdl2::Colors color = sdl2::Colors::GREEN;
+        int atIndex = 0;
+        double lerpDegree = 0.06;
+        SDL_Rect *position = nullptr;
+        Tweening2DPoint positionTweener;
+
+        Checker(sdl2::Colors playerColor, SDL_Rect &p)
+            : color(playerColor)
+            , position(&p)
+            , positionTweener{
+                static_cast<double>(p.x),
+                static_cast<double>(p.y),
+                static_cast<double>(p.x),
+                static_cast<double>(p.y)
+            }
+            {}
+
+        Checker() {}
+
+        void updateNextPosition(int x, int y) {
+            positionTweener.xNext = x;
+            positionTweener.yNext = y;
+        }
+
+        void move() {
+            positionTweener.lerp(lerpDegree);
+            positionTweener.fillRect(position);
+        }
+    };
+
+    struct GridCell {
+        SDL_Rect *container;
+        Checker *occubant;
+    };
 
     const uint8_t *key_state = nullptr;
     SDL_Event event = {0};
@@ -93,13 +93,21 @@ struct FirstState : public GameState {
         return (r->x <= x && x <= r->x + r->w) && (r->y <= y && y <= r->y + r->h);
     }
 
+    void switchTurn() {
+        if (playingColor == sdl2::Colors::GREEN) {
+            playingColor = sdl2::Colors::RED;
+        } else {
+            playingColor = sdl2::Colors::GREEN;
+        }
+    }
+
+public:
     void handleInput() override {
 
         while ( SDL_PollEvent(&event) != 0 ) {
             if ( event.type == SDL_QUIT ) {
                 isPlaying = false;
-            }
-            else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 auto mouseButtonState = SDL_GetMouseState(&x, &y);
                 if ( (mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT)) && selected == nullptr ) {
                     for (auto &checker : checkers) {
@@ -117,6 +125,7 @@ struct FirstState : public GameState {
             isPlaying = false;
         }
     }
+
 
     bool load() override {
         int i = 0, row = n_rows;
@@ -203,21 +212,44 @@ struct FirstState : public GameState {
                     if ( 0 <= nextIndex && nextIndex < static_cast<int>(rects.size()) && nextIndex != selectedGridIndex ) {
                         auto &targetCell = cells[nextIndex];
 
-                        if ( contains(targetCell.container, x, y) && targetCell.occubant == nullptr ) {
-                            selected->updateNextPosition(targetCell.container->x + 20, targetCell.container->y + 20);
-                            selected->atIndex = nextIndex;
+                        if ( contains(targetCell.container, x, y) ) {
+                            if ( targetCell.occubant == nullptr ) {
+                                selected->updateNextPosition(targetCell.container->x + 20, targetCell.container->y + 20);
+                                selected->atIndex = nextIndex;
 
-                            cells[selectedGridIndex].occubant = nullptr;
-                            targetCell.occubant = selected;
+                                cells[selectedGridIndex].occubant = nullptr;
+                                targetCell.occubant = selected;
 
-                            if (playingColor == sdl2::Colors::GREEN) {
-                                playingColor = sdl2::Colors::RED;
-                            } else {
-                                playingColor = sdl2::Colors::GREEN;
+                                switchTurn();
+
+                                selected = nullptr;
+                                escape = true;
+                                break;
+                            } else if ( targetCell.occubant->color != selected->color ) {
+                                int nextNextIndex = (selectedGridIndex + (n_rows * (2 * j)) + (2 * i));
+                                if ( 0 <= nextNextIndex && nextNextIndex < static_cast<int>(cells.size()) ) {
+                                    auto &nextTargetCell = cells[nextNextIndex];
+                                    if ( nextTargetCell.occubant == nullptr ) {
+
+                                        selected->updateNextPosition(nextTargetCell.container->x + 20, nextTargetCell.container->y + 20);
+                                        selected->atIndex = nextNextIndex;
+
+                                        // "deleteing" checker
+                                        targetCell.occubant->position->w = 0;
+                                        targetCell.occubant->position->h = 0;
+                                        targetCell.occubant = nullptr;
+
+                                        cells[selectedGridIndex].occubant = nullptr; // remove old position
+                                        nextTargetCell.occubant = selected; // new position is
+
+                                        switchTurn();
+
+                                        selected = nullptr;
+                                        escape = true;
+                                        break;
+                                    }
+                                }
                             }
-                            selected = nullptr;
-                            escape = true;
-                            break;
                         }
                     }
                 }
