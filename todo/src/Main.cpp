@@ -22,6 +22,7 @@ const int SCREEN_HEIGHT = 840;
 sdl2::Globals globals;
 sdl2::Window window;
 sdl2::Renderer renderer;
+sdl2::TTFFont font;
 
 GameStateProcessor gameStateProcessor { 18. };
 
@@ -62,6 +63,14 @@ class FirstState : public GameState {
     struct GridCell {
         SDL_Rect *container;
         Checker *occubant;
+        int x;
+        int y;
+    };
+
+    struct Test {
+        int x;
+        int y;
+        sdl2::Texture text;
     };
 
     const uint8_t *key_state = nullptr;
@@ -75,7 +84,8 @@ class FirstState : public GameState {
     std::vector<SDL_Rect> redChecks{32};
 
     // metainfo structs that points to rects
-    std::vector<std::shared_ptr<Checker> > checkers;
+    std::vector<std::shared_ptr<Checker>> checkers;
+    std::vector<sdl2::Texture> text;
 
     Checker *selected = nullptr;
 
@@ -95,8 +105,10 @@ class FirstState : public GameState {
 
     void switchTurn() {
         if (playingColor == sdl2::Colors::GREEN) {
+            std::cout << "REDs turn\n";
             playingColor = sdl2::Colors::RED;
         } else {
+            std::cout << "GREENs turn\n";
             playingColor = sdl2::Colors::GREEN;
         }
     }
@@ -109,10 +121,14 @@ public:
                 isPlaying = false;
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 auto mouseButtonState = SDL_GetMouseState(&x, &y);
-                if ( (mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT)) && selected == nullptr ) {
+                if ( (mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT)) ) {
                     for (auto &checker : checkers) {
                         auto &r = rects[checker->atIndex];
-                        if ( contains(r, x, y) && playingColor == checker->color && r.w != 0 && r.h != 0 ) {
+
+                        if ( contains(r, x, y) && playingColor == checker->color
+                            && checker->position->w != 0
+                            && checker->position->h != 0 ) {
+                            std::cout << ":> " << checker->atIndex << " Selected\n";
                             selected = checker.get();
                             break;
                         }
@@ -129,26 +145,32 @@ public:
 
 
     bool load() override {
-        int i = 0, row = n_rows;
-        for ( auto &r : rects ) {
-            r.h = checkerCellDim;
-            r.w = checkerCellDim;
 
-            auto dx = r.w * (i % row);
-            auto dy = r.h * (i / row);
-
-            r.x = dx + 20;
-            r.y = dy + 20;
-
-            cells[i].container = &r;
-            i++;
-        }
+        font.loadTTF("assets/NotoMono-Regular.ttf", 24);
 
         for (int i = 0; i < n_rows; ++i) {
             for (int j = 0; j < n_rows; ++j) {
 
                 auto flatindex = i * static_cast<int>(n_rows) + j;
                 auto &r = rects[flatindex];
+
+                r.h = checkerCellDim;
+                r.w = checkerCellDim;
+
+                auto dx = r.w * (flatindex % n_rows);
+                auto dy = r.h * (flatindex / n_rows);
+
+                r.x = dx + 20;
+                r.y = dy + 20;
+
+                cells[flatindex].container = &r;
+                cells[flatindex].x = j;
+                cells[flatindex].y = i;
+
+                auto k = sdl2::loadSolidText(renderer, std::to_string(flatindex), (TTF_Font *) font, SDL_Color{
+                    0x00, 0x00, 0x00, 0xff
+                });
+                text.emplace_back(k);
 
                 // GREEN upper player
                 if ( i % 2 == 0 && i < (n_rows / 2) ) {
@@ -228,6 +250,7 @@ public:
                                 break;
                             } else if ( targetCell.occubant->color != selected->color ) {
                                 int nextNextIndex = (selectedGridIndex + (n_rows * (2 * j)) + (2 * i));
+
                                 if ( 0 <= nextNextIndex && nextNextIndex < static_cast<int>(cells.size()) ) {
                                     auto &nextTargetCell = cells[nextNextIndex];
                                     if ( nextTargetCell.occubant == nullptr ) {
@@ -272,6 +295,13 @@ public:
 
         renderer.setColor(sdl2::Colors::RED);
         renderer.drawRects(redChecks);
+
+        for (auto i = 0; i < n_rows; ++i)
+            for (auto j = 0; j < n_rows; ++j) {
+                auto &t = text[i * n_rows + j];
+                t.render(j * 100 + 22, i * 100 + 20);
+            }
+
 
         renderer.updateScreen();
     }
