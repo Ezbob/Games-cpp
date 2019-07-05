@@ -8,7 +8,7 @@
 #include <stack>
 #include <vector>
 #include <array>
-#include "Kdtree.hpp"
+//#include "Kdtree.hpp"
 
 #if _WIN32
     #define MAIN_NAME WinMain
@@ -75,7 +75,7 @@ class FirstState : public GameState {
     std::vector<SDL_Rect> redChecks{32};
 
     // metainfo structs that points to rects
-    std::vector<Checker> checkers;
+    std::vector<std::shared_ptr<Checker> > checkers;
 
     Checker *selected = nullptr;
 
@@ -111,9 +111,10 @@ public:
                 auto mouseButtonState = SDL_GetMouseState(&x, &y);
                 if ( (mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT)) && selected == nullptr ) {
                     for (auto &checker : checkers) {
-                        auto &r = rects[checker.atIndex];
-                        if ( contains(r, x, y) && playingColor == checker.color ) {
-                            selected = &checker;
+                        auto &r = rects[checker->atIndex];
+                        if ( contains(r, x, y) && playingColor == checker->color && r.w != 0 && r.h != 0 ) {
+                            selected = checker.get();
+                            break;
                         }
                     }
                 }
@@ -153,19 +154,19 @@ public:
                 if ( i % 2 == 0 && i < (n_rows / 2) ) {
                     if (j % 2 == 0) {
                         greenChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
-                        auto c = Checker(sdl2::Colors::GREEN, greenChecks[greenChecks.size() - 1]);
-                        c.atIndex = flatindex;
+                        auto c = std::make_shared<Checker>(sdl2::Colors::GREEN, greenChecks[greenChecks.size() - 1]);
+                        c->atIndex = flatindex;
                         checkers.emplace_back(c);
-                        cells[flatindex].occubant = &checkers[checkers.size() - 1];
+                        cells[flatindex].occubant = checkers[checkers.size() - 1].get();
                         continue;
                     }
                 } else if ( i % 2 != 0 && i < (n_rows / 2) - 1) {
                     if (j % 2 != 0) {
                         greenChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
-                        auto c = Checker(sdl2::Colors::GREEN, greenChecks[greenChecks.size() - 1]);
-                        c.atIndex = flatindex;
+                        auto c = std::make_shared<Checker>(sdl2::Colors::GREEN, greenChecks[greenChecks.size() - 1]);
+                        c->atIndex = flatindex;
                         checkers.emplace_back(c);
-                        cells[flatindex].occubant = &checkers[checkers.size() - 1];
+                        cells[flatindex].occubant = checkers[checkers.size() - 1].get();
                         continue;
                     }
                 }
@@ -174,19 +175,19 @@ public:
                 if ( i % 2 == 0 && i > (n_rows / 2) ) {
                     if (j % 2 == 0) {
                         redChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
-                        auto c = Checker(sdl2::Colors::RED, redChecks[redChecks.size() - 1]);
-                        c.atIndex = flatindex;
+                        auto c = std::make_shared<Checker>(sdl2::Colors::RED, redChecks[redChecks.size() - 1]);
+                        c->atIndex = flatindex;
                         checkers.emplace_back(c);
-                        cells[flatindex].occubant = &checkers[checkers.size() - 1];
+                        cells[flatindex].occubant = checkers[checkers.size() - 1].get();
                         continue;
                     }
                 } else if ( i % 2 != 0 && i > (n_rows / 2) ) {
                     if (j % 2 != 0) {
                         redChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
-                        auto c = Checker(sdl2::Colors::RED, redChecks[redChecks.size() - 1]);
-                        c.atIndex = flatindex;
+                        auto c = std::make_shared<Checker>(sdl2::Colors::RED, redChecks[redChecks.size() - 1]);
+                        c->atIndex = flatindex;
                         checkers.emplace_back(c);
-                        cells[flatindex].occubant = &checkers[checkers.size() - 1];
+                        cells[flatindex].occubant = checkers[checkers.size() - 1].get();
                         continue;
                     }
                 }
@@ -256,7 +257,7 @@ public:
             }
         }
         for (auto &c : checkers)
-            c.move();
+            c->move();
     }
 
     void render() override {
