@@ -47,6 +47,11 @@ namespace sdl2 {
             return CheckError<SDL_GetError>(SDL_RenderDrawRects(m_contained.get(), rects.data(), N), "Could not fill rectangle");
         }
 
+        template<std::size_t N>
+        bool drawRects(const SDL_Rect (&rects)[N]) {
+            return CheckError<SDL_GetError>(SDL_RenderDrawRects(m_contained.get(), rects, N), "Could not fill rectangle");
+        }
+
         bool drawRects(const std::vector<SDL_Rect> &);
 
         bool fillRect(const SDL_Rect *);

@@ -31,7 +31,6 @@ class FirstState : public GameState {
 
     struct Checker {
         sdl2::Colors color = sdl2::Colors::GREEN;
-        int atIndex = 0;
         double lerpDegree = 0.06;
         SDL_Rect *position = nullptr;
         Tweening2DPoint positionTweener;
@@ -47,8 +46,6 @@ class FirstState : public GameState {
             }
             {}
 
-        Checker() {}
-
         void updateNextPosition(int x, int y) {
             positionTweener.xNext = x;
             positionTweener.yNext = y;
@@ -61,8 +58,8 @@ class FirstState : public GameState {
     };
 
     struct GridCell {
-        SDL_Rect *container;
-        Checker *occubant;
+        SDL_Rect *container = nullptr;
+        Checker *occubant = nullptr;
         int x;
         int y;
     };
@@ -78,8 +75,9 @@ class FirstState : public GameState {
     int x, y;
 
     // these can be used to draw in batch
-    std::array<SDL_Rect, 64> boardContainers;
-    std::array<GridCell, 64> cells;
+    SDL_Rect boardContainers[64];
+    GridCell cells[64];
+
     std::vector<SDL_Rect> greenChecks{32};
     std::vector<SDL_Rect> redChecks{32};
 
@@ -87,7 +85,8 @@ class FirstState : public GameState {
     std::vector<std::shared_ptr<Checker>> checkers;
     std::vector<sdl2::Texture> text;
 
-    Checker *selected = nullptr;
+    bool is_findingSelected = false;
+    GridCell *selected = nullptr;
 
     int n_rows = 8;
     int checkerCellDim = 100; // h/w of the cell that can contain a checker
@@ -114,15 +113,21 @@ class FirstState : public GameState {
     }
 
     void findSelected() {
-        for (auto &checker : checkers) {
-            auto &bc = boardContainers[checker->atIndex];
+        for (int i = 0; i < n_rows; i++) {
+            for (int j = 0; j < n_rows; ++j) {
 
-            if ( contains(bc, x, y) && playingColor == checker->color
-                && checker->position->w != 0
-                && checker->position->h != 0 ) {
-                std::cout << ":> " << checker->atIndex << " Selected\n";
-                selected = checker.get();
-                break;
+                int index = i * n_rows + j;
+                auto &gridCell = cells[index];
+
+                if ( contains(gridCell.container, x, y)
+                    && gridCell.occubant != nullptr
+                    && gridCell.occubant->color == playingColor
+                    && gridCell.occubant->position->w != 0
+                    && gridCell.occubant->position->h != 0 ) {
+                    std::cout << ":> " << index << " Selected\n";
+                    selected = &gridCell;
+                    break;
+                }
             }
         }
     }
@@ -137,23 +142,58 @@ class FirstState : public GameState {
 
         if (checkerColor == sdl2::Colors::GREEN) {
             greenChecks.emplace_back(checkerRect);
-            auto c = std::make_shared<Checker>(
+            checkers.emplace_back(std::make_shared<Checker>(
                 checkerColor,
                 greenChecks[greenChecks.size() - 1]
-            );
-            c->atIndex = flatindex;
-            checkers.emplace_back(c);
+            ));
             cells[flatindex].occubant = checkers[checkers.size() - 1].get();
         } else {
             redChecks.emplace_back(checkerRect);
-            auto c = std::make_shared<Checker>(
+            checkers.emplace_back(std::make_shared<Checker>(
                 checkerColor,
                 redChecks[redChecks.size() - 1]
-            );
-            c->atIndex = flatindex;
-            checkers.emplace_back(c);
+            ));
             cells[flatindex].occubant = checkers[checkers.size() - 1].get();
         }
+    }
+
+    void doMoveToEmpty(GridCell &target) {
+        Checker *source = selected->occubant;
+
+        source->updateNextPosition(
+            target.container->x + 20,
+            target.container->y + 20
+        );
+
+        switchTurn();
+
+        target.occubant = source;
+        selected->occubant = nullptr;
+        selected = nullptr;
+    }
+
+    bool tryAndMove(int xOffset, int yOffset) {
+
+        int nextIndex = (selected->y + xOffset) * n_rows + (selected->x + yOffset);
+        std::cout << "Next index " << nextIndex << "\n";
+        if ( 0 <= nextIndex && nextIndex < 64 ) {
+            auto &gridCell = cells[nextIndex];
+            if ( contains(gridCell.container, x, y) ) {
+                if ( gridCell.occubant == nullptr ) {
+                    doMoveToEmpty(gridCell);
+                    return true;
+                }
+            }
+        }   
+
+        return false;
+    }
+
+    void updateSelected() {
+        if ( tryAndMove(1, 1) ) return;
+        if ( tryAndMove(-1, 1) ) return;
+        if ( tryAndMove(1, -1) ) return;
+        if ( tryAndMove(-1, -1) ) return;
     }
 
 public:
@@ -164,8 +204,12 @@ public:
                 isPlaying = false;
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 auto mouseButtonState = SDL_GetMouseState(&x, &y);
-                if ( (mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT)) ) {
-                    findSelected();
+                if ((mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT))) {
+                    if (selected == nullptr ) {
+                        findSelected();
+                    } else {
+                        updateSelected();
+                    }
                 }
             }
         }
@@ -200,14 +244,13 @@ public:
                 cells[flatindex].x = j;
                 cells[flatindex].y = i;
 
-                auto k = sdl2::loadSolidText(renderer,
+                text.emplace_back(sdl2::loadSolidText(renderer,
                     std::to_string(flatindex),
                     (TTF_Font *) font,
                     SDL_Color {
                         0x00, 0x00, 0x00, 0xff
                     }
-                );
-                text.emplace_back(k);
+                ));
 
                 // GREEN upper player
                 if ( i % 2 == 0 && i < (n_rows / 2) ) {
@@ -261,65 +304,6 @@ public:
     }
 
     void update() override {
-        if (selected != nullptr) {
-            // we have selected a checker
-            int selectedGridIndex = selected->atIndex;
-            auto escape = false;
-
-            // looking through the neighbourhood and switching out the pointer to
-            // the cell only if the mouse was within a neighbour cell
-            for (int i = -1; i <= 1 && !escape; ++i) {
-                for (int j = -1; j <= 1 && !escape; ++j) {
-                    if (i == 0 || j == 0) continue;
-                    int nextIndex = (selectedGridIndex + (n_rows * j) + i);
-
-                    if ( 0 <= nextIndex && nextIndex < static_cast<int>(boardContainers.size()) && nextIndex != selectedGridIndex ) {
-                        auto &targetCell = cells[nextIndex];
-
-                        if ( contains(targetCell.container, x, y) ) {
-                            if ( targetCell.occubant == nullptr ) {
-                                selected->updateNextPosition(targetCell.container->x + 20, targetCell.container->y + 20);
-                                selected->atIndex = nextIndex;
-
-                                cells[selectedGridIndex].occubant = nullptr;
-                                targetCell.occubant = selected;
-
-                                switchTurn();
-
-                                selected = nullptr;
-                                escape = true;
-                                break;
-                            } else if ( targetCell.occubant->color != selected->color ) {
-                                int nextNextIndex = (selectedGridIndex + (n_rows * (2 * j)) + (2 * i));
-
-                                if ( 0 <= nextNextIndex && nextNextIndex < static_cast<int>(cells.size()) ) {
-                                    auto &nextTargetCell = cells[nextNextIndex];
-                                    if ( nextTargetCell.occubant == nullptr ) {
-
-                                        selected->updateNextPosition(nextTargetCell.container->x + 20, nextTargetCell.container->y + 20);
-                                        selected->atIndex = nextNextIndex;
-
-                                        // "deleteing" checker
-                                        targetCell.occubant->position->w = 0;
-                                        targetCell.occubant->position->h = 0;
-                                        targetCell.occubant = nullptr;
-
-                                        cells[selectedGridIndex].occubant = nullptr; // remove old position
-                                        nextTargetCell.occubant = selected; // new position is
-
-                                        switchTurn();
-
-                                        selected = nullptr;
-                                        escape = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
         for (auto &c : checkers)
             c->move();
     }
