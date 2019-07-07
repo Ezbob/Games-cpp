@@ -127,6 +127,35 @@ class FirstState : public GameState {
         }
     }
 
+    void initChecker(sdl2::Colors checkerColor, int flatindex, int checkerX, int checkerY) {
+        auto checkerRect = SDL_Rect {
+            checkerX,
+            checkerY,
+            checkerDim,
+            checkerDim
+        };
+
+        if (checkerColor == sdl2::Colors::GREEN) {
+            greenChecks.emplace_back(checkerRect);
+            auto c = std::make_shared<Checker>(
+                checkerColor,
+                greenChecks[greenChecks.size() - 1]
+            );
+            c->atIndex = flatindex;
+            checkers.emplace_back(c);
+            cells[flatindex].occubant = checkers[checkers.size() - 1].get();
+        } else {
+            redChecks.emplace_back(checkerRect);
+            auto c = std::make_shared<Checker>(
+                checkerColor,
+                redChecks[redChecks.size() - 1]
+            );
+            c->atIndex = flatindex;
+            checkers.emplace_back(c);
+            cells[flatindex].occubant = checkers[checkers.size() - 1].get();
+        }
+    }
+
 public:
     void handleInput() override {
 
@@ -156,43 +185,49 @@ public:
             for (int j = 0; j < n_rows; ++j) {
 
                 auto flatindex = i * static_cast<int>(n_rows) + j;
-                auto &r = boardContainers[flatindex];
+                auto &boardContainer = boardContainers[flatindex];
 
-                r.h = checkerCellDim;
-                r.w = checkerCellDim;
+                boardContainer.h = checkerCellDim;
+                boardContainer.w = checkerCellDim;
 
-                auto dx = r.w * (flatindex % n_rows);
-                auto dy = r.h * (flatindex / n_rows);
+                auto dx = boardContainer.w * (flatindex % n_rows);
+                auto dy = boardContainer.h * (flatindex / n_rows);
 
-                r.x = dx + 20;
-                r.y = dy + 20;
+                boardContainer.x = dx + 20;
+                boardContainer.y = dy + 20;
 
-                cells[flatindex].container = &r;
+                cells[flatindex].container = &boardContainer;
                 cells[flatindex].x = j;
                 cells[flatindex].y = i;
 
-                auto k = sdl2::loadSolidText(renderer, std::to_string(flatindex), (TTF_Font *) font, SDL_Color{
-                    0x00, 0x00, 0x00, 0xff
-                });
+                auto k = sdl2::loadSolidText(renderer,
+                    std::to_string(flatindex),
+                    (TTF_Font *) font,
+                    SDL_Color {
+                        0x00, 0x00, 0x00, 0xff
+                    }
+                );
                 text.emplace_back(k);
 
                 // GREEN upper player
                 if ( i % 2 == 0 && i < (n_rows / 2) ) {
                     if (j % 2 == 0) {
-                        greenChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
-                        auto c = std::make_shared<Checker>(sdl2::Colors::GREEN, greenChecks[greenChecks.size() - 1]);
-                        c->atIndex = flatindex;
-                        checkers.emplace_back(c);
-                        cells[flatindex].occubant = checkers[checkers.size() - 1].get();
+                        initChecker(
+                            sdl2::Colors::GREEN,
+                            flatindex,
+                            (boardContainer.w * (j % n_rows)) + 40,
+                            boardContainer.y + 20
+                        );
                         continue;
                     }
                 } else if ( i % 2 != 0 && i < (n_rows / 2) - 1) {
                     if (j % 2 != 0) {
-                        greenChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
-                        auto c = std::make_shared<Checker>(sdl2::Colors::GREEN, greenChecks[greenChecks.size() - 1]);
-                        c->atIndex = flatindex;
-                        checkers.emplace_back(c);
-                        cells[flatindex].occubant = checkers[checkers.size() - 1].get();
+                        initChecker(
+                            sdl2::Colors::GREEN,
+                            flatindex,
+                            (boardContainer.w * (j % n_rows)) + 40,
+                            boardContainer.y + 20
+                        );
                         continue;
                     }
                 }
@@ -200,20 +235,22 @@ public:
                 // RED lower player
                 if ( i % 2 == 0 && i > (n_rows / 2) ) {
                     if (j % 2 == 0) {
-                        redChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
-                        auto c = std::make_shared<Checker>(sdl2::Colors::RED, redChecks[redChecks.size() - 1]);
-                        c->atIndex = flatindex;
-                        checkers.emplace_back(c);
-                        cells[flatindex].occubant = checkers[checkers.size() - 1].get();
+                        initChecker(
+                            sdl2::Colors::RED,
+                            flatindex,
+                            (boardContainer.w * (j % n_rows)) + 40,
+                            boardContainer.y + 20
+                        );
                         continue;
                     }
                 } else if ( i % 2 != 0 && i > (n_rows / 2) ) {
                     if (j % 2 != 0) {
-                        redChecks.emplace_back(SDL_Rect{(r.w * (j % n_rows)) + 40, r.y + 20, checkerDim, checkerDim});
-                        auto c = std::make_shared<Checker>(sdl2::Colors::RED, redChecks[redChecks.size() - 1]);
-                        c->atIndex = flatindex;
-                        checkers.emplace_back(c);
-                        cells[flatindex].occubant = checkers[checkers.size() - 1].get();
+                        initChecker(
+                            sdl2::Colors::RED,
+                            flatindex,
+                            (boardContainer.w * (j % n_rows)) + 40,
+                            boardContainer.y + 20
+                        );
                         continue;
                     }
                 }
