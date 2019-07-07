@@ -74,9 +74,11 @@ class FirstState : public GameState {
     SDL_Event event = {0};
     int x, y;
 
+    const static size_t n_tiles = 64;
+
     // these can be used to draw in batch
-    SDL_Rect boardContainers[64];
-    GridCell cells[64];
+    SDL_Rect boardContainers[n_tiles];
+    GridCell cells[n_tiles];
 
     std::vector<SDL_Rect> greenChecks{32};
     std::vector<SDL_Rect> redChecks{32};
@@ -172,28 +174,52 @@ class FirstState : public GameState {
         selected = nullptr;
     }
 
-    bool tryAndMove(int xOffset, int yOffset) {
+    void doOvertake(GridCell &taken, GridCell &position) {
+        Checker *source = selected->occubant;
+
+        source->updateNextPosition(
+            position.container->x + 20,
+            position.container->y + 20
+        );
+
+        position.occubant = source;
+        selected->occubant = nullptr;
+
+        taken.occubant->position->h = 0;
+        taken.occubant->position->w = 0;
+        taken.occubant = nullptr;
+
+        selected = nullptr;
+    }
+
+    bool tryToMove(int xOffset, int yOffset) {
 
         int nextIndex = (selected->y + xOffset) * n_rows + (selected->x + yOffset);
         std::cout << "Next index " << nextIndex << "\n";
-        if ( 0 <= nextIndex && nextIndex < 64 ) {
+        if ( 0 <= nextIndex && nextIndex < static_cast<int>(n_tiles) ) {
             auto &gridCell = cells[nextIndex];
             if ( contains(gridCell.container, x, y) ) {
                 if ( gridCell.occubant == nullptr ) {
                     doMoveToEmpty(gridCell);
                     return true;
+                } else {
+                    int nextNextIndex = (selected->y + (xOffset * 2)) * n_rows + (selected->x + (yOffset * 2));
+                    if ( 0 <= nextNextIndex && nextNextIndex < static_cast<int>(n_tiles) ) {
+                        doOvertake(gridCell, cells[nextNextIndex]);
+                        return true;
+                    }
                 }
             }
-        }   
+        }
 
         return false;
     }
 
     void updateSelected() {
-        if ( tryAndMove(1, 1) ) return;
-        if ( tryAndMove(-1, 1) ) return;
-        if ( tryAndMove(1, -1) ) return;
-        if ( tryAndMove(-1, -1) ) return;
+        if ( tryToMove( 1,  1) ) return;
+        if ( tryToMove(-1,  1) ) return;
+        if ( tryToMove( 1, -1) ) return;
+        if ( tryToMove(-1, -1) ) return;
     }
 
 public:
