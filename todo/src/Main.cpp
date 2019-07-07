@@ -78,12 +78,12 @@ class FirstState : public GameState {
     int x, y;
 
     // these can be used to draw in batch
-    std::array<SDL_Rect, 64> rects = {{0, 0, 0, 0}};
+    std::array<SDL_Rect, 64> boardContainers;
     std::array<GridCell, 64> cells;
     std::vector<SDL_Rect> greenChecks{32};
     std::vector<SDL_Rect> redChecks{32};
 
-    // metainfo structs that points to rects
+    // metainfo structs that points to boardContainers
     std::vector<std::shared_ptr<Checker>> checkers;
     std::vector<sdl2::Texture> text;
 
@@ -113,6 +113,20 @@ class FirstState : public GameState {
         }
     }
 
+    void findSelected() {
+        for (auto &checker : checkers) {
+            auto &bc = boardContainers[checker->atIndex];
+
+            if ( contains(bc, x, y) && playingColor == checker->color
+                && checker->position->w != 0
+                && checker->position->h != 0 ) {
+                std::cout << ":> " << checker->atIndex << " Selected\n";
+                selected = checker.get();
+                break;
+            }
+        }
+    }
+
 public:
     void handleInput() override {
 
@@ -122,17 +136,7 @@ public:
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 auto mouseButtonState = SDL_GetMouseState(&x, &y);
                 if ( (mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT)) ) {
-                    for (auto &checker : checkers) {
-                        auto &r = rects[checker->atIndex];
-
-                        if ( contains(r, x, y) && playingColor == checker->color
-                            && checker->position->w != 0
-                            && checker->position->h != 0 ) {
-                            std::cout << ":> " << checker->atIndex << " Selected\n";
-                            selected = checker.get();
-                            break;
-                        }
-                    }
+                    findSelected();
                 }
             }
         }
@@ -146,13 +150,13 @@ public:
 
     bool load() override {
 
-        font.loadTTF("assets/NotoMono-Regular.ttf", 24);
+        font.loadTTF("assets/consola.ttf", 24);
 
         for (int i = 0; i < n_rows; ++i) {
             for (int j = 0; j < n_rows; ++j) {
 
                 auto flatindex = i * static_cast<int>(n_rows) + j;
-                auto &r = rects[flatindex];
+                auto &r = boardContainers[flatindex];
 
                 r.h = checkerCellDim;
                 r.w = checkerCellDim;
@@ -216,7 +220,7 @@ public:
             }
         }
 
-        return true;
+        return font.isLoaded();
     }
 
     void update() override {
@@ -232,7 +236,7 @@ public:
                     if (i == 0 || j == 0) continue;
                     int nextIndex = (selectedGridIndex + (n_rows * j) + i);
 
-                    if ( 0 <= nextIndex && nextIndex < static_cast<int>(rects.size()) && nextIndex != selectedGridIndex ) {
+                    if ( 0 <= nextIndex && nextIndex < static_cast<int>(boardContainers.size()) && nextIndex != selectedGridIndex ) {
                         auto &targetCell = cells[nextIndex];
 
                         if ( contains(targetCell.container, x, y) ) {
@@ -288,7 +292,7 @@ public:
         renderer.fillRect({0, 0, SCREEN_WIDTH, SCREEN_HEIGHT});
 
         renderer.setColor(sdl2::Colors::BLACK);
-        renderer.drawRects(rects);
+        renderer.drawRects(boardContainers);
 
         renderer.setColor(sdl2::Colors::GREEN);
         renderer.drawRects(greenChecks);

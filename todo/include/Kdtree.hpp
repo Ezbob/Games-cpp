@@ -4,6 +4,7 @@
 
 #include <cstddef>
 #include <array>
+#include <functional>
 #include "SDL2/SDL.h"
 
 template<std::size_t N>
@@ -15,20 +16,17 @@ class Position2DKDTree {
     };
     std::array<Cut, N> _data;
 
-    Cut *build(SDL_Rect *points, std::size_t length, std::size_t depth = 0) {
+    template<typename T>
+    using Comparator = bool(T a, T b);
+
+    Cut *build(SDL_Rect *points, std::size_t length, Comparator<SDL_Rect> comp, std::size_t depth = 0) {
         if (length == 1) 
             return new Cut(points[0], nullptr, nullptr);
         else if (length == 0)
             return nullptr;
         
         auto axis = depth % 2;
-        std::sort(points, points + length, [axis](SDL_Rect a, SDL_Rect b) {
-            if (axis == 0) {
-                return a.x < b.x;
-            } else {
-                return a.y < b.y;
-            }
-        });
+        std::sort(points, points + length, comp);
         auto median = length / 2;
 
         bool isOddLength = (length % 2) != 0;
