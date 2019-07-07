@@ -60,14 +60,8 @@ class FirstState : public GameState {
     struct GridCell {
         SDL_Rect *container = nullptr;
         Checker *occubant = nullptr;
-        int x;
-        int y;
-    };
-
-    struct Test {
-        int x;
-        int y;
-        sdl2::Texture text;
+        int column;
+        int row;
     };
 
     const uint8_t *key_state = nullptr;
@@ -106,10 +100,8 @@ class FirstState : public GameState {
 
     void switchTurn() {
         if (playingColor == sdl2::Colors::GREEN) {
-            std::cout << "REDs turn\n";
             playingColor = sdl2::Colors::RED;
         } else {
-            std::cout << "GREENs turn\n";
             playingColor = sdl2::Colors::GREEN;
         }
     }
@@ -126,9 +118,8 @@ class FirstState : public GameState {
                     && gridCell.occubant->color == playingColor
                     && gridCell.occubant->position->w != 0
                     && gridCell.occubant->position->h != 0 ) {
-                    std::cout << ":> " << index << " Selected\n";
                     selected = &gridCell;
-                    break;
+                    return;
                 }
             }
         }
@@ -194,18 +185,25 @@ class FirstState : public GameState {
 
     bool tryToMove(int xOffset, int yOffset) {
 
-        int nextIndex = (selected->y + xOffset) * n_rows + (selected->x + yOffset);
-        std::cout << "Next index " << nextIndex << "\n";
+        int nextIndex = (selected->row + xOffset) * n_rows + (selected->column + yOffset);
+
         if ( 0 <= nextIndex && nextIndex < static_cast<int>(n_tiles) ) {
             auto &gridCell = cells[nextIndex];
             if ( contains(gridCell.container, x, y) ) {
                 if ( gridCell.occubant == nullptr ) {
                     doMoveToEmpty(gridCell);
                     return true;
-                } else {
-                    int nextNextIndex = (selected->y + (xOffset * 2)) * n_rows + (selected->x + (yOffset * 2));
-                    if ( 0 <= nextNextIndex && nextNextIndex < static_cast<int>(n_tiles) ) {
-                        doOvertake(gridCell, cells[nextNextIndex]);
+                } else if (
+                    gridCell.occubant->color != selected->occubant->color
+                ) {
+                    int nextNextIndex = (selected->row + (xOffset * 2)) * n_rows + (selected->column + (yOffset * 2));
+                    auto nextPostion = cells[nextNextIndex];
+                    if (
+                        0 <= nextNextIndex
+                        && nextNextIndex < static_cast<int>(n_tiles)
+                        && nextPostion.occubant == nullptr
+                    ) {
+                        doOvertake(gridCell, nextPostion);
                         return true;
                     }
                 }
@@ -267,8 +265,8 @@ public:
                 boardContainer.y = dy + 20;
 
                 cells[flatindex].container = &boardContainer;
-                cells[flatindex].x = j;
-                cells[flatindex].y = i;
+                cells[flatindex].column = j;
+                cells[flatindex].row = i;
 
                 text.emplace_back(sdl2::loadSolidText(renderer,
                     std::to_string(flatindex),
