@@ -196,7 +196,7 @@ class FirstState : public GameState {
             auto &gridCell = cells[nextIndex];
 
             if (
-                (selected->column + xOffset) < 0 
+                (selected->column + xOffset) < 0
                 || (selected->column + xOffset) >= static_cast<int>(n_rows)
                 || (selected->row + yOffset) < 0
                 || (selected->row + yOffset) >= static_cast<int>(n_rows)
@@ -273,16 +273,16 @@ public:
 
         font.loadTTF("assets/consola.ttf", 24);
 
-        redTurn = sdl2::loadSolidText(renderer, 
-            "Red's turn", 
-            (TTF_Font *) font, 
+        redTurn = sdl2::loadSolidText(renderer,
+            "Red's turn",
+            (TTF_Font *) font,
             SDL_Color {
                 0xFF, 0x00, 0x00, 0xff
             });
 
-        greenTurn = sdl2::loadSolidText(renderer, 
-            "Green's turn", 
-            (TTF_Font *) font, 
+        greenTurn = sdl2::loadSolidText(renderer,
+            "Green's turn",
+            (TTF_Font *) font,
             SDL_Color {
                 0x00, 0xFF, 0x00, 0xff
             });
