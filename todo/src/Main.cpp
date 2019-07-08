@@ -17,7 +17,7 @@
 #endif
 
 const int SCREEN_WIDTH = 840;
-const int SCREEN_HEIGHT = 840;
+const int SCREEN_HEIGHT = 860;
 
 sdl2::Globals globals;
 sdl2::Window window;
@@ -89,6 +89,9 @@ class FirstState : public GameState {
     int checkerDim = 60; // h/w of the rect that is inside a cell
 
     sdl2::Colors playingColor = sdl2::Colors::GREEN;
+    sdl2::Texture greenTurn = renderer.createTexture();
+    sdl2::Texture redTurn = renderer.createTexture();
+    sdl2::Texture *currentText = nullptr;
 
     bool contains(const SDL_Rect &r, const int x, const int y) const {
         return (r.x <= x && x <= r.x + r.w) && (r.y <= y && y <= r.y + r.h);
@@ -101,8 +104,10 @@ class FirstState : public GameState {
     void switchTurn() {
         if (playingColor == sdl2::Colors::GREEN) {
             playingColor = sdl2::Colors::RED;
+            currentText = &redTurn;
         } else {
             playingColor = sdl2::Colors::GREEN;
+            currentText = &greenTurn;
         }
     }
 
@@ -185,19 +190,37 @@ class FirstState : public GameState {
 
     bool tryToMove(int xOffset, int yOffset) {
 
-        int nextIndex = (selected->row + xOffset) * n_rows + (selected->column + yOffset);
+        int nextIndex = (selected->row + yOffset) * n_rows + (selected->column + xOffset);
 
         if ( 0 <= nextIndex && nextIndex < static_cast<int>(n_tiles) ) {
             auto &gridCell = cells[nextIndex];
+
+            if (
+                (selected->column + xOffset) < 0 
+                || (selected->column + xOffset) >= static_cast<int>(n_rows)
+                || (selected->row + yOffset) < 0
+                || (selected->row + yOffset) >= static_cast<int>(n_rows)
+            ) {
+                return false;
+            }
+
             if ( contains(gridCell.container, x, y) ) {
                 if ( gridCell.occubant == nullptr ) {
                     doMoveToEmpty(gridCell);
                     return true;
-                } else if (
-                    gridCell.occubant->color != selected->occubant->color
-                ) {
-                    int nextNextIndex = (selected->row + (xOffset * 2)) * n_rows + (selected->column + (yOffset * 2));
-                    auto nextPostion = cells[nextNextIndex];
+                } else if ( gridCell.occubant->color != selected->occubant->color ) {
+                    int nextNextIndex = (selected->row + (yOffset * 2)) * n_rows + (selected->column + (xOffset * 2));
+                    auto &nextPostion = cells[nextNextIndex];
+
+                    if (
+                        (selected->column + (xOffset * 2)) < 0 ||
+                        (selected->column + (xOffset * 2)) >= static_cast<int>(n_rows) ||
+                        (selected->row    + (yOffset * 2)) < 0 ||
+                        (selected->row    + (yOffset * 2)) >= static_cast<int>(n_rows)
+                    ) {
+                        return false;
+                    }
+
                     if (
                         0 <= nextNextIndex
                         && nextNextIndex < static_cast<int>(n_tiles)
@@ -218,6 +241,7 @@ class FirstState : public GameState {
         if ( tryToMove(-1,  1) ) return;
         if ( tryToMove( 1, -1) ) return;
         if ( tryToMove(-1, -1) ) return;
+        selected = nullptr;
     }
 
 public:
@@ -229,7 +253,7 @@ public:
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 auto mouseButtonState = SDL_GetMouseState(&x, &y);
                 if ((mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT))) {
-                    if (selected == nullptr ) {
+                    if ( selected == nullptr ) {
                         findSelected();
                     } else {
                         updateSelected();
@@ -248,6 +272,22 @@ public:
     bool load() override {
 
         font.loadTTF("assets/consola.ttf", 24);
+
+        redTurn = sdl2::loadSolidText(renderer, 
+            "Red's turn", 
+            (TTF_Font *) font, 
+            SDL_Color {
+                0xFF, 0x00, 0x00, 0xff
+            });
+
+        greenTurn = sdl2::loadSolidText(renderer, 
+            "Green's turn", 
+            (TTF_Font *) font, 
+            SDL_Color {
+                0x00, 0xFF, 0x00, 0xff
+            });
+
+        currentText = &greenTurn;
 
         for (int i = 0; i < n_rows; ++i) {
             for (int j = 0; j < n_rows; ++j) {
@@ -269,7 +309,7 @@ public:
                 cells[flatindex].row = i;
 
                 text.emplace_back(sdl2::loadSolidText(renderer,
-                    std::to_string(flatindex),
+                    "(" + std::to_string(i) + ", " + std::to_string(j) + ")",
                     (TTF_Font *) font,
                     SDL_Color {
                         0x00, 0x00, 0x00, 0xff
@@ -351,6 +391,9 @@ public:
                 t.render(j * 100 + 22, i * 100 + 20);
             }
 
+        if (currentText != nullptr) {
+            currentText->render(SCREEN_WIDTH / 2 - 85, SCREEN_HEIGHT - 32);
+        }
 
         renderer.updateScreen();
     }
