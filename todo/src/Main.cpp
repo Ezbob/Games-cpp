@@ -8,9 +8,8 @@
 #include <stack>
 #include <vector>
 #include <array>
-//#include "Kdtree.hpp"
 
-#if _WIN32
+#if defined(_WIN32)
     #define MAIN_NAME WinMain
 #else
     #define MAIN_NAME main
@@ -188,18 +187,43 @@ class FirstState : public GameState {
         selected = nullptr;
     }
 
-    bool tryToMove(int xOffset, int yOffset) {
+    bool tryToOvertake(GridCell &clickedGridCell, int xOffset, int yOffset) {
+        int y2diff = selected->row + (yOffset * 2);
+        int x2diff = selected->column + (xOffset * 2);
+        int nextNextIndex = y2diff * n_rows + x2diff;
 
-        int nextIndex = (selected->row + yOffset) * n_rows + (selected->column + xOffset);
+        if (
+            x2diff < 0 ||
+            x2diff >= static_cast<int>(n_rows) ||
+            y2diff < 0 ||
+            y2diff >= static_cast<int>(n_rows)
+        ) {
+            return false;
+        }
+
+        if ( 0 <= nextNextIndex && nextNextIndex < static_cast<int>(n_tiles) ) {
+            if (auto &nextNextCell = cells[nextNextIndex]; nextNextCell.occubant == nullptr) {
+                doOvertake(clickedGridCell, nextNextCell);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    bool tryToMove(int xOffset, int yOffset) {
+        int ydiff = selected->row + yOffset;
+        int xdiff = selected->column + xOffset;
+        int nextIndex = ydiff * n_rows + xdiff;
 
         if ( 0 <= nextIndex && nextIndex < static_cast<int>(n_tiles) ) {
             auto &gridCell = cells[nextIndex];
 
             if (
-                (selected->column + xOffset) < 0
-                || (selected->column + xOffset) >= static_cast<int>(n_rows)
-                || (selected->row + yOffset) < 0
-                || (selected->row + yOffset) >= static_cast<int>(n_rows)
+                xdiff < 0 ||
+                xdiff >= static_cast<int>(n_rows) ||
+                ydiff < 0 ||
+                ydiff >= static_cast<int>(n_rows)
             ) {
                 return false;
             }
@@ -209,26 +233,7 @@ class FirstState : public GameState {
                     doMoveToEmpty(gridCell);
                     return true;
                 } else if ( gridCell.occubant->color != selected->occubant->color ) {
-                    int nextNextIndex = (selected->row + (yOffset * 2)) * n_rows + (selected->column + (xOffset * 2));
-                    auto &nextPostion = cells[nextNextIndex];
-
-                    if (
-                        (selected->column + (xOffset * 2)) < 0 ||
-                        (selected->column + (xOffset * 2)) >= static_cast<int>(n_rows) ||
-                        (selected->row    + (yOffset * 2)) < 0 ||
-                        (selected->row    + (yOffset * 2)) >= static_cast<int>(n_rows)
-                    ) {
-                        return false;
-                    }
-
-                    if (
-                        0 <= nextNextIndex
-                        && nextNextIndex < static_cast<int>(n_tiles)
-                        && nextPostion.occubant == nullptr
-                    ) {
-                        doOvertake(gridCell, nextPostion);
-                        return true;
-                    }
+                    return tryToOvertake(gridCell, xOffset, yOffset);
                 }
             }
         }
@@ -298,11 +303,8 @@ public:
                 boardContainer.h = checkerCellDim;
                 boardContainer.w = checkerCellDim;
 
-                auto dx = boardContainer.w * (flatindex % n_rows);
-                auto dy = boardContainer.h * (flatindex / n_rows);
-
-                boardContainer.x = dx + 20;
-                boardContainer.y = dy + 20;
+                boardContainer.x = boardContainer.w * (flatindex % n_rows) + 20;
+                boardContainer.y = boardContainer.h * (flatindex / n_rows) + 20;
 
                 cells[flatindex].container = &boardContainer;
                 cells[flatindex].column = j;
@@ -385,11 +387,12 @@ public:
         renderer.setColor(sdl2::Colors::RED);
         renderer.drawRects(redChecks);
 
-        for (auto i = 0; i < n_rows; ++i)
+        for (auto i = 0; i < n_rows; ++i) {
             for (auto j = 0; j < n_rows; ++j) {
                 auto &t = text[i * n_rows + j];
                 t.render(j * 100 + 22, i * 100 + 20);
             }
+        }
 
         if (currentText != nullptr) {
             currentText->render(SCREEN_WIDTH / 2 - 85, SCREEN_HEIGHT - 32);
