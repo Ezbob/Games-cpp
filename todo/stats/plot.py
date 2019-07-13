@@ -53,6 +53,7 @@ def main(args):
     plt.ylabel("Time in milliseconds")
     plt.xlabel("Frame sample count")
     plt.legend(plotlines, loc=1)
+    plt.tight_layout()
     plt.show()
     print("Done.")
 
