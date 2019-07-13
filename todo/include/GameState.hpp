@@ -6,19 +6,25 @@
 #include <memory>
 #include <functional>
 #include "GameClock.hpp"
-
-#if _STATS
-    #define _STATS_MS_DIFF(starttime) static_cast<double>(((SDL_GetPerformanceCounter() - starttime) * 1000) / static_cast<double>(SDL_GetPerformanceFrequency()))
-#endif
+#include "SDL.h"
 
 struct GameState {
+    bool isPlaying = true;
+
+    void pumpEvents() {
+        static SDL_Event inputEvent;
+        while ( SDL_PollEvent(&inputEvent) != 0 ) {
+            handleEvent(inputEvent);
+        }
+        handleKeyState(SDL_GetKeyboardState(nullptr));
+    }
+
     virtual ~GameState() {};
-    virtual void handleInput() = 0;
+    virtual void handleKeyState(const uint8_t *keyState) = 0;
+    virtual void handleEvent(const SDL_Event &inputEvent) = 0;
     virtual bool load() = 0;
     virtual void update() = 0;
     virtual void render() = 0;
-
-    bool isPlaying = true;
 };
 
 using GameStateStack = std::stack<std::shared_ptr<GameState>>;
@@ -28,6 +34,7 @@ class GameStateProcessor {
     GameClock clock;
 
     bool isPlaying = true;
+
 public:
     GameStateProcessor(double msPerFrame = 16.) {
         clock.msPerUpdate = msPerFrame;
@@ -37,58 +44,7 @@ public:
         initFunction(gameStates);
     }
 
-    void processStates() {
-        #if _STATS
-        double rtime = 0.0;
-        double utime = 0.0;
-        double itime = 0.0;
-        #endif
-
-        while ( !gameStates.empty() && isPlaying ) {
-            auto state = gameStates.top();
-            if (  state->load() ) {
-                while ( state->isPlaying && isPlaying ) {
-                    #if _STATS
-                    auto istart = SDL_GetPerformanceCounter();
-                    #endif
-
-                    state->handleInput();
-
-                    #if _STATS
-                    itime = _STATS_MS_DIFF(istart);
-                    auto ustart = SDL_GetPerformanceCounter();
-                    #endif
-
-                    while ( clock.updateLag >= clock.msPerUpdate ) {   
-                        state->update();
-                        clock.updateLag -= clock.msPerUpdate;
-                    }
-
-                    #if _STATS
-                    utime = _STATS_MS_DIFF(ustart);
-                    auto rstart = SDL_GetPerformanceCounter();
-                    #endif
-
-                    state->render();
-
-                    #if _STATS
-                    rtime = _STATS_MS_DIFF(rstart);
-                    #endif
-
-                    clock.tick();
-
-                    #if _STATS
-                    std::cout <<
-                        "I " << itime << "\n" <<
-                        "U " << utime << "\n" <<
-                        "R " << rtime << "\n" <<
-                        "F " << clock.frameElapsed << "\n";
-                    #endif
-                }
-            }
-            gameStates.pop();
-        }
-    }
+    void processStates();
 
     GameClock const *getClock() {
         return &clock;
