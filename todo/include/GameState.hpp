@@ -27,6 +27,7 @@ class GameStateProcessor {
     GameStateStack gameStates;
     GameClock clock;
 
+    bool isPlaying = true;
 public:
     GameStateProcessor(double msPerFrame = 16.) {
         clock.msPerUpdate = msPerFrame;
@@ -43,10 +44,10 @@ public:
         double itime = 0.0;
         #endif
 
-        while ( !gameStates.empty() ) {
+        while ( !gameStates.empty() && isPlaying ) {
             auto state = gameStates.top();
             if (  state->load() ) {
-                while ( state->isPlaying ) {
+                while ( state->isPlaying && isPlaying ) {
                     #if _STATS
                     auto istart = SDL_GetPerformanceCounter();
                     #endif
@@ -85,13 +86,16 @@ public:
                     #endif
                 }
             }
-
             gameStates.pop();
         }
     }
 
     GameClock const *getClock() {
         return &clock;
+    }
+
+    void quitGame() {
+        isPlaying = false;
     }
 };
 

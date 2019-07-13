@@ -25,7 +25,7 @@ sdl2::TTFFont font;
 
 GameStateProcessor gameStateProcessor { 18. };
 
-class FirstState : public GameState {
+class BoardPlayState : public GameState {
     const GameClock *clock = gameStateProcessor.getClock();
 
     struct Checker {
@@ -65,7 +65,8 @@ class FirstState : public GameState {
 
     const uint8_t *key_state = nullptr;
     SDL_Event event = {0};
-    int x, y;
+    int mouse_x, mouse_y;
+    int nRedCheckers = 0, nGreenCheckers = 0;
 
     const static size_t n_tiles = 64;
 
@@ -117,7 +118,7 @@ class FirstState : public GameState {
                 int index = i * n_rows + j;
                 auto &gridCell = cells[index];
 
-                if ( contains(gridCell.container, x, y)
+                if ( contains(gridCell.container, mouse_x, mouse_y)
                     && gridCell.occubant != nullptr
                     && gridCell.occubant->color == playingColor
                     && gridCell.occubant->position->w != 0
@@ -182,6 +183,13 @@ class FirstState : public GameState {
 
         taken.occubant->position->h = 0;
         taken.occubant->position->w = 0;
+
+        if (taken.occubant->color == sdl2::Colors::RED) {
+            nRedCheckers--;
+        } else {
+            nGreenCheckers--;
+        }
+
         taken.occubant = nullptr;
 
         selected = nullptr;
@@ -228,7 +236,7 @@ class FirstState : public GameState {
                 return false;
             }
 
-            if ( contains(gridCell.container, x, y) ) {
+            if ( contains(gridCell.container, mouse_x, mouse_y) ) {
                 if ( gridCell.occubant == nullptr ) {
                     doMoveToEmpty(gridCell);
                     return true;
@@ -256,7 +264,7 @@ public:
             if ( event.type == SDL_QUIT ) {
                 isPlaying = false;
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-                auto mouseButtonState = SDL_GetMouseState(&x, &y);
+                auto mouseButtonState = SDL_GetMouseState(&mouse_x, &mouse_y);
                 if ((mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT))) {
                     if ( selected == nullptr ) {
                         findSelected();
@@ -270,13 +278,12 @@ public:
 
         if ( key_state[SDL_SCANCODE_ESCAPE] ) {
             isPlaying = false;
+            gameStateProcessor.quitGame();
         }
     }
 
 
     bool load() override {
-
-        font.loadTTF("assets/consola.ttf", 24);
 
         redTurn = sdl2::loadSolidText(renderer,
             "Red's turn",
@@ -366,12 +373,18 @@ public:
             }
         }
 
-        return font.isLoaded();
+        nGreenCheckers = greenChecks.size();
+        nRedCheckers = redChecks.size();
+
+        return true;
     }
 
     void update() override {
         for (auto &c : checkers)
             c->move();
+        if (nRedCheckers <= 0 || nGreenCheckers <= 0) {
+            isPlaying = false;
+        }
     }
 
     void render() override {
@@ -399,6 +412,41 @@ public:
         }
 
         renderer.updateScreen();
+    }
+};
+
+class WinState : public GameState {
+    sdl2::Texture winnerText = renderer.createTexture();
+    const uint8_t *key_state;
+public:
+
+    bool load() override {
+
+        winnerText = sdl2::loadSolidText(renderer,
+            "You're a winner",
+            (TTF_Font *) font,
+            SDL_Color{
+                0xff,
+                0x00,
+                0x00,
+                0xff
+            }
+        );
+
+        return true;
+    }
+
+    void handleInput() override {
+        key_state = SDL_GetKeyboardState(nullptr);
+
+        if ( key_state[SDL_SCANCODE_ESCAPE] ) {
+            isPlaying = false;
+            gameStateProcessor.quitGame();
+        }
+    }
+    void update() override {}
+    void render() override {
+        winnerText.render(SCREEN_WIDTH / 2 + 200, SCREEN_HEIGHT / 2 + 12);
     }
 };
 
@@ -430,8 +478,14 @@ int MAIN_NAME() {
         return 1;
     }
 
+    font.loadTTF("assets/consola.ttf", 24);
+    if ( !font.isLoaded() ) {
+        return 1;
+    }
+
     gameStateProcessor.initStates([](auto &stack) {
-        stack.emplace(new FirstState());
+        stack.emplace(new WinState());
+        stack.emplace(new BoardPlayState());
     });
 
     gameStateProcessor.processStates();
