@@ -46,8 +46,8 @@ public:
 
     void processStates();
 
-    GameClock const *getClock() {
-        return &clock;
+    GameClock const &getClock() {
+        return clock;
     }
 
     void quitGame() {

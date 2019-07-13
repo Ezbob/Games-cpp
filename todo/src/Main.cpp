@@ -26,7 +26,7 @@ sdl2::TTFFont font;
 GameStateProcessor gameStateProcessor { 18. };
 
 class BoardPlayState : public GameState {
-    const GameClock *clock = gameStateProcessor.getClock();
+    const GameClock &clock = gameStateProcessor.getClock();
 
     struct Checker {
         sdl2::Colors color = sdl2::Colors::GREEN;
