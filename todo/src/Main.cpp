@@ -258,12 +258,9 @@ class BoardPlayState : public GameState {
     }
 
 public:
-    void handleInput() override {
-
-        while ( SDL_PollEvent(&event) != 0 ) {
-            if ( event.type == SDL_QUIT ) {
-                isPlaying = false;
-            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+    void handleEvent(const SDL_Event &event) override {
+        switch (event.type) {
+        case SDL_MOUSEBUTTONDOWN: {
                 auto mouseButtonState = SDL_GetMouseState(&mouse_x, &mouse_y);
                 if ((mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT))) {
                     if ( selected == nullptr ) {
@@ -273,15 +270,19 @@ public:
                     }
                 }
             }
-        }
-        key_state = SDL_GetKeyboardState(nullptr);
-
-        if ( key_state[SDL_SCANCODE_ESCAPE] ) {
+            break;
+        case SDL_QUIT:
             isPlaying = false;
-            gameStateProcessor.quitGame();
+            break;
+        default:
+            break;
         }
     }
 
+    void handleKeyState(const uint8_t *state [[maybe_unused]]) override {
+        if ( state[SDL_SCANCODE_ESCAPE] )
+            gameStateProcessor.quitGame();
+    }
 
     bool load() override {
 
@@ -421,7 +422,8 @@ class WinState : public GameState {
 public:
 
     bool load() override {
-
+        renderer.setColor(sdl2::Colors::WHITE);
+        renderer.clear();
         winnerText = sdl2::loadSolidText(renderer,
             "You're a winner",
             (TTF_Font *) font,
@@ -436,17 +438,20 @@ public:
         return true;
     }
 
-    void handleInput() override {
-        key_state = SDL_GetKeyboardState(nullptr);
-
-        if ( key_state[SDL_SCANCODE_ESCAPE] ) {
+    void handleEvent(const SDL_Event &event [[maybe_unused]]) override {
+        if (event.type == SDL_QUIT) {
             isPlaying = false;
-            gameStateProcessor.quitGame();
         }
+    }
+    void handleKeyState(const uint8_t *state [[maybe_unused]]) override {
+        if ( state[SDL_SCANCODE_ESCAPE] )
+            gameStateProcessor.quitGame();
     }
     void update() override {}
     void render() override {
-        winnerText.render(SCREEN_WIDTH / 2 + 200, SCREEN_HEIGHT / 2 + 12);
+        winnerText.render(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 12);
+
+        renderer.updateScreen();
     }
 };
 
