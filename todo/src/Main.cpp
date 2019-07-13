@@ -63,8 +63,6 @@ class BoardPlayState : public GameState {
         int row;
     };
 
-    const uint8_t *key_state = nullptr;
-    SDL_Event event = {0};
     int mouse_x, mouse_y;
     int nRedCheckers = 0, nGreenCheckers = 0;
 
@@ -81,7 +79,6 @@ class BoardPlayState : public GameState {
     std::vector<std::shared_ptr<Checker>> checkers;
     std::vector<sdl2::Texture> text;
 
-    bool is_findingSelected = false;
     GridCell *selected = nullptr;
 
     int n_rows = 8;
@@ -260,22 +257,22 @@ class BoardPlayState : public GameState {
 public:
     void handleEvent(const SDL_Event &event) override {
         switch (event.type) {
-        case SDL_MOUSEBUTTONDOWN: {
-                auto mouseButtonState = SDL_GetMouseState(&mouse_x, &mouse_y);
-                if ((mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT))) {
-                    if ( selected == nullptr ) {
-                        findSelected();
-                    } else {
-                        updateSelected();
+            case SDL_MOUSEBUTTONDOWN: {
+                    auto mouseButtonState = SDL_GetMouseState(&mouse_x, &mouse_y);
+                    if ((mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT))) {
+                        if ( selected == nullptr ) {
+                            findSelected();
+                        } else {
+                            updateSelected();
+                        }
                     }
                 }
-            }
-            break;
-        case SDL_QUIT:
-            isPlaying = false;
-            break;
-        default:
-            break;
+                break;
+            case SDL_QUIT:
+                isPlaying = false;
+                break;
+            default:
+                break;
         }
     }
 
