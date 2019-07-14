@@ -447,6 +447,16 @@ public:
             isPlaying = false;
     }
 
+    void handleEvent(const SDL_Event &event) override {
+        switch (event.type) {
+            case SDL_QUIT:
+                gameStateProcessor.quitGame();
+                break;
+            default:
+                break;
+        }
+    }
+
     bool load() override {
         pausedText = sdl2::loadSolidText(renderer,
             "Game Paused",
