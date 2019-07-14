@@ -22,7 +22,7 @@ sdl2::TTFFont font;
 
 std::shared_ptr<gtool::GameState> pauseState;
 
-gtool::GameStateProcessor gameStateProcessor { 18. };
+gtool::GameStateProcessor gameStateProcessor { 16. };
 
 class BoardPlayState : public gtool::GameState {
     const gtool::GameClock &clock = gameStateProcessor.getClock();
@@ -76,7 +76,10 @@ class BoardPlayState : public gtool::GameState {
 
     // metainfo structs that points to boardContainers
     std::vector<std::shared_ptr<Checker>> checkers;
+
+#if _DEBUG
     std::vector<sdl2::Texture> text;
+#endif
 
     GridCell *selected = nullptr;
 
@@ -258,7 +261,7 @@ public:
         switch (event.type) {
             case SDL_MOUSEBUTTONDOWN: {
                     auto mouseButtonState = SDL_GetMouseState(&mouse_x, &mouse_y);
-                    if ((mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT))) {
+                    if ( (mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT)) ) {
                         if ( selected == nullptr ) {
                             findSelected();
                         } else {
@@ -268,7 +271,7 @@ public:
                 }
                 break;
             case SDL_QUIT:
-                isPlaying = false;
+                gameStateProcessor.quitGame();
                 break;
             default:
                 break;
@@ -277,24 +280,19 @@ public:
 
     void handleKeyState(const uint8_t *state [[maybe_unused]]) override {
         if ( state[SDL_SCANCODE_ESCAPE] )
-            gameStateProcessor.quitGame();
+            gameStateProcessor.startFromNewState(pauseState);
     }
 
     bool load() override {
-
         redTurn = sdl2::loadSolidText(renderer,
             "Red's turn",
             (TTF_Font *) font,
-            SDL_Color {
-                0xFF, 0x00, 0x00, 0xff
-            });
+            sdl2::asColorStruct(sdl2::Colors::RED));
 
         greenTurn = sdl2::loadSolidText(renderer,
             "Green's turn",
             (TTF_Font *) font,
-            SDL_Color {
-                0x00, 0xFF, 0x00, 0xff
-            });
+            sdl2::asColorStruct(sdl2::Colors::GREEN));
 
         currentText = &greenTurn;
 
@@ -314,14 +312,13 @@ public:
                 cells[flatindex].column = j;
                 cells[flatindex].row = i;
 
+#if _DEBUG
                 text.emplace_back(sdl2::loadSolidText(renderer,
                     "(" + std::to_string(i) + ", " + std::to_string(j) + ")",
                     (TTF_Font *) font,
-                    SDL_Color {
-                        0x00, 0x00, 0x00, 0xff
-                    }
+                    sdl2::asColorStruct(sdl2::Colors::BLACK)
                 ));
-
+#endif
                 // GREEN upper player
                 if ( i % 2 == 0 && i < (n_rows / 2) ) {
                     if (j % 2 == 0) {
@@ -397,12 +394,14 @@ public:
         renderer.setColor(sdl2::Colors::RED);
         renderer.drawRects(redChecks);
 
+#if _DEBUG
         for (auto i = 0; i < n_rows; ++i) {
             for (auto j = 0; j < n_rows; ++j) {
                 auto &t = text[i * n_rows + j];
                 t.render(j * 100 + 22, i * 100 + 20);
             }
         }
+#endif
 
         if (currentText != nullptr) {
             currentText->render(SCREEN_WIDTH / 2 - 85, SCREEN_HEIGHT - 32);
@@ -423,7 +422,6 @@ public:
             (TTF_Font *) font,
             sdl2::asColorStruct(sdl2::Colors::RED)
         );
-
         return true;
     }
 
@@ -442,27 +440,37 @@ public:
 
 class PauseState : public gtool::GameState {
     sdl2::Texture pausedText = renderer.createTexture();
+    sdl2::Texture subText = renderer.createTexture();
 public:
     void handleKeyState(const uint8_t *state [[maybe_unused]]) override {
-        if ( state[SDL_SCANCODE_ESCAPE] )
-            gameStateProcessor.quitGame();
+        if ( state[SDL_SCANCODE_RETURN] )
+            isPlaying = false;
     }
 
     bool load() override {
-        renderer.setColor(sdl2::Colors::WHITE);
-        renderer.clear();
         pausedText = sdl2::loadSolidText(renderer,
             "Game Paused",
             (TTF_Font *) font,
             asColorStruct(sdl2::Colors::BLACK)
         );
-        return true;
+
+        subText = sdl2::loadSolidText(renderer,
+            "(Press Enter to continue)",
+            (TTF_Font *) font,
+            asColorStruct(sdl2::Colors::BLACK)
+        );
+
+        return pausedText && subText;
     }
 
     void update() override {}
 
     void render() override {
-        pausedText.render(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 12);
+        renderer.setColor(sdl2::Colors::WHITE);
+        renderer.clear();
+
+        pausedText.render(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 12);
+        subText.render(SCREEN_WIDTH / 2 - 140, SCREEN_HEIGHT / 2 + 14);
 
         renderer.updateScreen();
     }

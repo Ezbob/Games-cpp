@@ -2,6 +2,7 @@
 #define HEADER_GUARD_a17e097f8bd12c4c14b2c994eb545006
 
 #include "SDL.h"
+#include <iostream>
 #include <stack>
 #include <memory>
 #include <functional>
@@ -11,6 +12,7 @@ namespace gtool {
 
     struct GameState {
         bool isPlaying = true;
+        bool isLoaded = false; // as we push and pop states we need to only load once
 
         void pumpEvents() {
             static SDL_Event inputEvent;
@@ -27,6 +29,7 @@ namespace gtool {
                 isPlaying = false;
             }
         }
+
         virtual bool load() = 0;
         virtual void update() = 0;
         virtual void render() = 0;

@@ -36,6 +36,10 @@ namespace sdl2 {
             return m_contained;
         }
 
+        operator bool() {
+            return isLoaded();
+        }
+
         bool isLoaded() const {
             return m_contained != nullptr;
         }

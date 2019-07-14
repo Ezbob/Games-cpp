@@ -16,10 +16,14 @@ void GameStateProcessor::processStates() {
     #endif
 
     while ( !gameStates.empty() && isPlaying ) {
-state_start:
+gameloop_start:
         auto state = gameStates.top();
 
-        if (  state->load() ) {
+        if ( !state->isLoaded ) {
+            state->isLoaded = state->load();
+        }
+
+        if ( state->isLoaded ) {
             while ( state->isPlaying && isPlaying ) {
                 #if _STATS
                 auto istart = SDL_GetPerformanceCounter();
@@ -60,15 +64,17 @@ state_start:
 
                 if ( shouldReload ) {
                     shouldReload = false;
-                    goto state_start;
+                    goto gameloop_start; 
                 }
             }
         }
+
         gameStates.pop();
     }
 }
 
-void GameStateProcessor::startFromNewState(const std::shared_ptr<GameState> state) {
+void GameStateProcessor::startFromNewState(std::shared_ptr<GameState> state) {
+    state->isPlaying = true;
     gameStates.emplace(state);
     shouldReload = true;
 }
