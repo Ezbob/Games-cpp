@@ -39,6 +39,7 @@ namespace gtool {
         gtool::GameClock clock;
 
         bool isPlaying = true;
+        bool shouldReload = false;
 
     public:
         GameStateProcessor(double msPerFrame = 16.) {
@@ -50,6 +51,8 @@ namespace gtool {
         }
 
         void processStates();
+
+        void startFromNewState(const std::shared_ptr<GameState> state);
 
         gtool::GameClock const &getClock() {
             return clock;

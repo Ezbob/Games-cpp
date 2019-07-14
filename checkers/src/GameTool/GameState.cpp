@@ -2,11 +2,13 @@
 #include <iostream>
 #include "sdl.h"
 
+using namespace gtool;
+
 #if _STATS
     #define _STATS_MS_DIFF(starttime) static_cast<double>(((SDL_GetPerformanceCounter() - starttime) * 1000) / static_cast<double>(SDL_GetPerformanceFrequency()))
 #endif
 
-void gtool::GameStateProcessor::processStates() {
+void GameStateProcessor::processStates() {
     #if _STATS
     double rtime = 0.0;
     double utime = 0.0;
@@ -14,7 +16,9 @@ void gtool::GameStateProcessor::processStates() {
     #endif
 
     while ( !gameStates.empty() && isPlaying ) {
+state_start:
         auto state = gameStates.top();
+
         if (  state->load() ) {
             while ( state->isPlaying && isPlaying ) {
                 #if _STATS
@@ -53,8 +57,18 @@ void gtool::GameStateProcessor::processStates() {
                     "R " << rtime << "\n" <<
                     "F " << clock.frameElapsed << "\n";
                 #endif
+
+                if ( shouldReload ) {
+                    shouldReload = false;
+                    goto state_start;
+                }
             }
         }
         gameStates.pop();
     }
+}
+
+void GameStateProcessor::startFromNewState(const std::shared_ptr<GameState> state) {
+    gameStates.emplace(state);
+    shouldReload = true;
 }

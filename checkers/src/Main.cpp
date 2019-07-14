@@ -20,6 +20,8 @@ sdl2::Window window;
 sdl2::Renderer renderer;
 sdl2::TTFFont font;
 
+std::shared_ptr<gtool::GameState> pauseState;
+
 gtool::GameStateProcessor gameStateProcessor { 18. };
 
 class BoardPlayState : public gtool::GameState {
@@ -438,6 +440,34 @@ public:
     }
 };
 
+class PauseState : public gtool::GameState {
+    sdl2::Texture pausedText = renderer.createTexture();
+public:
+    void handleKeyState(const uint8_t *state [[maybe_unused]]) override {
+        if ( state[SDL_SCANCODE_ESCAPE] )
+            gameStateProcessor.quitGame();
+    }
+
+    bool load() override {
+        renderer.setColor(sdl2::Colors::WHITE);
+        renderer.clear();
+        pausedText = sdl2::loadSolidText(renderer,
+            "Game Paused",
+            (TTF_Font *) font,
+            asColorStruct(sdl2::Colors::BLACK)
+        );
+        return true;
+    }
+
+    void update() override {}
+
+    void render() override {
+        pausedText.render(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 12);
+
+        renderer.updateScreen();
+    }
+};
+
 bool sdlInit() {
     if ( globals.init(SDL_INIT_VIDEO | SDL_INIT_TIMER) ) {
         globals.loadExternLib(sdl2::ExternLibs::SDL_IMAGE, IMG_INIT_PNG);
@@ -453,11 +483,16 @@ bool sdlInit() {
         );
 
         renderer = window.getRenderer();
-
         renderer.setColor(sdl2::Colors::WHITE);
     }
 
     return globals.is_initialized && window.isLoaded();
+}
+
+bool loadGlobalAssets() {
+    font.loadTTF("assets/consola.ttf", 24);
+    pauseState = std::shared_ptr<gtool::GameState>(new PauseState());
+    return font.isLoaded();
 }
 
 int MAIN_NAME() {
@@ -466,8 +501,7 @@ int MAIN_NAME() {
         return 1;
     }
 
-    font.loadTTF("assets/consola.ttf", 24);
-    if ( !font.isLoaded() ) {
+    if ( !loadGlobalAssets() ) {
         return 1;
     }
 
