@@ -412,21 +412,14 @@ public:
 
 class WinState : public gtool::GameState {
     sdl2::Texture winnerText = renderer.createTexture();
-    const uint8_t *key_state;
 public:
-
     bool load() override {
         renderer.setColor(sdl2::Colors::WHITE);
         renderer.clear();
         winnerText = sdl2::loadSolidText(renderer,
             "You're a winner",
             (TTF_Font *) font,
-            SDL_Color{
-                0xff,
-                0x00,
-                0x00,
-                0xff
-            }
+            sdl2::asColorStruct(sdl2::Colors::RED)
         );
 
         return true;

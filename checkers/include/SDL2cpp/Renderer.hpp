@@ -6,21 +6,10 @@
 #include <array>
 #include <vector>
 
-
 namespace sdl2 {
 
     class Texture;
     class Window;
-
-    enum class Colors {
-        BLACK,
-        WHITE,
-        RED,
-        GREEN,
-        YELLOW,
-        BLUE,
-        CYAN
-    };
 
     class Renderer : public SharedContainerBase<SDL_Renderer, SDL_DestroyRenderer> {
 
@@ -37,7 +26,7 @@ namespace sdl2 {
         bool copyTexture(Texture &texture, SDL_Rect *src = nullptr, SDL_Rect *dest = nullptr);
         void updateScreen() const;
         bool setColor(int r, int g, int b, int a = 0xFF);
-        bool setColor(Colors);
+        bool setColor(sdl2::Colors);
 
         bool drawRect(const SDL_Rect *fillRect);
         bool drawRect(const SDL_Rect &fillRect);

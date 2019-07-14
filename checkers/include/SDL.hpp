@@ -5,6 +5,7 @@
 
 #include "SDL2/SDL.h"
 
+#include "SDL2cpp/Color.hpp"
 #include "SDL2cpp/Globals.hpp"
 #include "SDL2cpp/Window.hpp"
 #include "SDL2cpp/Renderer.hpp"
