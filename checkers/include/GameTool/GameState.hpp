@@ -21,8 +21,12 @@ namespace gtool {
         }
 
         virtual ~GameState() {};
-        virtual void handleKeyState(const uint8_t *keyState) = 0;
-        virtual void handleEvent(const SDL_Event &inputEvent) = 0;
+        virtual void handleKeyState(const uint8_t *keyState [[maybe_unused]]) {};
+        virtual void handleEvent(const SDL_Event &event [[maybe_unused]]) {
+            if (event.type == SDL_QUIT) {
+                isPlaying = false;
+            }
+        }
         virtual bool load() = 0;
         virtual void update() = 0;
         virtual void render() = 0;

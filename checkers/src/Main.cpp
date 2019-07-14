@@ -425,15 +425,11 @@ public:
         return true;
     }
 
-    void handleEvent(const SDL_Event &event [[maybe_unused]]) override {
-        if (event.type == SDL_QUIT) {
-            isPlaying = false;
-        }
-    }
     void handleKeyState(const uint8_t *state [[maybe_unused]]) override {
         if ( state[SDL_SCANCODE_ESCAPE] )
             gameStateProcessor.quitGame();
     }
+
     void update() override {}
     void render() override {
         winnerText.render(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 12);
