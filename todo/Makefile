@@ -19,7 +19,7 @@ $(BUILD_DIR_DEBUG):
 
 $(BUILD_DIR_RELEASE):
 	@mkdir -p $@
-	@cd $@ && cmake -DCMAKE_BUILD_TYPE=Release -G ${BUILD_TOOL_CMAKE} ../../
+	@cd $@ && cmake -DCMAKE_BUILD_TYPE=Release -DENABLE_STATS=0 -G ${BUILD_TOOL_CMAKE} ../../
 
 clean:
 	$(RM) -rf ${BUILD_DIR_PREFIX}
