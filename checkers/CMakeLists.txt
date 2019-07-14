@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 
-project("game"
+project("checkers"
     VERSION 0.1
-    DESCRIPTION "A trying out SDL"
+    DESCRIPTION "A simple checker game"
     LANGUAGES CXX
 )
 
@@ -19,7 +19,7 @@ endif()
 # Also look for Find-cmake modules here
 set(CMAKE_MODULE_PATH  ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/sdl2")
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 ${STATS_ENV} -Wall -Wextra -ggdb
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -D_DEBUG=1 ${STATS_ENV} -Wall -Wextra -ggdb
  -fsanitize=address,undefined")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -O3")
 set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
@@ -33,6 +33,7 @@ set(SOURCES
     src/SDL2cpp/Window.cpp
     src/SDL2cpp/Surface.cpp
     src/SDL2cpp/Globals.cpp
+    src/SDL2cpp/Color.cpp
     src/SDLExtra/Font.cpp
 )
 
