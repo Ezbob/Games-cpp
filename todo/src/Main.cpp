@@ -1,9 +1,6 @@
 #include "SDL.hpp"
 #include "SDL_extra.hpp"
-#include "Animator.hpp"
-#include "GameState.hpp"
-#include "GameClock.hpp"
-#include "Tweening.hpp"
+#include "game_tool.hpp"
 #include <iostream>
 #include <stack>
 #include <vector>
@@ -23,16 +20,16 @@ sdl2::Window window;
 sdl2::Renderer renderer;
 sdl2::TTFFont font;
 
-GameStateProcessor gameStateProcessor { 18. };
+gtool::GameStateProcessor gameStateProcessor { 18. };
 
-class BoardPlayState : public GameState {
-    const GameClock &clock = gameStateProcessor.getClock();
+class BoardPlayState : public gtool::GameState {
+    const gtool::GameClock &clock = gameStateProcessor.getClock();
 
     struct Checker {
         sdl2::Colors color = sdl2::Colors::GREEN;
         double lerpDegree = 0.06;
         SDL_Rect *position = nullptr;
-        Tweening2DPoint positionTweener;
+        gtool::Tweening2DPoint positionTweener;
 
         Checker(sdl2::Colors playerColor, SDL_Rect &p)
             : color(playerColor)
@@ -413,7 +410,7 @@ public:
     }
 };
 
-class WinState : public GameState {
+class WinState : public gtool::GameState {
     sdl2::Texture winnerText = renderer.createTexture();
     const uint8_t *key_state;
 public:

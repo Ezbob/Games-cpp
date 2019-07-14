@@ -1,11 +1,12 @@
-#include "GameState.hpp"
+#include "GameTool/GameState.hpp"
 #include <iostream>
+#include "sdl.h"
 
 #if _STATS
     #define _STATS_MS_DIFF(starttime) static_cast<double>(((SDL_GetPerformanceCounter() - starttime) * 1000) / static_cast<double>(SDL_GetPerformanceFrequency()))
 #endif
 
-void GameStateProcessor::processStates() {
+void gtool::GameStateProcessor::processStates() {
     #if _STATS
     double rtime = 0.0;
     double utime = 0.0;
