@@ -27,6 +27,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
 set(SOURCES
     src/Main.c
+    src/Gameclock.c
 )
 
 set(INCLUDE_DIRS
