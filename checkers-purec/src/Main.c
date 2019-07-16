@@ -25,6 +25,8 @@ static const double MS_PER_UPDATE = 16.0;
 static const int SCREEN_WIDTH = 840;
 static const int SCREEN_HEIGHT = 860;
 
+static const int checkerLength = 60;
+
 struct Checker {
     enum {
         C_RED,
@@ -48,6 +50,9 @@ SDL_bool g_is_playing = SDL_TRUE;
 
 SDL_Rect g_board[BOARD_LENGTH * BOARD_LENGTH];
 SDL_Rect g_checkers[BOARD_LENGTH * BOARD_LENGTH];
+
+int green_length = 0;
+int red_length = 0;
 
 struct Cell g_cellboard[BOARD_LENGTH * BOARD_LENGTH];
 struct GameClock g_gameclock;
@@ -111,6 +116,62 @@ SDL_bool load() {
             cell->container = container;
             cell->columnIndex = j;
             cell->rowIndex = i;
+
+            /** GREEN **/
+            if ( i % 2 == 0 && i < (BOARD_LENGTH / 2) ) {
+                if (j % 2 == 0) {
+                    SDL_Rect *rect = g_checkers + (green_length++);
+
+                    rect->x = (100 * (j % BOARD_LENGTH)) + 40;
+                    rect->y = (container->y + 20);
+                    rect->w = checkerLength;
+                    rect->h = checkerLength;
+
+                    cell->container = rect;
+                    continue;
+                }
+            } else if ( i % 2 != 0 && i < (BOARD_LENGTH / 2) - 1) {
+                if (j % 2 != 0) {
+                    SDL_Rect *rect = g_checkers + (green_length++);
+
+                    rect->x = (100 * (j % BOARD_LENGTH)) + 40;
+                    rect->y = (container->y + 20);
+                    rect->w = checkerLength;
+                    rect->h = checkerLength;
+
+                    cell->container = rect;
+                    continue;
+                }
+            }
+
+            /** RED **/
+            if ( i % 2 == 0 && i > (BOARD_LENGTH / 2) ) {
+                if (j % 2 == 0) {
+                    SDL_Rect *rect = g_checkers + (green_length + red_length);
+                    red_length++;
+
+                    rect->x = (100 * (j % BOARD_LENGTH)) + 40;
+                    rect->y = (container->y + 20);
+                    rect->w = checkerLength;
+                    rect->h = checkerLength;
+
+                    cell->container = rect;
+                    continue;
+                }
+            } else if ( i % 2 != 0 && i > (BOARD_LENGTH / 2) ) {
+                if (j % 2 != 0) {
+                    SDL_Rect *rect = g_checkers + (green_length + red_length);
+                    red_length++;
+
+                    rect->x = (100 * (j % BOARD_LENGTH)) + 40;
+                    rect->y = (container->y + 20);
+                    rect->w = checkerLength;
+                    rect->h = checkerLength;
+
+                    cell->container = rect;
+                    continue;
+                }
+            }
         }
     }
 
@@ -125,6 +186,12 @@ void render() {
 
     SDL_SetRenderDrawColor(g_renderer, PC_OPAQUE_BLACK);
     SDL_RenderDrawRects(g_renderer, g_board, BOARD_LENGTH * BOARD_LENGTH);
+
+    SDL_SetRenderDrawColor(g_renderer, PC_OPAQUE_GREEN);
+    SDL_RenderFillRects(g_renderer, g_checkers, green_length);
+
+    SDL_SetRenderDrawColor(g_renderer, PC_OPAQUE_RED);
+    SDL_RenderFillRects(g_renderer, g_checkers + green_length, red_length);
 
     SDL_RenderPresent(g_renderer);
 }
