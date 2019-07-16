@@ -12,6 +12,7 @@
 #define UNUSED(x) ((void) x)
 
 // PC = Parameter Color
+//           name        r    g    b    a
 #define PC_OPAQUE_RED   0xff,0x00,0x00,0xff
 #define PC_OPAQUE_GREEN 0x00,0xff,0x00,0xff
 #define PC_OPAQUE_BLUE  0x00,0x00,0xff,0xff
@@ -21,8 +22,8 @@
 #define BOARD_LENGTH 8
 
 static const double MS_PER_UPDATE = 16.0;
-static const int SCREEN_WIDTH = 800;
-static const int SCREEN_HEIGHT = 600;
+static const int SCREEN_WIDTH = 840;
+static const int SCREEN_HEIGHT = 860;
 
 struct Checker {
     enum {
@@ -36,6 +37,8 @@ struct Checker {
 struct Cell {
     SDL_Rect *container;
     struct Checker *occubant;
+    int columnIndex;
+    int rowIndex;
 };
 
 static const char *g_window_title = "Pure C Checkers";
@@ -47,7 +50,6 @@ SDL_Rect g_board[BOARD_LENGTH * BOARD_LENGTH];
 SDL_Rect g_checkers[BOARD_LENGTH * BOARD_LENGTH];
 
 struct Cell g_cellboard[BOARD_LENGTH * BOARD_LENGTH];
-
 struct GameClock g_gameclock;
 
 
@@ -87,7 +89,44 @@ void handleEvent(const SDL_Event *event) {
 }
 
 void handleKeyState(const Uint8 *states) {
-    UNUSED(states);
+    if (states[SDL_SCANCODE_ESCAPE])
+        g_is_playing = SDL_FALSE;
+}
+
+
+SDL_bool load() {
+
+    for (int i = 0; i < BOARD_LENGTH; ++i) {
+        for (int j = 0; j < BOARD_LENGTH; ++j) {
+            int flatIndex = i * BOARD_LENGTH + j;
+
+            SDL_Rect *container = g_board + flatIndex;
+            struct Cell *cell = g_cellboard + flatIndex;
+
+            container->h = 100;
+            container->w = 100;
+            container->x = 100 * (flatIndex % BOARD_LENGTH) + 20;
+            container->y = 100 * (flatIndex / BOARD_LENGTH) + 20;
+
+            cell->container = container;
+            cell->columnIndex = j;
+            cell->rowIndex = i;
+        }
+    }
+
+    return SDL_TRUE;
+}
+
+void update() {
+
+}
+
+void render() {
+
+    SDL_SetRenderDrawColor(g_renderer, PC_OPAQUE_BLACK);
+    SDL_RenderDrawRects(g_renderer, g_board, BOARD_LENGTH * BOARD_LENGTH);
+
+    SDL_RenderPresent(g_renderer);
 }
 
 void pumpEvents() {
@@ -105,24 +144,10 @@ void initCells(struct Cell *cs, int length) {
     }
 }
 
-void initData() {
+void initGlobalData() {
     initCells(g_cellboard, BOARD_LENGTH * BOARD_LENGTH);
     GT_gameclock_init(&g_gameclock, MS_PER_UPDATE);
 }
-
-SDL_bool load() {
-
-    return SDL_TRUE;
-}
-
-void update() {
-
-}
-
-void render() {
-
-}
-
 
 int MAIN_NAME(int argc, char *argv[])
 {
@@ -133,6 +158,8 @@ int MAIN_NAME(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
+    initGlobalData();
+
     if ( !load() ) {
         return EXIT_FAILURE;
     }
@@ -140,14 +167,15 @@ int MAIN_NAME(int argc, char *argv[])
     while ( g_is_playing ) {
         pumpEvents();
 
-        while ( g_gameclock.updateLag >= g_gameclock.msPerUpdate ) {
+        while ( GT_CLOCK_SHOULD_UPDATE(g_gameclock) ) {
             update();
-            g_gameclock.updateLag -= g_gameclock.msPerUpdate;
+
+            GT_CLOCK_LAG_UPDATE(g_gameclock);
         }
 
         render();
 
-        GT_gameclock_tick(&g_gameclock);
+        GT_CLOCK_TICK(g_gameclock);
     }
 
     sdlDestroy();
