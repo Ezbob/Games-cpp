@@ -62,7 +62,7 @@ class BoardPlayState : public gtool::GameState {
         int row;
     };
 
-    int mouse_x, mouse_y;
+    SDL_Point mouseClick;
     int nRedCheckers = 0, nGreenCheckers = 0;
 
     const static size_t n_tiles = 64;
@@ -78,7 +78,7 @@ class BoardPlayState : public gtool::GameState {
     std::vector<std::shared_ptr<Checker>> checkers;
 
 #if _DEBUG
-    std::vector<sdl2::Texture> text;
+    std::vector<sdl2::Texture> debugText;
 #endif
 
     GridCell *selected = nullptr;
@@ -91,14 +91,6 @@ class BoardPlayState : public gtool::GameState {
     sdl2::Texture greenTurn = renderer.createTexture();
     sdl2::Texture redTurn = renderer.createTexture();
     sdl2::Texture *currentText = nullptr;
-
-    bool contains(const SDL_Rect &r, const int x, const int y) const {
-        return (r.x <= x && x <= r.x + r.w) && (r.y <= y && y <= r.y + r.h);
-    }
-
-    bool contains(const SDL_Rect *r, const int x, const int y) const {
-        return (r->x <= x && x <= r->x + r->w) && (r->y <= y && y <= r->y + r->h);
-    }
 
     void switchTurn() {
         if (playingColor == sdl2::Colors::GREEN) {
@@ -117,11 +109,11 @@ class BoardPlayState : public gtool::GameState {
                 int index = i * n_rows + j;
                 auto &gridCell = cells[index];
 
-                if ( contains(gridCell.container, mouse_x, mouse_y)
+                if ( SDL_PointInRect(&mouseClick, gridCell.container)
                     && gridCell.occubant != nullptr
                     && gridCell.occubant->color == playingColor
-                    && gridCell.occubant->position->w != 0
-                    && gridCell.occubant->position->h != 0 ) {
+                    && !SDL_RectEmpty(gridCell.occubant->position)
+                ) {
                     selected = &gridCell;
                     return;
                 }
@@ -235,7 +227,7 @@ class BoardPlayState : public gtool::GameState {
                 return false;
             }
 
-            if ( contains(gridCell.container, mouse_x, mouse_y) ) {
+            if ( SDL_PointInRect(&mouseClick, gridCell.container) ) {
                 if ( gridCell.occubant == nullptr ) {
                     doMoveToEmpty(gridCell);
                     return true;
@@ -260,7 +252,7 @@ public:
     void handleEvent(const SDL_Event &event) override {
         switch (event.type) {
             case SDL_MOUSEBUTTONDOWN: {
-                    auto mouseButtonState = SDL_GetMouseState(&mouse_x, &mouse_y);
+                    auto mouseButtonState = SDL_GetMouseState(&mouseClick.x, &mouseClick.y);
                     if ( (mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT)) ) {
                         if ( selected == nullptr ) {
                             findSelected();
@@ -313,7 +305,7 @@ public:
                 cells[flatindex].row = i;
 
 #if _DEBUG
-                text.emplace_back(sdl2::loadSolidText(renderer,
+                debugText.emplace_back(sdl2::loadSolidText(renderer,
                     "(" + std::to_string(i) + ", " + std::to_string(j) + ")",
                     (TTF_Font *) font,
                     sdl2::asColorStruct(sdl2::Colors::BLACK)
@@ -397,7 +389,7 @@ public:
 #if _DEBUG
         for (auto i = 0; i < n_rows; ++i) {
             for (auto j = 0; j < n_rows; ++j) {
-                auto &t = text[i * n_rows + j];
+                auto &t = debugText[i * n_rows + j];
                 t.render(j * 100 + 22, i * 100 + 20);
             }
         }
