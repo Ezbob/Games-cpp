@@ -23,6 +23,6 @@ void GT_gameclock_tick(struct GameClock *);
     } while(0)
 
 #define GT_CLOCK_LAG_UPDATE(clock) (clock.updateLag -= clock.msPerUpdate)
-#define GT_CLOCK_SHOULD_UPDATE(clock) (g_gameclock.updateLag >= g_gameclock.msPerUpdate)
+#define GT_CLOCK_SHOULD_UPDATE(clock) (clock.updateLag >= clock.msPerUpdate)
 
 #endif

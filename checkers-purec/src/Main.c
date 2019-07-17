@@ -27,11 +27,13 @@ static const int SCREEN_HEIGHT = 860;
 
 static const int checkerLength = 60;
 
+enum PlayingColor {
+    GREEN,
+    RED
+};
+
 struct Checker {
-    enum {
-        C_RED,
-        C_GREEN
-    } color;
+    enum PlayingColor color;
     SDL_Rect *rect; // the actual rendered rect
     SDL_Rect next; // the next point in the lerp
 };
@@ -49,14 +51,44 @@ SDL_Renderer *g_renderer = NULL;
 SDL_bool g_is_playing = SDL_TRUE;
 
 SDL_Rect g_board[BOARD_LENGTH * BOARD_LENGTH];
-SDL_Rect g_checkers[BOARD_LENGTH * BOARD_LENGTH];
+SDL_Rect g_checker_rects[BOARD_LENGTH * BOARD_LENGTH];
 
-int green_length = 0;
-int red_length = 0;
 
+int g_green_length = 0;
+int g_red_length = 0;
+
+struct Checker g_checkers[BOARD_LENGTH * BOARD_LENGTH];
 struct Cell g_cellboard[BOARD_LENGTH * BOARD_LENGTH];
 struct GameClock g_gameclock;
 
+struct Cell *g_selected = NULL;
+SDL_Point g_mouse;
+
+enum PlayingColor g_playingColor = GREEN;
+
+void printCell(const struct Cell * c) {
+    printf("CELL %p %p\n", c->container, c->occubant);
+}
+
+void findSelected() {
+    for (int i = 0; i < BOARD_LENGTH; i++) {
+        for (int j = 0; j < BOARD_LENGTH; ++j) {
+
+            int index = i * BOARD_LENGTH + j;
+            struct Cell *gridCell = g_cellboard + index;
+            //printCell(gridCell);
+
+            if ( SDL_PointInRect(&g_mouse, gridCell->container)
+                && gridCell->occubant != NULL
+                && gridCell->occubant->color == g_playingColor
+                && !SDL_RectEmpty(gridCell->occubant->rect)
+            ) {
+                g_selected = gridCell;
+                return;
+            }
+        }
+    }
+}
 
 SDL_bool sdlInit() {
     if ( SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT,
@@ -84,9 +116,16 @@ void sdlDestroy() {
 }
 
 void handleEvent(const SDL_Event *event) {
+    Uint32 mouseState;
     switch(event->type) {
         case SDL_QUIT:
             g_is_playing = SDL_FALSE;
+            break;
+        case SDL_MOUSEBUTTONDOWN:
+            mouseState = SDL_GetMouseState(&g_mouse.x, &g_mouse.y);
+            if ( mouseState & SDL_BUTTON(SDL_BUTTON_LEFT) ) {
+                findSelected();
+            }
             break;
         default:
             break;
@@ -97,7 +136,6 @@ void handleKeyState(const Uint8 *states) {
     if (states[SDL_SCANCODE_ESCAPE])
         g_is_playing = SDL_FALSE;
 }
-
 
 SDL_bool load() {
 
@@ -120,26 +158,32 @@ SDL_bool load() {
             /** GREEN **/
             if ( i % 2 == 0 && i < (BOARD_LENGTH / 2) ) {
                 if (j % 2 == 0) {
-                    SDL_Rect *rect = g_checkers + (green_length++);
+                    struct Checker *checker = g_checkers + (g_green_length);
+                    SDL_Rect *rect = g_checker_rects + (g_green_length++);
 
                     rect->x = (100 * (j % BOARD_LENGTH)) + 40;
                     rect->y = (container->y + 20);
                     rect->w = checkerLength;
                     rect->h = checkerLength;
 
-                    cell->container = rect;
+                    checker->color = GREEN;
+                    checker->rect = rect;
+                    cell->occubant = checker;
                     continue;
                 }
             } else if ( i % 2 != 0 && i < (BOARD_LENGTH / 2) - 1) {
                 if (j % 2 != 0) {
-                    SDL_Rect *rect = g_checkers + (green_length++);
+                    struct Checker *checker = g_checkers + (g_green_length);
+                    SDL_Rect *rect = g_checker_rects + (g_green_length++);
 
                     rect->x = (100 * (j % BOARD_LENGTH)) + 40;
                     rect->y = (container->y + 20);
                     rect->w = checkerLength;
                     rect->h = checkerLength;
 
-                    cell->container = rect;
+                    checker->color = GREEN;
+                    checker->rect = rect;
+                    cell->occubant = checker;
                     continue;
                 }
             }
@@ -147,28 +191,36 @@ SDL_bool load() {
             /** RED **/
             if ( i % 2 == 0 && i > (BOARD_LENGTH / 2) ) {
                 if (j % 2 == 0) {
-                    SDL_Rect *rect = g_checkers + (green_length + red_length);
-                    red_length++;
+                    int currentIndex =  (g_green_length + g_red_length);
+                    struct Checker *checker = g_checkers + currentIndex;
+                    SDL_Rect *rect = g_checker_rects + currentIndex;
+                    g_red_length++;
 
                     rect->x = (100 * (j % BOARD_LENGTH)) + 40;
                     rect->y = (container->y + 20);
                     rect->w = checkerLength;
                     rect->h = checkerLength;
 
-                    cell->container = rect;
+                    checker->color = RED;
+                    checker->rect = rect;
+                    cell->occubant = checker;
                     continue;
                 }
             } else if ( i % 2 != 0 && i > (BOARD_LENGTH / 2) ) {
                 if (j % 2 != 0) {
-                    SDL_Rect *rect = g_checkers + (green_length + red_length);
-                    red_length++;
+                    int currentIndex =  (g_green_length + g_red_length);
+                    struct Checker *checker = g_checkers + currentIndex;
+                    SDL_Rect *rect = g_checker_rects + currentIndex;
+                    g_red_length++;
 
                     rect->x = (100 * (j % BOARD_LENGTH)) + 40;
                     rect->y = (container->y + 20);
                     rect->w = checkerLength;
                     rect->h = checkerLength;
 
-                    cell->container = rect;
+                    checker->color = RED;
+                    checker->rect = rect;
+                    cell->occubant = checker;
                     continue;
                 }
             }
@@ -179,7 +231,10 @@ SDL_bool load() {
 }
 
 void update() {
-
+    if (g_selected != NULL) {
+        printf("Found selected\n");
+        g_selected = NULL;
+    }
 }
 
 void render() {
@@ -188,10 +243,10 @@ void render() {
     SDL_RenderDrawRects(g_renderer, g_board, BOARD_LENGTH * BOARD_LENGTH);
 
     SDL_SetRenderDrawColor(g_renderer, PC_OPAQUE_GREEN);
-    SDL_RenderFillRects(g_renderer, g_checkers, green_length);
+    SDL_RenderFillRects(g_renderer, g_checker_rects, g_green_length);
 
     SDL_SetRenderDrawColor(g_renderer, PC_OPAQUE_RED);
-    SDL_RenderFillRects(g_renderer, g_checkers + green_length, red_length);
+    SDL_RenderFillRects(g_renderer, g_checker_rects + g_green_length, g_red_length);
 
     SDL_RenderPresent(g_renderer);
 }
