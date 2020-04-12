@@ -69,6 +69,8 @@ class BoardPlayState : public gtool::GameState {
 
     // these can be used to draw in batch
     SDL_Rect boardContainers[n_tiles];
+    SDL_Rect boardBlackTiles[n_tiles / 2];
+
     GridCell cells[n_tiles];
 
     std::vector<SDL_Rect> greenChecks{32};
@@ -86,6 +88,7 @@ class BoardPlayState : public gtool::GameState {
     int n_rows = 8;
     int checkerCellDim = 100; // h/w of the cell that can contain a checker
     int checkerDim = 60; // h/w of the rect that is inside a cell
+    int padding = 20;
 
     sdl2::Colors playingColor = sdl2::Colors::GREEN;
     sdl2::Texture greenTurn = renderer.createTexture();
@@ -288,6 +291,8 @@ public:
 
         currentText = &greenTurn;
 
+        size_t currentBlackTileIndex = 0;
+
         for (int i = 0; i < n_rows; ++i) {
             for (int j = 0; j < n_rows; ++j) {
 
@@ -297,8 +302,8 @@ public:
                 boardContainer.h = checkerCellDim;
                 boardContainer.w = checkerCellDim;
 
-                boardContainer.x = boardContainer.w * (flatindex % n_rows) + 20;
-                boardContainer.y = boardContainer.h * (flatindex / n_rows) + 20;
+                boardContainer.x = checkerCellDim * j + padding;
+                boardContainer.y = checkerCellDim * i + padding;
 
                 cells[flatindex].container = &boardContainer;
                 cells[flatindex].column = j;
@@ -311,50 +316,26 @@ public:
                     sdl2::asColorStruct(sdl2::Colors::BLACK)
                 ));
 #endif
-                // GREEN upper player
-                if ( i % 2 == 0 && i < (n_rows / 2) ) {
-                    if (j % 2 == 0) {
-                        initChecker(
-                            sdl2::Colors::GREEN,
-                            flatindex,
-                            (boardContainer.w * (j % n_rows)) + 40,
-                            boardContainer.y + 20
-                        );
-                        continue;
-                    }
-                } else if ( i % 2 != 0 && i < (n_rows / 2) - 1) {
-                    if (j % 2 != 0) {
-                        initChecker(
-                            sdl2::Colors::GREEN,
-                            flatindex,
-                            (boardContainer.w * (j % n_rows)) + 40,
-                            boardContainer.y + 20
-                        );
-                        continue;
-                    }
-                }
-
-                // RED lower player
-                if ( i % 2 == 0 && i > (n_rows / 2) ) {
-                    if (j % 2 == 0) {
-                        initChecker(
-                            sdl2::Colors::RED,
-                            flatindex,
-                            (boardContainer.w * (j % n_rows)) + 40,
-                            boardContainer.y + 20
-                        );
-                        continue;
-                    }
-                } else if ( i % 2 != 0 && i > (n_rows / 2) ) {
-                    if (j % 2 != 0) {
-                        initChecker(
-                            sdl2::Colors::RED,
-                            flatindex,
-                            (boardContainer.w * (j % n_rows)) + 40,
-                            boardContainer.y + 20
-                        );
-                        continue;
-                    }
+                if (i % 2 != j % 2) {
+                    auto &bbt = boardBlackTiles[currentBlackTileIndex++];
+                    bbt.w = checkerCellDim;
+                    bbt.h = checkerCellDim;
+                    bbt.x = checkerCellDim * j + padding;
+                    bbt.y = checkerCellDim * i + padding;
+                } else if (i < (n_rows / 2 - 1)) {
+                    initChecker(
+                        sdl2::Colors::GREEN,
+                        flatindex,
+                        (boardContainer.w * (j % n_rows)) + 40,
+                        boardContainer.y + 20
+                    );
+                } else if (i > (n_rows / 2)) {
+                    initChecker(
+                        sdl2::Colors::RED,
+                        flatindex,
+                        (boardContainer.w * (j % n_rows)) + 40,
+                        boardContainer.y + 20
+                    );
                 }
             }
         }
@@ -375,10 +356,18 @@ public:
 
     void render() override {
         renderer.setColor(sdl2::Colors::WHITE);
-        renderer.fillRect({0, 0, SCREEN_WIDTH, SCREEN_HEIGHT});
+        renderer.clear();
+
+        renderer.setColor(sdl2::Colors::BLACK);
+        renderer.fillRects(boardBlackTiles);
 
         renderer.setColor(sdl2::Colors::BLACK);
         renderer.drawRects(boardContainers);
+
+        if (selected) {
+            renderer.setColor(sdl2::Colors::BLUE);
+            renderer.fillRect(selected->container);
+        }
 
         renderer.setColor(sdl2::Colors::GREEN);
         renderer.drawRects(greenChecks);

@@ -49,7 +49,12 @@ namespace sdl2 {
 
         template<std::size_t N>
         bool fillRects(const std::array<SDL_Rect, N> &fillRect) {
-            return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), fillRect.data(), N), "Could not fill rectangle");
+            return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), fillRect.data(), N), "Could not fill rectangles");
+        }
+
+        template<std::size_t N>
+        bool fillRects(const SDL_Rect (&rects)[N]) {
+            return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), rects, N), "Could not fill rectangles");
         }
 
         bool drawLine(int x1, int y1, int x2, int y2);
