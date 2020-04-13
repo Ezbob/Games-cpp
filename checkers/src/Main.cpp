@@ -6,6 +6,8 @@
 #include <vector>
 #include <array>
 #include <optional>
+#include "PauseState.hpp"
+#include "WinState.hpp"
 
 #if defined(_WIN32)
 #define MAIN_NAME WinMain
@@ -447,91 +449,6 @@ public:
     }
 };
 
-class WinState : public gtool::GameState
-{
-    std::optional<sdl2::Texture> winnerText;
-
-public:
-    bool load() override
-    {
-        renderer.setColor(sdl2::Colors::WHITE);
-        renderer.clear();
-        winnerText = sdl2::loadBlendedText(renderer,
-                                           "You're a winner",
-                                           (TTF_Font *)font,
-                                           sdl2::asColorStruct(sdl2::Colors::RED));
-        return isLoaded(true);
-    }
-
-    void handleKeyState(const uint8_t *state) override
-    {
-        if (state[SDL_SCANCODE_ESCAPE])
-        {
-            gameStateProcessor.quitGame();
-        }
-    }
-
-    void render() override
-    {
-        winnerText->render(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 12);
-
-        renderer.updateScreen();
-    }
-};
-
-class PauseState : public gtool::GameState
-{
-    std::optional<sdl2::Texture> pausedText;
-    std::optional<sdl2::Texture> subText;
-
-public:
-    void handleKeyState(const uint8_t *state) override
-    {
-        if (state[SDL_SCANCODE_RETURN])
-        {
-            isPlaying(false);
-        }
-    }
-
-    void handleEvent(const SDL_Event &event) override
-    {
-        switch (event.type)
-        {
-        case SDL_QUIT:
-            gameStateProcessor.quitGame();
-            break;
-        default:
-            break;
-        }
-    }
-
-    bool load() override
-    {
-        pausedText = sdl2::loadBlendedText(renderer,
-                                         "Game Paused",
-                                         (TTF_Font *)font,
-                                         asColorStruct(sdl2::Colors::BLACK));
-
-        subText = sdl2::loadBlendedText(renderer,
-                                      "(Press Enter to continue)",
-                                      (TTF_Font *)font,
-                                      asColorStruct(sdl2::Colors::BLACK));
-
-        return isLoaded(pausedText && subText);
-    }
-
-    void render() override
-    {
-        renderer.setColor(sdl2::Colors::WHITE);
-        renderer.clear();
-
-        pausedText->render(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 12);
-        subText->render(SCREEN_WIDTH / 2 - 140, SCREEN_HEIGHT / 2 + 14);
-
-        renderer.updateScreen();
-    }
-};
-
 bool sdlInit()
 {
     if (globals.init(SDL_INIT_VIDEO | SDL_INIT_TIMER))
@@ -557,7 +474,7 @@ bool sdlInit()
 bool loadGlobalAssets()
 {
     font.loadTTF("assets/consola.ttf", 24);
-    pauseState = std::make_shared<PauseState>();
+    pauseState = std::make_shared<PauseState>(renderer, gameStateProcessor, font, SCREEN_WIDTH, SCREEN_HEIGHT);
     return font.isLoaded();
 }
 
@@ -575,7 +492,7 @@ int MAIN_NAME()
     }
 
     gameStateProcessor.initStates([](auto &stack) {
-        stack.emplace(new WinState());
+        stack.emplace(new WinState(renderer, gameStateProcessor, font, SCREEN_WIDTH, SCREEN_HEIGHT));
         stack.emplace(new BoardPlayState());
     });
 
