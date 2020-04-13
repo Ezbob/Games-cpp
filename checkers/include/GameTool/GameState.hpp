@@ -1,69 +1,31 @@
 #ifndef HEADER_GUARD_a17e097f8bd12c4c14b2c994eb545006
 #define HEADER_GUARD_a17e097f8bd12c4c14b2c994eb545006
 
-#include "SDL.h"
-#include <iostream>
-#include <stack>
-#include <memory>
-#include <functional>
-#include "GameTool/GameClock.hpp"
+#include "SDL_events.h"
+#include <cstdint>
 
 namespace gtool {
 
     struct GameState {
-        bool isPlaying = true;
-        bool isLoaded = false; // as we push and pop states we need to only load once
+        using BaseClass = GameState;
+        void pumpEvents();
 
-        void pumpEvents() {
-            static SDL_Event inputEvent;
-            while ( SDL_PollEvent(&inputEvent) != 0 ) {
-                handleEvent(inputEvent);
-            }
-            handleKeyState(SDL_GetKeyboardState(nullptr));
-        }
+        virtual ~GameState() = default;
+        virtual void handleKeyState(const uint8_t *keyState);
+        virtual void handleEvent(const SDL_Event &event);
 
-        virtual ~GameState() {};
-        virtual void handleKeyState(const uint8_t *keyState [[maybe_unused]]) {};
-        virtual void handleEvent(const SDL_Event &event [[maybe_unused]]) {
-            if (event.type == SDL_QUIT) {
-                isPlaying = false;
-            }
-        }
+        virtual bool load();
+        virtual void update();
+        virtual void render();
 
-        virtual bool load() = 0;
-        virtual void update() = 0;
-        virtual void render() = 0;
-    };
+        bool isLoaded() const;
+        bool isPlaying() const;
+        bool isPlaying(bool);
 
-    using GameStateStack = std::stack<std::shared_ptr<GameState>>;
-
-    class GameStateProcessor {
-        GameStateStack gameStates;
-        gtool::GameClock clock;
-
-        bool isPlaying = true;
-        bool shouldReload = false;
-
-    public:
-        GameStateProcessor(double msPerFrame = 16.) {
-            clock.msPerUpdate = msPerFrame;
-        }
-
-        void initStates(std::function<void (GameStateStack &)> initFunction) {
-            initFunction(gameStates);
-        }
-
-        void processStates();
-
-        void startFromNewState(const std::shared_ptr<GameState> state);
-
-        gtool::GameClock const &getClock() {
-            return clock;
-        }
-
-        void quitGame() {
-            isPlaying = false;
-        }
+    protected:
+        bool isLoaded(bool);
+        bool m_isPlaying = true;
+        bool m_isLoaded = false; // as we push and pop states we need to only load once
     };
 }
 

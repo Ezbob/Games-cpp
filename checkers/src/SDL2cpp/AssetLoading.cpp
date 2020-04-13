@@ -27,6 +27,20 @@ namespace sdl2 {
 
         return texture;
     }
+
+    Texture loadBlendedText(const Renderer &renderer, const std::string &text, TTF_Font *font, SDL_Color textColor) {
+        Texture texture = renderer.createTexture();
+
+        Surface surface;
+
+        surface.load(TTF_RenderText_Blended(font, text.c_str(), textColor));
+
+        if (surface.isLoaded()) {
+            texture.load(surface);
+        }
+
+        return texture;
+    }
 }
 
 

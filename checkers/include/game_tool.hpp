@@ -3,6 +3,7 @@
 
 #include "GameTool/Animator.hpp"
 #include "GameTool/GameClock.hpp"
+#include "GameTool/GameStateProcessor.hpp"
 #include "GameTool/GameState.hpp"
 #include "GameTool/Tweening.hpp"
 
