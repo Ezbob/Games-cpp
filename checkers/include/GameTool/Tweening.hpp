@@ -22,10 +22,7 @@ public:
     void lerp(double f = 0);
 
 private:
-    double x = 0;
-    double y = 0;
-    double xNext = 0;
-    double yNext = 0;
+    double m_coordinates[4];
 };
 
 } // namespace gtool
