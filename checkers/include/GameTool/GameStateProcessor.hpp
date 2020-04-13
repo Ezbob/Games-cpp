@@ -18,8 +18,8 @@ class GameStateProcessor
     GameStateStack gameStates;
     GameClock clock;
 
-    bool isPlaying = true;
-    bool shouldReload = false;
+    bool m_isPlaying = true;
+    bool m_shouldReload = false;
 
 public:
     GameStateProcessor(double msPerFrame = 16.);

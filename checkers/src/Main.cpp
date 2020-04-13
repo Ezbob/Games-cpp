@@ -397,7 +397,7 @@ public:
         }
         if (nRedCheckers <= 0 || nGreenCheckers <= 0)
         {
-            gameStateProcessor.startFromNewState(winState);
+            isPlaying(false);
         }
     }
 
@@ -573,6 +573,7 @@ int MAIN_NAME()
     }
 
     gameStateProcessor.initStates([](auto &stack) {
+        stack.emplace(winState);
         stack.emplace(new BoardPlayState());
     });
 

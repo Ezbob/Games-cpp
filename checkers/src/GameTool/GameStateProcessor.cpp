@@ -21,7 +21,7 @@ gtool::GameClock const &GameStateProcessor::getClock() const {
 
 void GameStateProcessor::quitGame()
 {
-    isPlaying = false;
+    m_isPlaying = false;
 }
 
 #if _STATS
@@ -36,7 +36,7 @@ void GameStateProcessor::processStates()
     double itime = 0.0;
 #endif
 
-    while (!gameStates.empty() && isPlaying)
+    while (!gameStates.empty() && m_isPlaying)
     {
     gameloop_start:
         auto state = gameStates.top();
@@ -48,7 +48,7 @@ void GameStateProcessor::processStates()
 
         if (state->isLoaded())
         {
-            while (state->isPlaying() && isPlaying)
+            while (state->isPlaying() && m_isPlaying)
             {
 #if _STATS
                 auto istart = SDL_GetPerformanceCounter();
@@ -87,9 +87,9 @@ void GameStateProcessor::processStates()
                           << "F " << clock.frameElapsed << "\n";
 #endif
 
-                if (shouldReload)
+                if (m_shouldReload)
                 {
-                    shouldReload = false;
+                    m_shouldReload = false;
                     goto gameloop_start;
                 }
             }
@@ -103,5 +103,5 @@ void GameStateProcessor::startFromNewState(const std::shared_ptr<GameState> stat
 {
     state->isPlaying(true);
     gameStates.emplace(state);
-    shouldReload = true;
+    m_shouldReload = true;
 }
