@@ -5,6 +5,7 @@
 #include <stack>
 #include <vector>
 #include <array>
+#include <optional>
 
 #if defined(_WIN32)
 #define MAIN_NAME WinMain
@@ -21,7 +22,6 @@ sdl2::Renderer renderer;
 sdl2::TTFFont font;
 
 std::shared_ptr<gtool::GameState> pauseState;
-std::shared_ptr<gtool::GameState> winState;
 
 gtool::GameStateProcessor gameStateProcessor{16.};
 
@@ -29,14 +29,21 @@ class BoardPlayState : public gtool::GameState
 {
     const gtool::GameClock &clock = gameStateProcessor.getClock();
 
+    enum class PlayingColor {
+        GREEN,
+        RED
+    };
+
+    PlayingColor playingColor = PlayingColor::GREEN;
+
     struct Checker
     {
-        sdl2::Colors color = sdl2::Colors::GREEN;
+        PlayingColor color = PlayingColor::GREEN;
         double lerpDegree = 0.2;
         SDL_Rect *position = nullptr;
         gtool::Tweening2DPoint positionTweener;
 
-        Checker(sdl2::Colors playerColor, SDL_Rect &p)
+        Checker(PlayingColor playerColor, SDL_Rect &p)
             : color(playerColor), position(&p), positionTweener(p.x, p.y)
         {
         }
@@ -89,22 +96,18 @@ class BoardPlayState : public gtool::GameState
     int checkerDim = 60;      // h/w of the rect that is inside a cell
     int padding = 20;
 
-    sdl2::Colors playingColor = sdl2::Colors::GREEN;
-    sdl2::Texture greenTurn = renderer.createTexture();
-    sdl2::Texture redTurn = renderer.createTexture();
-    sdl2::Texture *currentText = nullptr;
+    std::optional<sdl2::Texture> greenTurn;
+    std::optional<sdl2::Texture> redTurn;
 
     void switchTurn()
     {
-        if (playingColor == sdl2::Colors::GREEN)
+        if (playingColor == PlayingColor::GREEN)
         {
-            playingColor = sdl2::Colors::RED;
-            currentText = &redTurn;
+            playingColor = PlayingColor::RED;
         }
         else
         {
-            playingColor = sdl2::Colors::GREEN;
-            currentText = &greenTurn;
+            playingColor = PlayingColor::GREEN;
         }
     }
 
@@ -127,11 +130,11 @@ class BoardPlayState : public gtool::GameState
         }
     }
 
-    void initChecker(sdl2::Colors checkerColor, int flatindex, int checkerX, int checkerY)
+    void initChecker(PlayingColor checkerColor, int flatindex, int checkerX, int checkerY)
     {
 
         std::shared_ptr<Checker> checker;
-        if (checkerColor == sdl2::Colors::GREEN)
+        if (checkerColor == PlayingColor::GREEN)
         {
             greenChecks.emplace_back(SDL_Rect{
                 checkerX,
@@ -186,7 +189,7 @@ class BoardPlayState : public gtool::GameState
         taken.occubant->position->h = 0;
         taken.occubant->position->w = 0;
 
-        if (taken.occubant->color == sdl2::Colors::RED)
+        if (taken.occubant->color == PlayingColor::RED)
         {
             nRedCheckers--;
         }
@@ -325,8 +328,6 @@ public:
                                           (TTF_Font *)font,
                                           sdl2::asColorStruct(sdl2::Colors::GREEN));
 
-        currentText = &greenTurn;
-
         size_t currentBlackTileIndex = 0;
         size_t red = 0, green = 0;
 
@@ -366,7 +367,7 @@ public:
                 {
                     green++;
                     initChecker(
-                        sdl2::Colors::GREEN,
+                        PlayingColor::GREEN,
                         flatindex,
                         boardContainer.x + padding,
                         boardContainer.y + padding);
@@ -375,7 +376,7 @@ public:
                 {
                     red++;
                     initChecker(
-                        sdl2::Colors::RED,
+                        PlayingColor::RED,
                         flatindex,
                         boardContainer.x + padding,
                         boardContainer.y + padding);
@@ -435,9 +436,11 @@ public:
         }
 #endif
 
-        if (currentText != nullptr)
+        if (playingColor == PlayingColor::GREEN)
         {
-            currentText->render(SCREEN_WIDTH / 2 - 85, SCREEN_HEIGHT - 32);
+            greenTurn->render(SCREEN_WIDTH / 2 - 85, SCREEN_HEIGHT - 32);
+        } else {
+            redTurn->render(SCREEN_WIDTH / 2 - 85, SCREEN_HEIGHT - 32);
         }
 
         renderer.updateScreen();
@@ -446,7 +449,7 @@ public:
 
 class WinState : public gtool::GameState
 {
-    sdl2::Texture winnerText = renderer.createTexture();
+    std::optional<sdl2::Texture> winnerText;
 
 public:
     bool load() override
@@ -470,7 +473,7 @@ public:
 
     void render() override
     {
-        winnerText.render(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 12);
+        winnerText->render(SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT / 2 - 12);
 
         renderer.updateScreen();
     }
@@ -478,11 +481,11 @@ public:
 
 class PauseState : public gtool::GameState
 {
-    sdl2::Texture pausedText = renderer.createTexture();
-    sdl2::Texture subText = renderer.createTexture();
+    std::optional<sdl2::Texture> pausedText;
+    std::optional<sdl2::Texture> subText;
 
 public:
-    void handleKeyState(const uint8_t *state [[maybe_unused]]) override
+    void handleKeyState(const uint8_t *state) override
     {
         if (state[SDL_SCANCODE_RETURN])
         {
@@ -504,12 +507,12 @@ public:
 
     bool load() override
     {
-        pausedText = sdl2::loadSolidText(renderer,
+        pausedText = sdl2::loadBlendedText(renderer,
                                          "Game Paused",
                                          (TTF_Font *)font,
                                          asColorStruct(sdl2::Colors::BLACK));
 
-        subText = sdl2::loadSolidText(renderer,
+        subText = sdl2::loadBlendedText(renderer,
                                       "(Press Enter to continue)",
                                       (TTF_Font *)font,
                                       asColorStruct(sdl2::Colors::BLACK));
@@ -522,8 +525,8 @@ public:
         renderer.setColor(sdl2::Colors::WHITE);
         renderer.clear();
 
-        pausedText.render(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 12);
-        subText.render(SCREEN_WIDTH / 2 - 140, SCREEN_HEIGHT / 2 + 14);
+        pausedText->render(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 12);
+        subText->render(SCREEN_WIDTH / 2 - 140, SCREEN_HEIGHT / 2 + 14);
 
         renderer.updateScreen();
     }
@@ -555,7 +558,6 @@ bool loadGlobalAssets()
 {
     font.loadTTF("assets/consola.ttf", 24);
     pauseState = std::make_shared<PauseState>();
-    winState = std::make_shared<WinState>();
     return font.isLoaded();
 }
 
@@ -573,7 +575,7 @@ int MAIN_NAME()
     }
 
     gameStateProcessor.initStates([](auto &stack) {
-        stack.emplace(winState);
+        stack.emplace(new WinState());
         stack.emplace(new BoardPlayState());
     });
 

@@ -6,7 +6,7 @@ using namespace gtool;
 
 
 GameStateProcessor::GameStateProcessor(double mspf) {
-    clock.msPerUpdate = mspf;
+    clock.msPerUpdate(mspf);
 }
 
 
@@ -36,6 +36,10 @@ void GameStateProcessor::processStates()
     double itime = 0.0;
 #endif
 
+#if !_STATS && _DEBUG
+    std::cout << "Initial gamestate stack size: " << gameStates.size() << "\n";
+#endif
+
     while (!gameStates.empty() && m_isPlaying)
     {
     gameloop_start:
@@ -44,6 +48,9 @@ void GameStateProcessor::processStates()
         if (!state->isLoaded())
         {
             state->load();
+#if !_STATS && _DEBUG
+    std::cout << "State not loaded. Load successful: " << (state->isLoaded() ? "true" : "false") << "\n";
+#endif
         }
 
         if (state->isLoaded())
@@ -61,10 +68,11 @@ void GameStateProcessor::processStates()
                 auto ustart = SDL_GetPerformanceCounter();
 #endif
 
-                while (clock.updateLag >= clock.msPerUpdate)
+                while (clock.shouldUpdate())
                 {
                     state->update();
-                    clock.updateLag -= clock.msPerUpdate;
+
+                    clock.paybackLag();
                 }
 
 #if _STATS

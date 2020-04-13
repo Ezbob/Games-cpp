@@ -2,22 +2,26 @@
 #define HEADER_GUARD_6406329bbe77dff507947b3443ad5aa2
 
 #include "SDL2/SDL.h"
+#include <cstdint>
 
 namespace gtool {
 
-    struct GameClock {
-        double msPerUpdate = 16.0;
-        uint64_t now = SDL_GetPerformanceCounter();
-        uint64_t last = 0;
-        double frameElapsed = 0.0;
-        double updateLag = 0.0;
+    class GameClock {
+    public:
+        void tick(void);
 
-        void tick() {
-            last = now;
-            now = SDL_GetPerformanceCounter();
-            frameElapsed = ((now - last) * 1000) / static_cast<double>(SDL_GetPerformanceFrequency());
-            updateLag += frameElapsed;
-        }
+        double msPerUpdate(void) const;
+        double msPerUpdate(double);
+
+        bool shouldUpdate(void) const;
+
+        void paybackLag(void);
+    private:
+        uint64_t m_now = SDL_GetPerformanceCounter();
+        uint64_t m_last = 0;
+        double m_msPerUpdate = 16.0;
+        double m_frameElapsed = 0.0;
+        double m_updateLag = 0.0;
     };
 }
 
