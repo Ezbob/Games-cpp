@@ -14,12 +14,12 @@ namespace gtool {
         virtual void handleKeyState(const uint8_t *keyState);
         virtual void handleEvent(const SDL_Event &event);
 
-        virtual bool load();
-        virtual void update();
-        virtual void render();
+        virtual bool load(void);
+        virtual void update(void);
+        virtual void render(void);
 
-        bool isLoaded() const;
-        bool isPlaying() const;
+        bool isLoaded(void) const;
+        bool isPlaying(void) const;
         bool isPlaying(bool);
 
     protected:

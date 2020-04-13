@@ -26,6 +26,7 @@ set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
 set(SOURCES
     src/Main.cpp
+    src/states/AllStates.cpp
     src/GameTool/GameState.cpp
     src/GameTool/GameClock.cpp
     src/GameTool/GameStateProcessor.cpp

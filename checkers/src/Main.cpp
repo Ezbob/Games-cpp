@@ -6,9 +6,9 @@
 #include <vector>
 #include <array>
 #include <optional>
-#include "PauseState.hpp"
-#include "WinState.hpp"
-#include "BoardPlayState.hpp"
+#include "states/PauseState.hpp"
+#include "states/WinState.hpp"
+#include "states/BoardPlayState.hpp"
 
 #if defined(_WIN32)
 #define MAIN_NAME WinMain

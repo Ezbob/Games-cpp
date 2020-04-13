@@ -22,11 +22,12 @@ void GameState::handleEvent(const SDL_Event &event)
     }
 }
 
-void GameState::handleKeyState(const uint8_t *keyState)
+void GameState::handleKeyState(const uint8_t *keyState [[maybe_unused]])
 {
 }
 
-bool GameState::load() {
+bool GameState::load()
+{
     return this->isLoaded(true);
 }
 
