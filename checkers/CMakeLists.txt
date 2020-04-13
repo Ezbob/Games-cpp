@@ -28,6 +28,7 @@ set(SOURCES
     src/Main.cpp
     src/GameTool/GameState.cpp
     src/GameTool/GameStateProcessor.cpp
+    src/GameTool/Tweening.cpp
     src/SDL2cpp/AssetLoading.cpp
     src/SDL2cpp/Renderer.cpp
     src/SDL2cpp/Texture.cpp
