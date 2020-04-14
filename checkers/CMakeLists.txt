@@ -19,9 +19,8 @@ endif()
 # Also look for Find-cmake modules here
 set(CMAKE_MODULE_PATH  ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/sdl2")
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -std=c++17 -D_DEBUG=1 ${STATS_ENV} -Wall -Wextra -ggdb
- -fsanitize=address,undefined")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -std=c++17 -O3 -D_DEBUG=0")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG=1 ${STATS_ENV} -Wall -Wextra -ggdb")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -D_DEBUG=0")
 set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
 
 set(SOURCES
@@ -87,7 +86,9 @@ if(WIN32)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${SDL_DLL_DIRS} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
-else()
+else(WIN32)
+
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address,undefined")
     # on ubuntu we use the cmake modules to find the libraries and the header include dirs
 
     target_link_libraries(${PROJECT_NAME} PRIVATE "asan" "lsan")
