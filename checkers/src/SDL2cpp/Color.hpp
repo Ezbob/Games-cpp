@@ -1,9 +1,9 @@
 #ifndef HEADER_GUARD_43907dcfaf9a29402dbd7293e1b778b8
 #define HEADER_GUARD_43907dcfaf9a29402dbd7293e1b778b8
 
-#include "sdl.h"
+#include "SDL_pixels.h"
 
-namespace sdl2 {
+namespace asa {
     enum class Colors {
         BLACK,
         WHITE,
@@ -14,7 +14,7 @@ namespace sdl2 {
         CYAN
     };
 
-    SDL_Color asColorStruct(sdl2::Colors color);
+    SDL_Color asColorStruct(asa::Colors color);
 }
 
 #endif

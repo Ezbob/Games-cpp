@@ -4,7 +4,7 @@
 #include "SDL_events.h"
 #include <cstdint>
 
-namespace gtool {
+namespace asa {
 
     struct GameState {
         using BaseClass = GameState;

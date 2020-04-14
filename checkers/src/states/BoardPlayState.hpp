@@ -7,25 +7,27 @@
 #include <vector>
 #include "SDL.h"
 #include "SDL_ttf.h"
-#include "SDL.hpp"
-#include "SDL_extra.hpp"
+#include "SDL2cpp\Renderer.hpp"
+#include "SDL2cpp\Texture.hpp"
+#include "SDLExtra\Font.hpp"
 #include "GameTool\Tweening.hpp"
 #include "GameTool\GameState.hpp"
 #include "GameTool\GameStateProcessor.hpp"
 
-class BoardPlayState : public gtool::GameState
+class BoardPlayState : public asa::GameState
 {
 private:
-    sdl2::Renderer &renderer;
-    sdl2::TTFFont &font;
-    gtool::GameStateProcessor &processor;
+    asa::Renderer &renderer;
+    asa::TTFFont &font;
+    asa::GameStateProcessor &processor;
 
-    std::shared_ptr<gtool::GameState> pauseState;
+    std::shared_ptr<asa::GameState> pauseState;
 
     int screen_width;
     int screen_height;
 
-    enum class PlayingColor {
+    enum class PlayingColor
+    {
         GREEN,
         RED
     } playingColor = PlayingColor::GREEN;
@@ -35,7 +37,7 @@ private:
         PlayingColor color = PlayingColor::GREEN;
         double lerpDegree = 0.2;
         SDL_Rect *position = nullptr;
-        gtool::Tweening2DPoint positionTweener;
+        asa::Tweening2DPoint positionTweener;
 
         Checker(PlayingColor playerColor, SDL_Rect &p)
             : color(playerColor), position(&p), positionTweener(p.x, p.y)
@@ -80,7 +82,7 @@ private:
     std::vector<std::shared_ptr<Checker>> checkers;
 
 #if _DEBUG
-    std::vector<sdl2::Texture> debugText;
+    std::vector<asa::Texture> debugText;
 #endif
 
     GridCell *selected = nullptr;
@@ -90,8 +92,8 @@ private:
     int checkerDim = 60;      // h/w of the rect that is inside a cell
     int padding = 20;
 
-    std::optional<sdl2::Texture> greenTurn;
-    std::optional<sdl2::Texture> redTurn;
+    std::optional<asa::Texture> greenTurn;
+    std::optional<asa::Texture> redTurn;
 
     void switchTurn(void);
     void findSelected(void);
@@ -103,7 +105,7 @@ private:
     void updateSelected(void);
 
 public:
-    BoardPlayState(sdl2::Renderer &r, gtool::GameStateProcessor &p, sdl2::TTFFont &f, int swidth, int sheight);
+    BoardPlayState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, int swidth, int sheight);
 
     void handleEvent(const SDL_Event &event) override;
     void handleKeyState(const uint8_t *state) override;

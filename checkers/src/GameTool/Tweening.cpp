@@ -1,7 +1,7 @@
 
-#include "GameTool/Tweening.hpp"
+#include "Tweening.hpp"
 
-using namespace gtool;
+using namespace asa;
 
 Tweening2DPoint::Tweening2DPoint(double ax, double ay, double xn, double yn)
 {

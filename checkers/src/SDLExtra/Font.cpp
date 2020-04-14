@@ -1,8 +1,8 @@
-#include "SDLExtra/Font.hpp"
+#include "Font.hpp"
 #include "SDL2cpp/ErrorCheck.hpp"
 #include "SDL2/SDL_ttf.h"
 
-using namespace sdl2;
+using namespace asa;
 
 void TTFFont::loadTTF(const std::string filepath, int ptsize) {
     m_contained = CheckNullError<TTF_Font, TTF_GetError>(TTF_OpenFont(filepath.c_str(), ptsize), "Could not initialze font");

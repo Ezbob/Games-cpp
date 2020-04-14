@@ -1,7 +1,9 @@
 
 #include "PauseState.hpp"
+#include "SDL2cpp/AssetLoading.hpp"
+#include "SDL.h"
 
-PauseState::PauseState(sdl2::Renderer &r, gtool::GameStateProcessor &p, sdl2::TTFFont &f, int swidth, int sheight)
+PauseState::PauseState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, int swidth, int sheight)
     : renderer(r), font(f), processor(p), screen_width(swidth), screen_height(sheight) {}
 
 void PauseState::handleKeyState(const uint8_t *state)
@@ -26,22 +28,22 @@ void PauseState::handleEvent(const SDL_Event &event)
 
 bool PauseState::load()
 {
-    pausedText = sdl2::loadBlendedText(renderer,
-                                       "Game Paused",
-                                       (TTF_Font *)font,
-                                       asColorStruct(sdl2::Colors::BLACK));
+    pausedText = asa::loadBlendedText(renderer,
+                                      "Game Paused",
+                                      (TTF_Font *)font,
+                                      asColorStruct(asa::Colors::BLACK));
 
-    subText = sdl2::loadBlendedText(renderer,
-                                    "(Press Enter to continue)",
-                                    (TTF_Font *)font,
-                                    asColorStruct(sdl2::Colors::BLACK));
+    subText = asa::loadBlendedText(renderer,
+                                   "(Press Enter to continue)",
+                                   (TTF_Font *)font,
+                                   asColorStruct(asa::Colors::BLACK));
 
     return isLoaded(pausedText && subText);
 }
 
 void PauseState::render()
 {
-    renderer.setColor(sdl2::Colors::WHITE);
+    renderer.setColor(asa::Colors::WHITE);
     renderer.clear();
 
     pausedText->render(screen_width / 2 - 50, screen_height / 2 - 12);

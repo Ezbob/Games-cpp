@@ -4,23 +4,24 @@
 
 #include <optional>
 #include "SDL.h"
-#include "SDL.hpp"
-#include "SDL_extra.hpp"
 #include "GameTool/GameStateProcessor.hpp"
+#include "SDLExtra/Font.hpp"
+#include "SDL2cpp/Renderer.hpp"
+#include "SDL2cpp/Texture.hpp"
 
-class PauseState : public gtool::GameState
+class PauseState : public asa::GameState
 {
-    std::optional<sdl2::Texture> pausedText;
-    std::optional<sdl2::Texture> subText;
+    std::optional<asa::Texture> pausedText;
+    std::optional<asa::Texture> subText;
 
-    sdl2::Renderer &renderer;
-    sdl2::TTFFont &font;
-    gtool::GameStateProcessor &processor;
+    asa::Renderer &renderer;
+    asa::TTFFont &font;
+    asa::GameStateProcessor &processor;
     int screen_width;
     int screen_height;
 
 public:
-    PauseState(sdl2::Renderer &r, gtool::GameStateProcessor &p, sdl2::TTFFont &f, int swidth, int sheight);
+    PauseState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, int swidth, int sheight);
 
     void handleKeyState(const uint8_t *state) override;
 

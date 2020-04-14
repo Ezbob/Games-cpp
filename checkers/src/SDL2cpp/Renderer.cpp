@@ -1,10 +1,10 @@
-#include "SDL2cpp/Renderer.hpp"
-#include "SDL2cpp/Texture.hpp"
-#include "SDL2cpp/ErrorCheck.hpp"
+#include "Renderer.hpp"
+#include "Texture.hpp"
+#include "ErrorCheck.hpp"
 #include "SDL2/SDL.h"
 #include <memory>
 
-using namespace sdl2;
+using namespace asa;
 
 Renderer::Renderer(SDL_Window *window, int index, uint32_t rendererFlags) {
     m_contained = std::shared_ptr<SDL_Renderer>(SDL_CreateRenderer(window, index, rendererFlags), SDL_DestroyRenderer);
@@ -49,7 +49,7 @@ bool Renderer::setColor(int r, int g, int b, int a) {
     return CheckError<SDL_GetError>(SDL_SetRenderDrawColor(m_contained.get(), r, g, b, a), "Could not set renderer color");
 }
 
-bool Renderer::setColor(sdl2::Colors color) {
+bool Renderer::setColor(asa::Colors color) {
     uint8_t r = 0x0, g = 0x0, b = 0x0;
 
     switch (color) {

@@ -1,8 +1,9 @@
 
-#include "GameTool/GameStateProcessor.hpp"
+#include "GameStateProcessor.hpp"
 #include <iostream>
+#include "SDL_timer.h"
 
-using namespace gtool;
+using namespace asa;
 
 
 GameStateProcessor::GameStateProcessor(double mspf) {
@@ -15,7 +16,7 @@ void GameStateProcessor::initStates(std::function<void(GameStateStack &)> initFu
     initFunction(gameStates);
 }
 
-gtool::GameClock const &GameStateProcessor::getClock() const {
+asa::GameClock const &GameStateProcessor::getClock() const {
     return clock;
 }
 

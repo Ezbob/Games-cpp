@@ -1,8 +1,8 @@
 
-#include "SDL2cpp/Globals.hpp"
+#include "Globals.hpp"
 #include <iostream>
 
-using namespace sdl2;
+using namespace asa;
 
 bool Globals::init(uint32_t init_flags) {
     if ( SDL_Init( m_flags_set ) < 0 ) {

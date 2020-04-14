@@ -1,11 +1,12 @@
-#include "SDL.hpp"
-#include "SDL_extra.hpp"
-#include "game_tool.hpp"
 #include <iostream>
 #include <stack>
 #include <vector>
 #include <array>
 #include <optional>
+#include "SDL2cpp/Renderer.hpp"
+#include "SDL2cpp/Window.hpp"
+#include "SDL2cpp/Globals.hpp"
+#include "SDLExtra/Font.hpp"
 #include "states/PauseState.hpp"
 #include "states/WinState.hpp"
 #include "states/BoardPlayState.hpp"
@@ -19,19 +20,19 @@
 const int SCREEN_WIDTH = 840;
 const int SCREEN_HEIGHT = 860;
 
-sdl2::Globals globals;
-sdl2::Window window;
-sdl2::Renderer renderer;
-sdl2::TTFFont font;
+asa::Globals globals;
+asa::Window window;
+asa::Renderer renderer;
+asa::TTFFont font;
 
-gtool::GameStateProcessor gameStateProcessor(16.);
+asa::GameStateProcessor gameStateProcessor(16.);
 
 bool sdlInit()
 {
     if (globals.init(SDL_INIT_VIDEO | SDL_INIT_TIMER))
     {
-        globals.loadExternLib(sdl2::ExternLibs::SDL_IMAGE, IMG_INIT_PNG);
-        globals.loadExternLib(sdl2::ExternLibs::SDL_TTF);
+        globals.loadExternLib(asa::ExternLibs::SDL_IMAGE, IMG_INIT_PNG);
+        globals.loadExternLib(asa::ExternLibs::SDL_TTF);
 
         window.loadWindow(
             "Checkers game",
@@ -42,7 +43,7 @@ bool sdlInit()
             SDL_WINDOW_SHOWN);
 
         renderer = window.getRenderer();
-        renderer.setColor(sdl2::Colors::WHITE);
+        renderer.setColor(asa::Colors::WHITE);
     }
 
     return globals.is_initialized && window.isLoaded();

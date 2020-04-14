@@ -2,14 +2,13 @@
 #ifndef _HEADER_FILE_GameStateProcessor_20200413135256_
 #define _HEADER_FILE_GameStateProcessor_20200413135256_
 
-#include "SDL.h"
 #include <stack>
 #include "GameClock.hpp"
 #include "GameState.hpp"
 #include <functional>
 #include <memory>
 
-namespace gtool
+namespace asa
 {
 using GameStateStack = std::stack<std::shared_ptr<GameState>>;
 
@@ -30,10 +29,10 @@ public:
 
     void startFromNewState(const std::shared_ptr<GameState> state);
 
-    gtool::GameClock const &getClock() const;
+    asa::GameClock const &getClock() const;
 
     void quitGame();
 };
-}; // namespace gtool
+}; // namespace asa
 
 #endif

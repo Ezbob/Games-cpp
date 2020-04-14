@@ -1,8 +1,8 @@
-#include "GameTool/GameState.hpp"
+#include "GameState.hpp"
 #include <iostream>
 #include "sdl.h"
 
-using namespace gtool;
+using namespace asa;
 
 void GameState::pumpEvents()
 {

@@ -1,5 +1,6 @@
 
 #include "BoardPlayState.hpp"
+#include "SDL.h"
 
 void BoardPlayState::switchTurn()
 {
@@ -183,7 +184,7 @@ void BoardPlayState::updateSelected()
 
 /* === PUBLIC INTERFACE === */
 
-BoardPlayState::BoardPlayState(sdl2::Renderer &r, gtool::GameStateProcessor &p, sdl2::TTFFont &f, int swidth, int sheight)
+BoardPlayState::BoardPlayState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, int swidth, int sheight)
     : renderer(r), font(f), processor(p), screen_width(swidth), screen_height(sheight)
 {
     pauseState = std::make_shared<PauseState>(renderer, processor, font, screen_width, screen_height);
@@ -227,15 +228,15 @@ void BoardPlayState::handleKeyState(const uint8_t *state [[maybe_unused]])
 
 bool BoardPlayState::load()
 {
-    redTurn = sdl2::loadBlendedText(renderer,
-                                    "Red's turn",
-                                    (TTF_Font *)font,
-                                    sdl2::asColorStruct(sdl2::Colors::RED));
+    redTurn = asa::loadBlendedText(renderer,
+                                   "Red's turn",
+                                   (TTF_Font *)font,
+                                   asa::asColorStruct(asa::Colors::RED));
 
-    greenTurn = sdl2::loadBlendedText(renderer,
-                                      "Green's turn",
-                                      (TTF_Font *)font,
-                                      sdl2::asColorStruct(sdl2::Colors::GREEN));
+    greenTurn = asa::loadBlendedText(renderer,
+                                     "Green's turn",
+                                     (TTF_Font *)font,
+                                     asa::asColorStruct(asa::Colors::GREEN));
 
     size_t currentBlackTileIndex = 0;
     size_t red = 0, green = 0;
@@ -259,10 +260,10 @@ bool BoardPlayState::load()
             cells[flatindex].row = i;
 
 #if _DEBUG
-            debugText.emplace_back(sdl2::loadSolidText(renderer,
-                                                       "(" + std::to_string(i) + ", " + std::to_string(j) + ")",
-                                                       (TTF_Font *)font,
-                                                       sdl2::asColorStruct(sdl2::Colors::BLACK)));
+            debugText.emplace_back(asa::loadSolidText(renderer,
+                                                      "(" + std::to_string(i) + ", " + std::to_string(j) + ")",
+                                                      (TTF_Font *)font,
+                                                      asa::asColorStruct(asa::Colors::BLACK)));
 #endif
             if (i % 2 != j % 2)
             {
@@ -301,25 +302,25 @@ bool BoardPlayState::load()
 
 void BoardPlayState::render()
 {
-    renderer.setColor(sdl2::Colors::WHITE);
+    renderer.setColor(asa::Colors::WHITE);
     renderer.clear();
 
-    renderer.setColor(sdl2::Colors::BLACK);
+    renderer.setColor(asa::Colors::BLACK);
     renderer.fillRects(boardBlackTiles);
 
-    renderer.setColor(sdl2::Colors::BLACK);
+    renderer.setColor(asa::Colors::BLACK);
     renderer.drawRects(boardContainers);
 
     if (selected)
     {
-        renderer.setColor(sdl2::Colors::BLUE);
+        renderer.setColor(asa::Colors::BLUE);
         renderer.fillRect(selected->container);
     }
 
-    renderer.setColor(sdl2::Colors::GREEN);
+    renderer.setColor(asa::Colors::GREEN);
     renderer.drawRects(greenChecks);
 
-    renderer.setColor(sdl2::Colors::RED);
+    renderer.setColor(asa::Colors::RED);
     renderer.drawRects(redChecks);
 
 #if _DEBUG

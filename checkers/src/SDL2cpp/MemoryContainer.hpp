@@ -3,15 +3,15 @@
 
 #include <memory>
 #include <iostream>
-#include "SDL2cpp/ErrorCheck.hpp"
+#include "ErrorCheck.hpp"
 
-namespace sdl2 {
+namespace asa {
 
     template<typename T>
     using FreeingFunctionType = void (*)(T *);
 
     /*
-    * The SDL_Window type "inherites" from this base, because it is an incomplete type,
+    * The SDL_Window type "inherits" from this base, because it is an incomplete type,
     * and Windows generally outlives most other object of a game. 
     */
     template<typename ContainedType, FreeingFunctionType<ContainedType> FreeingFunction>

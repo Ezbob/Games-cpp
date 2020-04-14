@@ -1,15 +1,23 @@
 #include <iostream>
 #include "SDL2/SDL_image.h"
-#include "SDL2cpp/ErrorCheck.hpp"
-#include "SDL2cpp/Surface.hpp"
+#include "ErrorCheck.hpp"
+#include "Surface.hpp"
 
-using namespace sdl2;
+using namespace asa;
 
 Surface::Surface(SDL_Surface *surface) {
     m_contained = std::shared_ptr<SDL_Surface>(surface, SDL_FreeSurface);
 }
 
 Surface::Surface() {}
+
+int Surface::getHeight() const {
+    return m_contained->h;
+}
+
+int Surface::getWidth() const {
+    return m_contained->w;
+}
 
 void Surface::loadBMP(std::string filename) {
     m_contained = std::shared_ptr<SDL_Surface>(SDL_LoadBMP(filename.c_str()), Surface::freeingFunction);
@@ -23,14 +31,6 @@ void Surface::loadPNG(std::string filename) {
     m_contained = std::shared_ptr<SDL_Surface>(IMG_Load(filename.c_str()), Surface::freeingFunction);
     if ( !m_contained ) {
         std::cerr << "Error: Surface could not be initialize: " << SDL_GetError() << std::endl;
-        return;
-    }
-}
-
-void Surface::loadSolidText(std::string text, TTF_Font &font, SDL_Color color) {
-    m_contained = std::shared_ptr<SDL_Surface>(TTF_RenderText_Solid(&font, text.c_str(), color));
-    if (m_contained == nullptr) {
-        std::cerr << "Error: Surface could not be initialize: " << TTF_GetError() << std::endl;
         return;
     }
 }

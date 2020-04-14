@@ -1,12 +1,12 @@
 #ifndef HEADER_GUARD_ae78126d2bc5ee4610e84cb0f11eac44
 #define HEADER_GUARD_ae78126d2bc5ee4610e84cb0f11eac44
 
-#include "SDL2/SDL.h"
-#include "SDL2/SDL_ttf.h"
+#include "SDL_surface.h"
+#include "SDL_ttf.h"
 #include <memory>
-#include "SDL2cpp/MemoryContainer.hpp"
+#include "MemoryContainer.hpp"
 
-namespace sdl2 {
+namespace asa {
 
     class Surface : public SharedContainerBase<SDL_Surface, SDL_FreeSurface> {
 
@@ -16,17 +16,11 @@ namespace sdl2 {
 
         void loadBMP(std::string filename);
         void loadPNG(std::string filename);
-        void loadSolidText(std::string text, TTF_Font &font, SDL_Color color = {0, 0, 0, 0});
 
         int setKeyColor(int flags, uint32_t color);
 
-        int getHeight() const {
-            return m_contained->h;
-        }
-
-        int getWidth() const {
-            return m_contained->w;
-        }
+        int getHeight() const;
+        int getWidth() const;
 
         /**
          * Convert the internal surface pixel format to the other surface's pixelformat

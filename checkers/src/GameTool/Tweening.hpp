@@ -6,7 +6,7 @@
 #include <functional>
 #include <array>
 
-namespace gtool
+namespace asa
 {
 
 class Tweening2DPoint
@@ -25,6 +25,6 @@ private:
     double m_coordinates[4];
 };
 
-} // namespace gtool
+} // namespace asa
 
 #endif

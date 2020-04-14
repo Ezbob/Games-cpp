@@ -41,7 +41,7 @@ set(SOURCES
 )
 
 set(INCLUDE_DIRS
-    ${PROJECT_SOURCE_DIR}/include
+    ${PROJECT_SOURCE_DIR}/src
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

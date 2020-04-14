@@ -6,7 +6,7 @@
 #include "SDL2/SDL_ttf.h"
 #include <cstddef>
 
-namespace sdl2 {
+namespace asa {
 
     enum class ExternLibs {
         SDL_IMAGE = 1,

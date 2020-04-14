@@ -1,15 +1,17 @@
 #ifndef HEADER_GUARD_a04ab214bef1adcd47b92de3a2c703e2
 #define HEADER_GUARD_a04ab214bef1adcd47b92de3a2c703e2
 
-#include "SDL.hpp"
-#include "SDL2cpp/MemoryContainer.hpp"
+#include "SDL_video.h"
+#include "SDL_render.h"
+#include "SDL_rect.h"
+#include "Color.hpp"
+#include "MemoryContainer.hpp"
+#include "Window.hpp"
+#include "Texture.hpp"
 #include <array>
 #include <vector>
 
-namespace sdl2 {
-
-    class Texture;
-    class Window;
+namespace asa {
 
     class Renderer : public SharedContainerBase<SDL_Renderer, SDL_DestroyRenderer> {
 
@@ -26,7 +28,7 @@ namespace sdl2 {
         bool copyTexture(Texture &texture, SDL_Rect *src = nullptr, SDL_Rect *dest = nullptr);
         void updateScreen() const;
         bool setColor(int r, int g, int b, int a = 0xFF);
-        bool setColor(sdl2::Colors);
+        bool setColor(asa::Colors);
 
         bool drawRect(const SDL_Rect *fillRect);
         bool drawRect(const SDL_Rect &fillRect);

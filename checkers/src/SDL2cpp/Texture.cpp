@@ -1,11 +1,18 @@
-#include "SDL2/SDL.h"
-#include "SDL2cpp/Texture.hpp"
+#include "sdl_render.h"
+#include "Texture.hpp"
 #include <memory>
 
-using namespace sdl2;
+using namespace asa;
 
-Texture::Texture(Renderer &renderer) : m_renderer((SDL_Renderer *) renderer), m_width(0), m_height(0) {}
 Texture::Texture(SDL_Renderer *renderer) : m_renderer(renderer), m_width(0), m_height(0) {}
+
+int Texture::getHeight() const {
+    return m_height;
+}
+
+int Texture::getWidth() const {
+    return m_width;
+}
 
 void Texture::load(SDL_Texture *texture, int width, int height) {
     m_contained = std::shared_ptr<SDL_Texture>(texture, SDL_DestroyTexture);
@@ -48,7 +55,7 @@ void Texture::load(Surface &surface) {
     m_width = surface.getWidth();
 }
 
-void Texture::load(sdl2::Texture &&texture) {
+void Texture::load(asa::Texture &&texture) {
     m_contained.swap(texture.m_contained);
     if (m_contained == nullptr) {
         std::cerr << "Error: Could not load texture: " << SDL_GetError() << std::endl;

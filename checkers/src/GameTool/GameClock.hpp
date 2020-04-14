@@ -1,10 +1,10 @@
 #ifndef HEADER_GUARD_6406329bbe77dff507947b3443ad5aa2
 #define HEADER_GUARD_6406329bbe77dff507947b3443ad5aa2
 
-#include "SDL2/SDL.h"
+#include "SDL_timer.h"
 #include <cstdint>
 
-namespace gtool {
+namespace asa {
 
     class GameClock {
     public:
