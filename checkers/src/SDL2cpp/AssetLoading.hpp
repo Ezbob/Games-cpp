@@ -1,5 +1,4 @@
-#ifndef HEADER_GUARD_7438d22a99cec6e2475b167f3b35a0c3
-#define HEADER_GUARD_7438d22a99cec6e2475b167f3b35a0c3
+#pragma once
 
 #include "Texture.hpp"
 #include "Renderer.hpp"
@@ -18,5 +17,3 @@ Texture loadSolidText(const Renderer &renderer, const std::string &text, TTF_Fon
 Texture loadBlendedText(const Renderer &renderer, const std::string &text, TTF_Font *font, SDL_Color textColor);
 
 } // namespace asa
-
-#endif

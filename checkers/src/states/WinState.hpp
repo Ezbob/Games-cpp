@@ -1,11 +1,9 @@
-
-#ifndef _HEADER_FILE_WinState_20200413195715_
-#define _HEADER_FILE_WinState_20200413195715_
+#pragma once
 
 #include <optional>
 #include "SDL2cpp/Renderer.hpp"
 #include "SDL2cpp/Texture.hpp"
-#include "SDLExtra/Font.hpp"
+#include "SDL2cpp/Font.hpp"
 #include "SDL_ttf.h"
 #include "GameTool/GameState.hpp"
 #include "GameTool/GameStateProcessor.hpp"
@@ -28,5 +26,3 @@ public:
 
     void render() override;
 };
-
-#endif

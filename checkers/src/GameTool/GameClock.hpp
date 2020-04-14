@@ -1,5 +1,4 @@
-#ifndef HEADER_GUARD_6406329bbe77dff507947b3443ad5aa2
-#define HEADER_GUARD_6406329bbe77dff507947b3443ad5aa2
+#pragma once
 
 #include "SDL_timer.h"
 #include <cstdint>
@@ -25,4 +24,3 @@ namespace asa {
     };
 }
 
-#endif

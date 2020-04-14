@@ -1,5 +1,4 @@
-#ifndef HEADER_GUARD_43907dcfaf9a29402dbd7293e1b778b8
-#define HEADER_GUARD_43907dcfaf9a29402dbd7293e1b778b8
+#pragma once
 
 #include "SDL_pixels.h"
 
@@ -16,5 +15,3 @@ namespace asa {
 
     SDL_Color asColorStruct(asa::Colors color);
 }
-
-#endif

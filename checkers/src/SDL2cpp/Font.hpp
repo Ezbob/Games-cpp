@@ -1,5 +1,4 @@
-#ifndef HEADER_GUARD_9d0f70840337db3e8dfc9f59e0796fbd
-#define HEADER_GUARD_9d0f70840337db3e8dfc9f59e0796fbd
+#pragma once
 
 #include "SDL_ttf.h"
 #include "SDL2cpp/MemoryContainer.hpp"
@@ -13,5 +12,3 @@ namespace asa {
     };
 
 }
-
-#endif

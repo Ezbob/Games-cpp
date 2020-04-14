@@ -6,7 +6,7 @@
 #include "SDL2cpp/Renderer.hpp"
 #include "SDL2cpp/Window.hpp"
 #include "SDL2cpp/Globals.hpp"
-#include "SDLExtra/Font.hpp"
+#include "SDL2cpp/Font.hpp"
 #include "states/PauseState.hpp"
 #include "states/WinState.hpp"
 #include "states/BoardPlayState.hpp"
@@ -25,7 +25,7 @@ asa::Window window;
 asa::Renderer renderer;
 asa::TTFFont font;
 
-asa::GameStateProcessor gameStateProcessor(16.);
+asa::GameStateProcessor gameStateProcessor(16.66);
 
 bool sdlInit()
 {

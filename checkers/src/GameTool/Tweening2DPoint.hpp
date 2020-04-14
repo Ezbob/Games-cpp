@@ -1,7 +1,6 @@
-#ifndef HEADER_GUARD_d69be7fb91c8ba1ea03207db1b3d944a
-#define HEADER_GUARD_d69be7fb91c8ba1ea03207db1b3d944a
+#pragma once
 
-#include "SDL2/SDL.h"
+#include "SDL_rect.h"
 #include <iostream>
 #include <functional>
 #include <array>
@@ -26,5 +25,3 @@ private:
 };
 
 } // namespace asa
-
-#endif

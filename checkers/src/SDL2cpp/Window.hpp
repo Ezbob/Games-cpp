@@ -1,5 +1,4 @@
-#ifndef HEADER_GUARD_08570ec71d9036246ac3d05623b1f7bb
-#define HEADER_GUARD_08570ec71d9036246ac3d05623b1f7bb
+#pragma once
 
 #include "SDL_video.h"
 #include "Surface.hpp"
@@ -27,5 +26,3 @@ namespace asa {
 
     };
 }
-
-#endif

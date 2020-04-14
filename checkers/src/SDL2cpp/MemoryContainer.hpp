@@ -1,5 +1,4 @@
-#ifndef HEADER_GUARD_f608888504445bd55db8b149f35cfa17
-#define HEADER_GUARD_f608888504445bd55db8b149f35cfa17
+#pragma once
 
 #include <memory>
 #include <iostream>
@@ -83,5 +82,3 @@ namespace asa {
         }
     };
 }
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef HEADER_GUARD_e73311f1c7af9dc9fb705468721e084a
-#define HEADER_GUARD_e73311f1c7af9dc9fb705468721e084a
+#pragma once
 
 #include "Surface.hpp"
 #include "sdl_render.h"
@@ -33,5 +32,3 @@ namespace asa {
         int m_height;
     };
 }
-
-#endif

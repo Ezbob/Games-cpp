@@ -1,6 +1,4 @@
-
-#ifndef _HEADER_FILE_BoardPlayState_20200413202312_
-#define _HEADER_FILE_BoardPlayState_20200413202312_
+#pragma once
 
 #include <optional>
 #include <memory>
@@ -9,8 +7,8 @@
 #include "SDL_ttf.h"
 #include "SDL2cpp\Renderer.hpp"
 #include "SDL2cpp\Texture.hpp"
-#include "SDLExtra\Font.hpp"
-#include "GameTool\Tweening.hpp"
+#include "SDL2cpp\Font.hpp"
+#include "GameTool\Tweening2DPoint.hpp"
 #include "GameTool\GameState.hpp"
 #include "GameTool\GameStateProcessor.hpp"
 
@@ -113,5 +111,3 @@ public:
     void render(void) override;
     void update(void) override;
 };
-
-#endif

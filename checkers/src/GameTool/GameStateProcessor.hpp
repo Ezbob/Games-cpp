@@ -1,6 +1,4 @@
-
-#ifndef _HEADER_FILE_GameStateProcessor_20200413135256_
-#define _HEADER_FILE_GameStateProcessor_20200413135256_
+#pragma once
 
 #include <stack>
 #include "GameClock.hpp"
@@ -33,6 +31,5 @@ public:
 
     void quitGame();
 };
-}; // namespace asa
 
-#endif
+} // namespace asa

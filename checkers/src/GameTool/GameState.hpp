@@ -1,5 +1,4 @@
-#ifndef HEADER_GUARD_a17e097f8bd12c4c14b2c994eb545006
-#define HEADER_GUARD_a17e097f8bd12c4c14b2c994eb545006
+#pragma once
 
 #include "SDL_events.h"
 #include <cstdint>
@@ -28,5 +27,3 @@ namespace asa {
         bool m_isLoaded = false; // as we push and pop states we need to only load once
     };
 }
-
-#endif

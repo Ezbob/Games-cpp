@@ -1,5 +1,4 @@
-#ifndef ANIMATOR_H_dbc46f9133f3f0f7103ecf9fae61de05
-#define ANIMATOR_H_dbc46f9133f3f0f7103ecf9fae61de05
+#pragma once
 
 #include "SDL2cpp/Texture.hpp"
 #include <array>
@@ -136,6 +135,5 @@ public:
         framerate = framerate;
     }
 };
-} // namespace asa
 
-#endif
+} // namespace asa

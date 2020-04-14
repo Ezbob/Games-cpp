@@ -29,7 +29,7 @@ set(SOURCES
     src/GameTool/GameState.cpp
     src/GameTool/GameClock.cpp
     src/GameTool/GameStateProcessor.cpp
-    src/GameTool/Tweening.cpp
+    src/GameTool/Tweening2DPoint.cpp
     src/SDL2cpp/AssetLoading.cpp
     src/SDL2cpp/Renderer.cpp
     src/SDL2cpp/Texture.cpp
@@ -37,7 +37,7 @@ set(SOURCES
     src/SDL2cpp/Surface.cpp
     src/SDL2cpp/Globals.cpp
     src/SDL2cpp/Color.cpp
-    src/SDLExtra/Font.cpp
+    src/SDL2cpp/Font.cpp
 )
 
 set(INCLUDE_DIRS

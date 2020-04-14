@@ -1,5 +1,4 @@
-#ifndef HEADER_GUARD_aed9ee4c025f13329af83560b1a51946
-#define HEADER_GUARD_aed9ee4c025f13329af83560b1a51946
+#pragma once
 
 #include "SDL2/SDL.h"
 #include <iostream>
@@ -24,5 +23,3 @@ namespace asa {
         return success == 0;
     }
 }
-
-#endif

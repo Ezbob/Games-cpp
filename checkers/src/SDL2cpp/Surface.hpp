@@ -1,5 +1,4 @@
-#ifndef HEADER_GUARD_ae78126d2bc5ee4610e84cb0f11eac44
-#define HEADER_GUARD_ae78126d2bc5ee4610e84cb0f11eac44
+#pragma once
 
 #include "SDL_surface.h"
 #include "SDL_ttf.h"
@@ -34,5 +33,3 @@ namespace asa {
     };
 
 }
-
-#endif

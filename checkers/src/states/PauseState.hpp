@@ -1,11 +1,9 @@
-
-#ifndef _HEADER_FILE_PauseState_20200413193438_
-#define _HEADER_FILE_PauseState_20200413193438_
+#pragma once
 
 #include <optional>
 #include "SDL.h"
 #include "GameTool/GameStateProcessor.hpp"
-#include "SDLExtra/Font.hpp"
+#include "SDL2cpp/Font.hpp"
 #include "SDL2cpp/Renderer.hpp"
 #include "SDL2cpp/Texture.hpp"
 
@@ -31,5 +29,3 @@ public:
 
     void render() override;
 };
-
-#endif

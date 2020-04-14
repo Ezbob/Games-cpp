@@ -1,5 +1,4 @@
-#ifndef HEADER_GUARD_a04ab214bef1adcd47b92de3a2c703e2
-#define HEADER_GUARD_a04ab214bef1adcd47b92de3a2c703e2
+#pragma once
 
 #include "SDL_video.h"
 #include "SDL_render.h"
@@ -73,5 +72,3 @@ namespace asa {
     };
 
 }
-
-#endif
