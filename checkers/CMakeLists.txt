@@ -77,6 +77,16 @@ if(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE ${SDL_LIBS})
     target_include_directories(${PROJECT_NAME} PRIVATE ${SDL_INCLUDE_DIRS})
 
+    set(SDL_DLL_DIRS
+        ${PROJECT_SOURCE_DIR}/libs/SDL2-2.0.9/x86_64-w64-mingw32/bin
+        ${PROJECT_SOURCE_DIR}/libs/SDL2_image-2.0.4/x86_64-w64-mingw32/bin
+        ${PROJECT_SOURCE_DIR}/libs/SDL2_ttf-2.0.15/x86_64-w64-mingw32/bin
+    )
+
+    # This copies over the dll's to the executable dir so we can run it on windows
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${SDL_DLL_DIRS} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+
 else()
     # on ubuntu we use the cmake modules to find the libraries and the header include dirs
 
@@ -96,3 +106,9 @@ else()
 
 endif(WIN32)
 
+set(ASSET_DIR
+    ${PROJECT_SOURCE_DIR}/assets
+)
+# Assets copy
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+COMMAND ${CMAKE_COMMAND} -E copy_directory ${ASSET_DIR} "$<TARGET_FILE_DIR:${PROJECT_NAME}>/assets")
