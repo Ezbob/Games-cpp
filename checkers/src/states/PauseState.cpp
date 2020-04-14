@@ -1,6 +1,5 @@
 
 #include "PauseState.hpp"
-#include "SDL2cpp/AssetLoading.hpp"
 #include "SDL.h"
 
 PauseState::PauseState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, int swidth, int sheight)
@@ -28,14 +27,14 @@ void PauseState::handleEvent(const SDL_Event &event)
 
 bool PauseState::load()
 {
-    pausedText = asa::loadBlendedText(renderer,
+    pausedText = renderer.loadBlendedText(
                                       "Game Paused",
-                                      (TTF_Font *)font,
+                                      font,
                                       asColorStruct(asa::Colors::BLACK));
 
-    subText = asa::loadBlendedText(renderer,
+    subText = renderer.loadBlendedText(
                                    "(Press Enter to continue)",
-                                   (TTF_Font *)font,
+                                   font,
                                    asColorStruct(asa::Colors::BLACK));
 
     return isLoaded(pausedText && subText);

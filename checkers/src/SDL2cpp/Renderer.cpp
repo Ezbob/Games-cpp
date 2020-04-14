@@ -124,6 +124,50 @@ bool Renderer::fillRects(const std::vector<SDL_Rect> &fillRect) {
     return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), fillRect.data(), fillRect.size()), "Could not fill rectangle");
 }
 
+Texture Renderer::loadPNG(const std::string &path, uint8_t r, uint8_t g, uint8_t b) const {
+    Texture texture = createTexture();
+
+    Surface loadedSurface;
+    loadedSurface.loadPNG(path);
+    if (loadedSurface.isLoaded())
+    {
+        loadedSurface.setKeyColor(SDL_TRUE, SDL_MapRGB(loadedSurface.pixelFormat(), r, g, b));
+        texture.load(loadedSurface);
+    }
+
+    return texture;
+}
+
+Texture Renderer::loadSolidText(const std::string &text, TTFFont &font, SDL_Color textColor) const {
+    Texture texture = createTexture();
+
+    Surface surface;
+
+    surface.load(TTF_RenderText_Solid((TTF_Font *) font, text.c_str(), textColor));
+
+    if (surface.isLoaded())
+    {
+        texture.load(surface);
+    }
+
+    return texture;
+}
+
+Texture Renderer::loadBlendedText(const std::string &text, TTFFont &font, SDL_Color textColor) const {
+    Texture texture = createTexture();
+
+    Surface surface;
+
+    surface.load(TTF_RenderText_Blended((TTF_Font *) font, text.c_str(), textColor));
+
+    if (surface.isLoaded())
+    {
+        texture.load(surface);
+    }
+
+    return texture;
+}
+
 Texture Renderer::createTexture() const {
     return Texture(m_contained.get());
 }

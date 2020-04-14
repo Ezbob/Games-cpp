@@ -30,7 +30,6 @@ set(SOURCES
     src/GameTool/GameClock.cpp
     src/GameTool/GameStateProcessor.cpp
     src/GameTool/Tweening2DPoint.cpp
-    src/SDL2cpp/AssetLoading.cpp
     src/SDL2cpp/Renderer.cpp
     src/SDL2cpp/Texture.cpp
     src/SDL2cpp/Window.cpp

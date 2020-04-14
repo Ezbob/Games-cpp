@@ -11,10 +11,10 @@ bool WinState::load()
 {
     renderer.setColor(asa::Colors::WHITE);
     renderer.clear();
-    winnerText = asa::loadBlendedText(renderer,
-                                      "You're a winner",
-                                      (TTF_Font *)font,
-                                      asa::asColorStruct(asa::Colors::RED));
+    winnerText = renderer.loadBlendedText(
+        "You're a winner",
+        font,
+        asa::asColorStruct(asa::Colors::RED));
     return isLoaded(true);
 }
 

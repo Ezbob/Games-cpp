@@ -228,15 +228,14 @@ void BoardPlayState::handleKeyState(const uint8_t *state [[maybe_unused]])
 
 bool BoardPlayState::load()
 {
-    redTurn = asa::loadBlendedText(renderer,
-                                   "Red's turn",
-                                   (TTF_Font *)font,
-                                   asa::asColorStruct(asa::Colors::RED));
+    redTurn = renderer.loadBlendedText(
+        "Red's turn",
+        font,
+        asa::asColorStruct(asa::Colors::RED));
 
-    greenTurn = asa::loadBlendedText(renderer,
-                                     "Green's turn",
-                                     (TTF_Font *)font,
-                                     asa::asColorStruct(asa::Colors::GREEN));
+    greenTurn = renderer.loadBlendedText("Green's turn",
+                                         font,
+                                         asa::asColorStruct(asa::Colors::GREEN));
 
     size_t currentBlackTileIndex = 0;
     size_t red = 0, green = 0;
@@ -260,10 +259,10 @@ bool BoardPlayState::load()
             cells[flatindex].row = i;
 
 #if _DEBUG
-            debugText.emplace_back(asa::loadSolidText(renderer,
-                                                      "(" + std::to_string(i) + ", " + std::to_string(j) + ")",
-                                                      (TTF_Font *)font,
-                                                      asa::asColorStruct(asa::Colors::BLACK)));
+            debugText.emplace_back(renderer.loadSolidText(
+                "(" + std::to_string(i) + ", " + std::to_string(j) + ")",
+                font,
+                asa::asColorStruct(asa::Colors::BLACK)));
 #endif
             if (i % 2 != j % 2)
             {
