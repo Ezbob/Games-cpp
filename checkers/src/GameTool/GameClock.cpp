@@ -29,3 +29,7 @@ void GameClock::tick(void)
     m_frameElapsed = ((m_now - m_last) * 1000) / static_cast<double>(SDL_GetPerformanceFrequency());
     m_updateLag += m_frameElapsed;
 }
+
+auto GameClock::getDeltaTime(void) const -> double {
+    return m_frameElapsed;
+}

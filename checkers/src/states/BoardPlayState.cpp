@@ -46,7 +46,8 @@ void BoardPlayState::initChecker(PlayingColor checkerColor, int flatindex, int c
             checkerDim});
         checker = std::make_shared<Checker>(
             checkerColor,
-            greenChecks.back());
+            greenChecks.back(),
+            clock);
     }
     else
     {
@@ -57,7 +58,8 @@ void BoardPlayState::initChecker(PlayingColor checkerColor, int flatindex, int c
             checkerDim});
         checker = std::make_shared<Checker>(
             checkerColor,
-            redChecks.back());
+            redChecks.back(),
+            clock);
     }
     checkers.emplace_back(checker);
     cells[flatindex].occubant = checker.get();
@@ -184,8 +186,8 @@ void BoardPlayState::updateSelected()
 
 /* === PUBLIC INTERFACE === */
 
-BoardPlayState::BoardPlayState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, int swidth, int sheight)
-    : renderer(r), font(f), processor(p), screen_width(swidth), screen_height(sheight)
+BoardPlayState::BoardPlayState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, const asa::GameClock &clock, int swidth, int sheight)
+    : renderer(r), font(f), processor(p), clock(clock), screen_width(swidth), screen_height(sheight)
 {
     pauseState = std::make_shared<PauseState>(renderer, processor, font, screen_width, screen_height);
 }
@@ -350,6 +352,7 @@ void BoardPlayState::update()
 
     for (auto &c : checkers)
     {
+        c->tick();
         c->move();
     }
     if (nRedCheckers <= 0 || nGreenCheckers <= 0)

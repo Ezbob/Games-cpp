@@ -15,6 +15,9 @@ namespace asa {
         bool shouldUpdate(void) const;
 
         void paybackLag(void);
+
+        // in miliseconds
+        auto getDeltaTime(void) const -> double;
     private:
         uint64_t m_now = SDL_GetPerformanceCounter();
         uint64_t m_last = 0;

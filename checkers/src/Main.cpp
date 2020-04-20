@@ -70,7 +70,7 @@ int MAIN_NAME()
 
     gameStateProcessor.initStates([](auto &stack) {
         stack.emplace(new WinState(renderer, gameStateProcessor, font, SCREEN_WIDTH, SCREEN_HEIGHT));
-        stack.emplace(new BoardPlayState(renderer, gameStateProcessor, font, SCREEN_WIDTH, SCREEN_HEIGHT));
+        stack.emplace(new BoardPlayState(renderer, gameStateProcessor, font, gameStateProcessor.getClock(), SCREEN_WIDTH, SCREEN_HEIGHT));
     });
 
     gameStateProcessor.processStates();

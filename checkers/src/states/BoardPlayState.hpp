@@ -11,6 +11,9 @@
 #include "GameTool\Tweening2DPoint.hpp"
 #include "GameTool\GameState.hpp"
 #include "GameTool\GameStateProcessor.hpp"
+#include "GameTool\Easers.hpp"
+#include <cmath>
+#include <iostream>
 
 class BoardPlayState : public asa::GameState
 {
@@ -18,6 +21,7 @@ private:
     asa::Renderer &renderer;
     asa::TTFFont &font;
     asa::GameStateProcessor &processor;
+    const asa::GameClock &clock;
 
     std::shared_ptr<asa::GameState> pauseState;
 
@@ -32,27 +36,45 @@ private:
 
     struct Checker
     {
+        const asa::GameClock &clock;
         PlayingColor color = PlayingColor::GREEN;
-        double lerpDegree = 0.2;
+
+        double updateStep = 16.66;
+        double currentDegree = 1.0;
         SDL_Rect *position = nullptr;
+
         asa::Tweening2DPoint positionTweener;
 
-        Checker(PlayingColor playerColor, SDL_Rect &p)
-            : color(playerColor), position(&p), positionTweener(p.x, p.y)
+        Checker(PlayingColor playerColor, SDL_Rect &p, const asa::GameClock &c)
+            : clock(c), color(playerColor), position(&p), positionTweener(p.x, p.y)
         {
+            updateStep = clock.msPerUpdate() / 1000;
         }
 
         void updateNextPosition(int x, int y)
         {
             positionTweener.setNext(x, y);
+            currentDegree = 0;
+        }
+
+        void tick() {
+            currentDegree += updateStep;
+            if (currentDegree > 1.0) {
+                currentDegree = 1.0;
+            }
         }
 
         void move()
         {
-            positionTweener.lerp(lerpDegree);
-            positionTweener.fillRect(position);
+            double t = asa::ease_out(currentDegree);
+            if (t < 1.0) {
+                positionTweener.lerp(t);
+                positionTweener.fillRect(position);
+            }
         }
     };
+
+
 
     struct GridCell
     {
@@ -103,7 +125,7 @@ private:
     void updateSelected(void);
 
 public:
-    BoardPlayState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, int swidth, int sheight);
+    BoardPlayState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, const asa::GameClock &clock, int swidth, int sheight);
 
     void handleEvent(const SDL_Event &event) override;
     void handleKeyState(const uint8_t *state) override;
@@ -111,3 +133,4 @@ public:
     void render(void) override;
     void update(void) override;
 };
+
