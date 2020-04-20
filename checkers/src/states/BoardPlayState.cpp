@@ -1,6 +1,37 @@
 
 #include "BoardPlayState.hpp"
 #include "SDL.h"
+#include "GameTool\Easers.hpp"
+#include <cmath>
+
+
+BoardPlayState::Checker::Checker(PlayingColor playerColor, SDL_Rect &p, const asa::GameClock &c)
+    : clock(c), color(playerColor), position(&p), positionTweener(p.x, p.y)
+{
+    updateStep = clock.msPerUpdate() / 1000;
+}
+
+void BoardPlayState::Checker::updateNextPosition(int x, int y)
+{
+    positionTweener.setNext(x, y);
+    currentDegree = 0;
+}
+
+void BoardPlayState::Checker::tick(void) {
+    currentDegree += updateStep;
+    if (currentDegree > 1.0) {
+        currentDegree = 1.0;
+    }
+}
+
+void BoardPlayState::Checker::move(void)
+{
+    double t = asa::ease_out_trig(currentDegree);
+    if (t < 1.0) {
+        positionTweener.lerp(t);
+        positionTweener.fillRect(position);
+    }
+}
 
 void BoardPlayState::switchTurn()
 {
