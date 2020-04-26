@@ -26,10 +26,10 @@ void BoardPlayState::Checker::tick(void) {
 
 void BoardPlayState::Checker::move(void)
 {
-    double t = asa::ease_out_trig(currentDegree);
-    if (t < 1.0) {
+    double t = asa::ease_out_quadric(currentDegree);
+    if (t <= 1.0) {
         positionTweener.lerp(t);
-        positionTweener.fillRect(position);
+        positionTweener.fillRect(*position);
     }
 }
 
