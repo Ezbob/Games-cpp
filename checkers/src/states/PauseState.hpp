@@ -2,10 +2,10 @@
 
 #include <optional>
 #include "SDL.h"
-#include "GameTool/GameStateProcessor.hpp"
-#include "SDL2cpp/Font.hpp"
-#include "SDL2cpp/Renderer.hpp"
-#include "SDL2cpp/Texture.hpp"
+#include "gametool/GameStateProcessor.hpp"
+#include "sdl2cpp/Font.hpp"
+#include "sdl2cpp/Renderer.hpp"
+#include "sdl2cpp/Texture.hpp"
 
 class PauseState : public asa::GameState
 {

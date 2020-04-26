@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SDL2cpp/Texture.hpp"
+#include "sdl2cpp/Texture.hpp"
 #include <array>
 
 namespace asa

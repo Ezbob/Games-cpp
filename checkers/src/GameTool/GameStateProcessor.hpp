@@ -19,7 +19,7 @@ class GameStateProcessor
     bool m_shouldReload = false;
 
 public:
-    GameStateProcessor(double msPerFrame = 16.);
+    GameStateProcessor(unsigned int targetFps);
 
     void initStates(std::function<void(GameStateStack &)> initFunction);
 

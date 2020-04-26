@@ -1,35 +1,32 @@
 
 #include "BoardPlayState.hpp"
 #include "SDL.h"
-#include "GameTool\Easers.hpp"
+#include "gametool/Easers.hpp"
 #include <cmath>
 
-
-BoardPlayState::Checker::Checker(PlayingColor playerColor, SDL_Rect &p, const asa::GameClock &c)
-    : clock(c), color(playerColor), position(&p), positionTweener(p.x, p.y)
+BoardPlayState::Checker::Checker(PlayingColor playerColor, SDL_Rect &p)
+    : color(playerColor), position(p), next(p)
 {
-    updateStep = clock.msPerUpdate() / 1000;
 }
 
-void BoardPlayState::Checker::updateNextPosition(int x, int y)
+void BoardPlayState::Checker::setNextPosition(int x, int y)
 {
-    positionTweener.setNext(x, y);
+    next.x = x;
+    next.y = y;
     currentDegree = 0;
 }
 
-void BoardPlayState::Checker::tick(void) {
-    currentDegree += updateStep;
-    if (currentDegree > 1.0) {
+void BoardPlayState::Checker::update(double sekPerFrame)
+{
+    currentDegree += sekPerFrame;
+    if (currentDegree > 1.0)
+    {
         currentDegree = 1.0;
     }
-}
-
-void BoardPlayState::Checker::move(void)
-{
     double t = asa::ease_out_quadric(currentDegree);
-    if (t <= 1.0) {
-        positionTweener.lerp(t);
-        positionTweener.fillRect(*position);
+    if (t <= 1.0)
+    {
+        asa::lerp(position, next, t);
     }
 }
 
@@ -55,7 +52,7 @@ void BoardPlayState::findSelected()
             int index = i * n_rows + j;
             auto &gridCell = cells[index];
 
-            if (SDL_PointInRect(&mouseClick, gridCell.container) && gridCell.occubant != nullptr && gridCell.occubant->color == playingColor && !SDL_RectEmpty(gridCell.occubant->position))
+            if (SDL_PointInRect(&mouseClick, gridCell.container) && gridCell.occubant != nullptr && gridCell.occubant->color == playingColor && !SDL_RectEmpty(&gridCell.occubant->position))
             {
                 selected = &gridCell;
                 return;
@@ -77,8 +74,7 @@ void BoardPlayState::initChecker(PlayingColor checkerColor, int flatindex, int c
             checkerDim});
         checker = std::make_shared<Checker>(
             checkerColor,
-            greenChecks.back(),
-            clock);
+            greenChecks.back());
     }
     else
     {
@@ -89,8 +85,7 @@ void BoardPlayState::initChecker(PlayingColor checkerColor, int flatindex, int c
             checkerDim});
         checker = std::make_shared<Checker>(
             checkerColor,
-            redChecks.back(),
-            clock);
+            redChecks.back());
     }
     checkers.emplace_back(checker);
     cells[flatindex].occubant = checker.get();
@@ -100,7 +95,7 @@ void BoardPlayState::doMoveToEmpty(GridCell &target)
 {
     Checker *source = selected->occubant;
 
-    source->updateNextPosition(
+    source->setNextPosition(
         target.container->x + padding,
         target.container->y + padding);
 
@@ -115,15 +110,15 @@ void BoardPlayState::doOvertake(GridCell &taken, GridCell &position)
 {
     Checker *source = selected->occubant;
 
-    source->updateNextPosition(
+    source->setNextPosition(
         position.container->x + padding,
         position.container->y + padding);
 
     position.occubant = source;
     selected->occubant = nullptr;
 
-    taken.occubant->position->h = 0;
-    taken.occubant->position->w = 0;
+    taken.occubant->position.h = 0;
+    taken.occubant->position.w = 0;
 
     if (taken.occubant->color == PlayingColor::RED)
     {
@@ -218,7 +213,7 @@ void BoardPlayState::updateSelected()
 /* === PUBLIC INTERFACE === */
 
 BoardPlayState::BoardPlayState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, const asa::GameClock &clock, int swidth, int sheight)
-    : renderer(r), font(f), processor(p), clock(clock), screen_width(swidth), screen_height(sheight)
+    : renderer(r), font(f), processor(p), clock(clock), screen_width(swidth), screen_height(sheight), sec_per_frame(clock.msPerUpdate() / 1000.)
 {
     pauseState = std::make_shared<PauseState>(renderer, processor, font, screen_width, screen_height);
 }
@@ -380,11 +375,9 @@ void BoardPlayState::render()
 
 void BoardPlayState::update()
 {
-
     for (auto &c : checkers)
     {
-        c->tick();
-        c->move();
+        c->update(sec_per_frame);
     }
     if (nRedCheckers <= 0 || nGreenCheckers <= 0)
     {

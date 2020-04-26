@@ -6,8 +6,9 @@
 using namespace asa;
 
 
-GameStateProcessor::GameStateProcessor(double mspf) {
-    clock.msPerUpdate(mspf);
+GameStateProcessor::GameStateProcessor(unsigned int targetFps) {
+    double msPerFrame = (1. / ((double) targetFps)) * 1000.;
+    clock.msPerUpdate(msPerFrame);
 }
 
 

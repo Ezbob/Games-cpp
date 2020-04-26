@@ -1,3 +1,4 @@
+#include "SDL_rect.h"
 
 namespace asa {
 
@@ -17,4 +18,6 @@ namespace asa {
 
     auto smoother(double x) -> double;
 
+    void lerp(SDL_Rect &out, SDL_Rect const& start, SDL_Rect const& end, double f);
+    void lerp(SDL_Rect &out, SDL_Rect const& end, double f);
 };

@@ -1,12 +1,12 @@
 #pragma once
 
 #include <optional>
-#include "SDL2cpp/Renderer.hpp"
-#include "SDL2cpp/Texture.hpp"
-#include "SDL2cpp/Font.hpp"
+#include "sdl2cpp/Renderer.hpp"
+#include "sdl2cpp/Texture.hpp"
+#include "sdl2cpp/Font.hpp"
 #include "SDL_ttf.h"
-#include "GameTool/GameState.hpp"
-#include "GameTool/GameStateProcessor.hpp"
+#include "gametool/GameState.hpp"
+#include "gametool/GameStateProcessor.hpp"
 
 class WinState : public asa::GameState
 {

@@ -39,4 +39,17 @@ auto asa::smoother(double x) -> double {
     return x * x * x * (x * (6.0 * x - 15.0) + 10.0);
 }
 
+void asa::lerp(SDL_Rect &out, SDL_Rect const& start, SDL_Rect const& end, double f)
+{
+    double t = 1.0 - f;
+    out.x = ((double) start.x) * t + ((double) end.x) * f;
+    out.y = ((double) start.y) * t + ((double) end.y) * f;
+}
+
+void asa::lerp(SDL_Rect &out, SDL_Rect const& end, double f)
+{
+    double t = 1.0 - f;
+    out.x = ((double) out.x) * t + ((double) end.x) * f;
+    out.y = ((double) out.y) * t + ((double) end.y) * f;
+}
 

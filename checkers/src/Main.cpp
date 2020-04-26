@@ -3,10 +3,10 @@
 #include <vector>
 #include <array>
 #include <optional>
-#include "SDL2cpp/Renderer.hpp"
-#include "SDL2cpp/Window.hpp"
-#include "SDL2cpp/Globals.hpp"
-#include "SDL2cpp/Font.hpp"
+#include "sdl2cpp/Renderer.hpp"
+#include "sdl2cpp/Window.hpp"
+#include "sdl2cpp/Globals.hpp"
+#include "sdl2cpp/Font.hpp"
 #include "states/PauseState.hpp"
 #include "states/WinState.hpp"
 #include "states/BoardPlayState.hpp"
@@ -25,7 +25,7 @@ asa::Window window;
 asa::Renderer renderer;
 asa::TTFFont font;
 
-asa::GameStateProcessor gameStateProcessor(16.66);
+asa::GameStateProcessor gameStateProcessor(60);
 
 bool sdlInit()
 {
@@ -58,12 +58,7 @@ bool loadGlobalAssets()
 int MAIN_NAME()
 {
 
-    if (!sdlInit())
-    {
-        return 1;
-    }
-
-    if (!loadGlobalAssets())
+    if (!sdlInit() || !loadGlobalAssets())
     {
         return 1;
     }

@@ -5,12 +5,11 @@
 #include <vector>
 #include "SDL.h"
 #include "SDL_ttf.h"
-#include "SDL2cpp\Renderer.hpp"
-#include "SDL2cpp\Texture.hpp"
-#include "SDL2cpp\Font.hpp"
-#include "GameTool\Tweening2DPoint.hpp"
-#include "GameTool\GameState.hpp"
-#include "GameTool\GameStateProcessor.hpp"
+#include "sdl2cpp/Renderer.hpp"
+#include "sdl2cpp/Texture.hpp"
+#include "sdl2cpp/Font.hpp"
+#include "gametool/GameState.hpp"
+#include "gametool/GameStateProcessor.hpp"
 
 #include <iostream>
 
@@ -20,12 +19,14 @@ private:
     asa::Renderer &renderer;
     asa::TTFFont &font;
     asa::GameStateProcessor &processor;
-    const asa::GameClock &clock;
+    asa::GameClock const&clock;
 
     std::shared_ptr<asa::GameState> pauseState;
 
     int screen_width;
     int screen_height;
+
+    const double sec_per_frame;
 
     enum class PlayingColor
     {
@@ -35,22 +36,15 @@ private:
 
     struct Checker
     {
-        const asa::GameClock &clock;
         PlayingColor color = PlayingColor::GREEN;
-
-        double updateStep = 16.66;
         double currentDegree = 1.0;
-        SDL_Rect *position = nullptr;
+        SDL_Rect &position;
+        SDL_Rect next;
 
-        asa::Tweening2DPoint positionTweener;
+        Checker(PlayingColor playerColor, SDL_Rect &p);
 
-        Checker(PlayingColor playerColor, SDL_Rect &p, const asa::GameClock &c);
-
-        void updateNextPosition(int x, int y);
-
-        void tick(void);
-
-        void move(void);
+        void setNextPosition(int x, int y);
+        void update(double sekPerFrame);
     };
 
     struct GridCell
@@ -110,4 +104,3 @@ public:
     void render(void) override;
     void update(void) override;
 };
-

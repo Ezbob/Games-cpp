@@ -1,5 +1,5 @@
 #include "Font.hpp"
-#include "SDL2cpp/ErrorCheck.hpp"
+#include "sdl2cpp/ErrorCheck.hpp"
 #include "SDL2/SDL_ttf.h"
 
 using namespace asa;

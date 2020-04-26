@@ -1,7 +1,7 @@
 #pragma once
 
 #include "SDL_ttf.h"
-#include "SDL2cpp/MemoryContainer.hpp"
+#include "sdl2cpp/MemoryContainer.hpp"
 #include <string>
 
 namespace asa {
