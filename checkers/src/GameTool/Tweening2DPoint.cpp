@@ -20,12 +20,6 @@ void Tweening2DPoint::fillRect(SDL_Rect &rect) const
     rect.y = m_coordinates[1];
 }
 
-void Tweening2DPoint::fillRect(SDL_Rect *rect) const
-{
-    rect->x = m_coordinates[0];
-    rect->y = m_coordinates[1];
-}
-
 void Tweening2DPoint::setNext(Coord_t x, Coord_t y)
 {
     m_coordinates[2] = x;
@@ -59,3 +53,4 @@ auto Tweening2DPoint::x_end() const -> Coord_t {
 auto Tweening2DPoint::y_end() const -> Coord_t {
     return m_coordinates[3];
 }
+

@@ -11,12 +11,11 @@ namespace asa
 class Tweening2DPoint
 {
 public:
-    using Coord_t = uint32_t;
+    using Coord_t = int;
     Tweening2DPoint(Coord_t ax, Coord_t ay, Coord_t xn, Coord_t yn);
     Tweening2DPoint(Coord_t ax, Coord_t ay);
 
     void fillRect(SDL_Rect &rect) const;
-    void fillRect(SDL_Rect *rect) const;
     void setNext(Coord_t x, Coord_t y);
 
     void lerp(double f);
