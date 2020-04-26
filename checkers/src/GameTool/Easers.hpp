@@ -20,4 +20,7 @@ namespace asa {
 
     void lerp(SDL_Rect &out, SDL_Rect const& start, SDL_Rect const& end, double f);
     void lerp(SDL_Rect &out, SDL_Rect const& end, double f);
+
+    void lerp(SDL_Rect &out, SDL_Rect const& start, SDL_Point const& end, double f);
+    void lerp(SDL_Rect &out, SDL_Point const& end, double f);
 };

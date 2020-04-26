@@ -5,7 +5,7 @@
 #include <cmath>
 
 BoardPlayState::Checker::Checker(PlayingColor playerColor, SDL_Rect &p)
-    : color(playerColor), position(p), next(p)
+    : color(playerColor), position(p), next(SDL_Point{p.x, p.y})
 {
 }
 

@@ -53,3 +53,14 @@ void asa::lerp(SDL_Rect &out, SDL_Rect const& end, double f)
     out.y = ((double) out.y) * t + ((double) end.y) * f;
 }
 
+void asa::lerp(SDL_Rect &out, SDL_Rect const& start, SDL_Point const& end, double f) {
+    double t = 1.0 - f;
+    out.x = ((double) out.x) * t + ((double) end.x) * f;
+    out.y = ((double) out.y) * t + ((double) end.y) * f;
+}
+
+void asa::lerp(SDL_Rect &out, SDL_Point const& end, double f) {
+    double t = 1.0 - f;
+    out.x = ((double) out.x) * t + ((double) end.x) * f;
+    out.y = ((double) out.y) * t + ((double) end.y) * f;
+}

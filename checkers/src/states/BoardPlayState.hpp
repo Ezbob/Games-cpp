@@ -39,7 +39,7 @@ private:
         PlayingColor color = PlayingColor::GREEN;
         double currentDegree = 1.0;
         SDL_Rect &position;
-        SDL_Rect next;
+        SDL_Point next;
 
         Checker(PlayingColor playerColor, SDL_Rect &p);
 
