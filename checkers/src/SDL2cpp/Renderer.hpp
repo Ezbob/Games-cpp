@@ -10,6 +10,7 @@
 #include "Font.hpp"
 #include <array>
 #include <vector>
+#include <iterator>
 
 namespace asa
 {
@@ -47,6 +48,12 @@ public:
         return CheckError<SDL_GetError>(SDL_RenderDrawRects(m_contained.get(), rects, N), "Could not fill rectangle");
     }
 
+    template <typename Iter_t>
+    bool drawRects(Iter_t begin, Iter_t end)
+    {
+        return CheckError<SDL_GetError>(SDL_RenderDrawRects(m_contained.get(), begin, std::distance(begin, end)), "Could not fill rectangle");
+    }
+
     bool drawRects(const std::vector<SDL_Rect> &);
 
     bool fillRect(const SDL_Rect *);
@@ -58,6 +65,13 @@ public:
     {
         return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), fillRect.data(), N), "Could not fill rectangles");
     }
+
+    template <typename Iter_t>
+    bool fillRects(Iter_t begin, Iter_t end)
+    {
+        return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), begin, std::distance(begin, end)), "Could not fill rectangle");
+    }
+
 
     template <std::size_t N>
     bool fillRects(const SDL_Rect (&rects)[N])

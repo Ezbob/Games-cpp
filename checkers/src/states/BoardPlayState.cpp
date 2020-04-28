@@ -1,34 +1,71 @@
 
 #include "BoardPlayState.hpp"
-#include "SDL.h"
 #include "gametool/Easers.hpp"
 #include <cmath>
+#include <algorithm>
 
-BoardPlayState::Checker::Checker(PlayingColor playerColor, SDL_Rect &p)
-    : color(playerColor), position(p), next(SDL_Point{p.x, p.y})
+namespace
 {
+
+bool is_red(int i)
+{
+    return ((BOARD_N_CHECKERS / 2) < ((std::size_t)i) && ((std::size_t)i) < BOARD_N_CHECKERS);
 }
 
-void BoardPlayState::Checker::setNextPosition(int x, int y)
+bool is_green(int i)
 {
-    next.x = x;
-    next.y = y;
-    currentDegree = 0;
+    return (0 <= ((std::size_t)i) && ((std::size_t)i) < (BOARD_N_CHECKERS / 2));
 }
 
-void BoardPlayState::Checker::update(double sekPerFrame)
+bool is_same_color(int i, BoardPlayState::PlayingColor c)
 {
-    currentDegree += sekPerFrame;
-    if (currentDegree > 1.0)
-    {
-        currentDegree = 1.0;
-    }
-    double t = asa::ease_out_quadric(currentDegree);
-    if (t <= 1.0)
-    {
-        asa::lerp(position, next, t);
-    }
+    return (is_green(i) && c == BoardPlayState::PlayingColor::GREEN) || (is_red(i) && c == BoardPlayState::PlayingColor::RED);
 }
+
+bool is_in_bounds(int x, int y) {
+    return (0 <= x && x < ((int)BOARD_SIDE)) && (0 <= y && y < ((int) BOARD_SIDE));
+}
+
+bool is_occupied(int i)
+{
+    return i >= 0;
+}
+
+int empty(void)
+{
+    return -1;
+}
+
+/**
+     * Aka the chess distance. This asks how many turns a king piece must need in order to
+     * reach some other space on a chess board.
+     */
+std::size_t chebyshev_distance(int ax, int ay, int bx, int by)
+{
+    return std::max(std::abs(ax - bx), std::abs(ay - by));
+}
+
+template <typename T>
+constexpr void vec2_add(T &outx, T &outy, const T ax, const T ay, const T bx, const T by) noexcept
+{
+    outx = ax + bx;
+    outy = ay + by;
+}
+
+template <typename T>
+constexpr void vec2_scale(T &outx, T &outy, const T ax, const T ay, const T bscale) noexcept
+{
+    outx = ax * bscale;
+    outy = ay * bscale;
+}
+
+template <typename T>
+constexpr T vec2_mag(const T ax, const T ay) noexcept
+{
+    return std::sqrt(ax * ax, ay * ay);
+}
+
+}; // namespace
 
 void BoardPlayState::switchTurn()
 {
@@ -42,172 +79,12 @@ void BoardPlayState::switchTurn()
     }
 }
 
-void BoardPlayState::findSelected()
-{
-    for (int i = 0; i < n_rows; i++)
-    {
-        for (int j = 0; j < n_rows; ++j)
-        {
+void BoardPlayState::start_easing(int occupant_index, int next_x, int next_y) {
+    auto &next_checker = next_checker_position[occupant_index];
+    next_checker.x = next_x + PADDING;
+    next_checker.y = next_y + PADDING;
 
-            int index = i * n_rows + j;
-            auto &gridCell = cells[index];
-
-            if (SDL_PointInRect(&mouseClick, gridCell.container) && gridCell.occubant != nullptr && gridCell.occubant->color == playingColor && !SDL_RectEmpty(&gridCell.occubant->position))
-            {
-                selected = &gridCell;
-                return;
-            }
-        }
-    }
-}
-
-void BoardPlayState::initChecker(PlayingColor checkerColor, int flatindex, int checkerX, int checkerY)
-{
-
-    std::shared_ptr<Checker> checker;
-    if (checkerColor == PlayingColor::GREEN)
-    {
-        greenChecks.emplace_back(SDL_Rect{
-            checkerX,
-            checkerY,
-            checkerDim,
-            checkerDim});
-        checker = std::make_shared<Checker>(
-            checkerColor,
-            greenChecks.back());
-    }
-    else
-    {
-        redChecks.emplace_back(SDL_Rect{
-            checkerX,
-            checkerY,
-            checkerDim,
-            checkerDim});
-        checker = std::make_shared<Checker>(
-            checkerColor,
-            redChecks.back());
-    }
-    checkers.emplace_back(checker);
-    cells[flatindex].occubant = checker.get();
-}
-
-void BoardPlayState::doMoveToEmpty(GridCell &target)
-{
-    Checker *source = selected->occubant;
-
-    source->setNextPosition(
-        target.container->x + padding,
-        target.container->y + padding);
-
-    switchTurn();
-
-    target.occubant = source;
-    selected->occubant = nullptr;
-    selected = nullptr;
-}
-
-void BoardPlayState::doOvertake(GridCell &taken, GridCell &position)
-{
-    Checker *source = selected->occubant;
-
-    source->setNextPosition(
-        position.container->x + padding,
-        position.container->y + padding);
-
-    position.occubant = source;
-    selected->occubant = nullptr;
-
-    taken.occubant->position.h = 0;
-    taken.occubant->position.w = 0;
-
-    if (taken.occubant->color == PlayingColor::RED)
-    {
-        nRedCheckers--;
-    }
-    else
-    {
-        nGreenCheckers--;
-    }
-
-    taken.occubant = nullptr;
-
-    selected = nullptr;
-}
-
-bool BoardPlayState::tryToOvertake(GridCell &clickedGridCell, int xOffset, int yOffset)
-{
-    int y2diff = selected->row + (yOffset * 2);
-    int x2diff = selected->column + (xOffset * 2);
-    int nextNextIndex = y2diff * n_rows + x2diff;
-
-    if (
-        x2diff < 0 ||
-        x2diff >= static_cast<int>(n_rows) ||
-        y2diff < 0 ||
-        y2diff >= static_cast<int>(n_rows))
-    {
-        return false;
-    }
-
-    if (0 <= nextNextIndex && nextNextIndex < static_cast<int>(n_tiles))
-    {
-        if (auto &nextNextCell = cells[nextNextIndex]; nextNextCell.occubant == nullptr)
-        {
-            doOvertake(clickedGridCell, nextNextCell);
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool BoardPlayState::tryToMove(int xOffset, int yOffset)
-{
-    int ydiff = selected->row + yOffset;
-    int xdiff = selected->column + xOffset;
-    int nextIndex = ydiff * n_rows + xdiff;
-
-    if (0 <= nextIndex && nextIndex < static_cast<int>(n_tiles))
-    {
-        auto &gridCell = cells[nextIndex];
-
-        if (
-            xdiff < 0 ||
-            xdiff >= static_cast<int>(n_rows) ||
-            ydiff < 0 ||
-            ydiff >= static_cast<int>(n_rows))
-        {
-            return false;
-        }
-
-        if (SDL_PointInRect(&mouseClick, gridCell.container))
-        {
-            if (gridCell.occubant == nullptr)
-            {
-                doMoveToEmpty(gridCell);
-                return true;
-            }
-            else if (gridCell.occubant->color != selected->occubant->color)
-            {
-                return tryToOvertake(gridCell, xOffset, yOffset);
-            }
-        }
-    }
-
-    return false;
-}
-
-void BoardPlayState::updateSelected()
-{
-    if (tryToMove(1, 1))
-        return;
-    if (tryToMove(-1, 1))
-        return;
-    if (tryToMove(1, -1))
-        return;
-    if (tryToMove(-1, -1))
-        return;
-    selected = nullptr;
+    easing_progress[occupant_index] = 0.0;
 }
 
 /* === PUBLIC INTERFACE === */
@@ -227,13 +104,38 @@ void BoardPlayState::handleEvent(const SDL_Event &event)
         auto mouseButtonState = SDL_GetMouseState(&mouseClick.x, &mouseClick.y);
         if ((mouseButtonState & SDL_BUTTON(SDL_BUTTON_LEFT)))
         {
-            if (selected == nullptr)
+            if (source == nullptr)
             {
-                findSelected();
+                for (auto &gridCell : cells)
+                {
+                    bool intersects_with_mouse = SDL_PointInRect(&mouseClick, gridCell.container);
+                    bool is_occupied_cell = is_occupied(gridCell.occupant);
+                    bool is_playing_color = is_same_color(gridCell.occupant, playingColor);
+                    if (intersects_with_mouse && is_occupied_cell && is_playing_color)
+                    {
+                        source = &gridCell;
+                        return;
+                    }
+                }
             }
             else
             {
-                updateSelected();
+                for (auto &gridCell : cells)
+                {
+                    bool intersects_with_mouse = SDL_PointInRect(&mouseClick, gridCell.container);
+                    bool is_not_occupied_by_same_color = !(is_occupied(gridCell.occupant) && is_same_color(gridCell.occupant, playingColor));
+                    bool is_on_diagonal = (gridCell.row != source->row && gridCell.column != source->column);
+                    bool is_constrained_by_super_constraint = (chebyshev_distance(gridCell.row, gridCell.column, source->row, source->column) == 1 && !source->is_super);
+
+                    if (intersects_with_mouse && is_not_occupied_by_same_color && is_on_diagonal && is_constrained_by_super_constraint)
+                    {
+                        target = &gridCell;
+                        return;
+                    } else if (intersects_with_mouse && gridCell.occupant == source->occupant) {
+                        source = nullptr;
+                        return;
+                    }
+                }
             }
         }
     }
@@ -265,64 +167,71 @@ bool BoardPlayState::load()
                                          font,
                                          asa::asColorStruct(asa::Colors::GREEN));
 
-    size_t currentBlackTileIndex = 0;
-    size_t red = 0, green = 0;
+    easing_progress.fill(-1.0);
 
-    for (int i = 0; i < n_rows; ++i)
+    size_t currentBlackTileIndex = 0;
+    size_t currentCheckerIndex = 0;
+
+    for (size_t i = 0; i < BOARD_SIDE; ++i)
     {
-        for (int j = 0; j < n_rows; ++j)
+        for (size_t j = 0; j < BOARD_SIDE; ++j)
         {
 
-            auto flatindex = i * static_cast<int>(n_rows) + j;
+            auto flatindex = i * BOARD_SIDE + j;
             auto &boardContainer = boardContainers[flatindex];
 
-            boardContainer.h = checkerCellDim;
-            boardContainer.w = checkerCellDim;
+            boardContainer.h = CHECKER_CELL_DIM;
+            boardContainer.w = CHECKER_CELL_DIM;
 
-            boardContainer.x = checkerCellDim * j + padding;
-            boardContainer.y = checkerCellDim * i + padding;
+            boardContainer.x = CHECKER_CELL_DIM * j + PADDING;
+            boardContainer.y = CHECKER_CELL_DIM * i + PADDING;
 
-            cells[flatindex].container = &boardContainer;
-            cells[flatindex].column = j;
-            cells[flatindex].row = i;
+            auto &current_cell = cells[flatindex];
+            current_cell.container = &boardContainer;
+            current_cell.column = j;
+            current_cell.row = i;
 
 #if _DEBUG
+            // + std::to_string(i) + ", " + std::to_string(j)
             debugText.emplace_back(renderer.loadSolidText(
-                "(" + std::to_string(i) + ", " + std::to_string(j) + ")",
+                "(" + std::to_string(i * BOARD_SIDE + j) + ")",
                 font,
                 asa::asColorStruct(asa::Colors::BLACK)));
 #endif
+
             if (i % 2 != j % 2)
             {
-                auto &bbt = boardBlackTiles[currentBlackTileIndex++];
-                bbt.w = checkerCellDim;
-                bbt.h = checkerCellDim;
-                bbt.x = checkerCellDim * j + padding;
-                bbt.y = checkerCellDim * i + padding;
+                // back tiles
+                auto &bbt = boardBlackTiles[currentBlackTileIndex];
+                bbt.w = CHECKER_CELL_DIM;
+                bbt.h = CHECKER_CELL_DIM;
+                bbt.x = boardContainer.x;
+                bbt.y = boardContainer.y;
+
+                currentBlackTileIndex++;
             }
-            else if (i < (n_rows / 2 - 1))
+            else if (i < (BOARD_SIDE / 2 - 1) || i > (BOARD_SIDE / 2))
             {
-                green++;
-                initChecker(
-                    PlayingColor::GREEN,
-                    flatindex,
-                    boardContainer.x + padding,
-                    boardContainer.y + padding);
-            }
-            else if (i > (n_rows / 2))
-            {
-                red++;
-                initChecker(
-                    PlayingColor::RED,
-                    flatindex,
-                    boardContainer.x + padding,
-                    boardContainer.y + padding);
+                // all current_checker_dimensions
+                auto &checker_rect = current_checker_dimensions[currentCheckerIndex];
+                current_cell.occupant = currentCheckerIndex;
+
+                checker_rect.x = boardContainer.x + PADDING;
+                checker_rect.y = boardContainer.y + PADDING;
+                checker_rect.w = CHECKER_DIM;
+                checker_rect.h = CHECKER_DIM;
+
+                auto &checker_next = next_checker_position[currentCheckerIndex];
+                checker_next.x = checker_rect.x;
+                checker_next.y = checker_rect.y;
+
+                currentCheckerIndex++;
             }
         }
     }
 
-    nGreenCheckers = green;
-    nRedCheckers = red;
+    nGreenCheckers = current_checker_dimensions.size() / 2;
+    nRedCheckers = current_checker_dimensions.size() / 2;
 
     return isLoaded(true);
 }
@@ -338,24 +247,25 @@ void BoardPlayState::render()
     renderer.setColor(asa::Colors::BLACK);
     renderer.drawRects(boardContainers);
 
-    if (selected)
+    if (source)
     {
         renderer.setColor(asa::Colors::BLUE);
-        renderer.fillRect(selected->container);
+        renderer.fillRect(source->container);
     }
 
     renderer.setColor(asa::Colors::GREEN);
-    renderer.drawRects(greenChecks);
+    renderer.fillRects(current_checker_dimensions.begin(), current_checker_dimensions.begin() + 12);
 
     renderer.setColor(asa::Colors::RED);
-    renderer.drawRects(redChecks);
+    renderer.fillRects(current_checker_dimensions.begin() + 12, current_checker_dimensions.begin() + 24);
+
 
 #if _DEBUG
-    for (auto i = 0; i < n_rows; ++i)
+    for (std::size_t i = 0; i < BOARD_SIDE; ++i)
     {
-        for (auto j = 0; j < n_rows; ++j)
+        for (std::size_t j = 0; j < BOARD_SIDE; ++j)
         {
-            auto &t = debugText[i * n_rows + j];
+            auto &t = debugText[i * BOARD_SIDE + j];
             t.render(j * 100 + 22, i * 100 + 20);
         }
     }
@@ -375,10 +285,75 @@ void BoardPlayState::render()
 
 void BoardPlayState::update()
 {
-    for (auto &c : checkers)
+
+    // tweening/easing of checker movement
+    for (std::size_t i = 0; i < BOARD_N_CHECKERS; ++i)
     {
-        c->update(sec_per_frame);
+        auto &current_lerp_progress = easing_progress[i];
+        current_lerp_progress += sec_per_frame;
+        if (current_lerp_progress > 1.0)
+        {
+            current_lerp_progress = 1.0;
+        }
+        double t = asa::ease_out_quadric(current_lerp_progress);
+
+        if (0.0 <= t && t <= 1.0)
+        {
+            asa::lerp(current_checker_dimensions[i], next_checker_position[i], t);
+        }
     }
+
+    if (source && target)
+    {
+        if (!is_occupied(target->occupant))
+        {
+            // Move to empty place
+            target->occupant = source->occupant;
+            source->occupant = empty();
+
+            start_easing(target->occupant, target->container->x, target->container->y);
+
+            switchTurn();
+        }
+        else
+        {
+            // computing overtake
+            int xn = 0, yn = 0;
+            vec2_add(xn, yn, -source->column, -source->row, target->column, target->row);
+            vec2_scale(xn, yn, xn, yn, 2);
+            vec2_add(xn, yn, source->column, source->row, xn, yn);
+
+            if ( is_in_bounds(xn, yn) ) {
+                int flat_index = xn + BOARD_SIDE * yn;
+                auto &next_postion = cells[flat_index];
+
+                if ( !is_occupied(next_postion.occupant) ) {
+                    // I FEEL THE CHAOS OVERTAKING ME; IT IS A GOOD PAIN
+                    next_postion.occupant = source->occupant;
+
+                    auto &target_checker = current_checker_dimensions[target->occupant];
+
+                    target_checker.h = 0;
+                    target_checker.w = 0;
+
+                    if (is_green(target->occupant)) {
+                        nGreenCheckers--;
+                    } else {
+                        nRedCheckers--;
+                    }
+
+                    source->occupant = empty();
+                    target->occupant = empty();
+
+                    start_easing(next_postion.occupant, next_postion.container->x, next_postion.container->y);
+
+                }
+            }
+        }
+        source = nullptr;
+        target = nullptr;
+    }
+
     if (nRedCheckers <= 0 || nGreenCheckers <= 0)
     {
         isPlaying(false);
