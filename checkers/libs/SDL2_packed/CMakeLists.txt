@@ -4,20 +4,22 @@ project(SDL2_packed)
 
 set(PREFIX ${CMAKE_CURRENT_SOURCE_DIR})
 
+set(SDL2_PLATFORM_TARGET x86_64-w64-mingw32)
+
 set(SDL2_PACKED_INCLUDE_DIRS
-    ${PREFIX}/SDL2-2.0.9/x86_64-w64-mingw32/include
-    ${PREFIX}/SDL2_image-2.0.4/x86_64-w64-mingw32/include
-    ${PREFIX}/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include
-    ${PREFIX}/SDL2-2.0.9/x86_64-w64-mingw32/include/SDL2
-    ${PREFIX}/SDL2_image-2.0.4/x86_64-w64-mingw32/include/SDL2
-    ${PREFIX}/SDL2_ttf-2.0.15/x86_64-w64-mingw32/include/SDL2
+    ${PREFIX}/SDL2-2.0.9/${SDL2_PLATFORM_TARGET}/include
+    ${PREFIX}/SDL2_image-2.0.4/${SDL2_PLATFORM_TARGET}/include
+    ${PREFIX}/SDL2_ttf-2.0.15/${SDL2_PLATFORM_TARGET}/include
+    ${PREFIX}/SDL2-2.0.9/${SDL2_PLATFORM_TARGET}/include/SDL2
+    ${PREFIX}/SDL2_image-2.0.4/${SDL2_PLATFORM_TARGET}/include/SDL2
+    ${PREFIX}/SDL2_ttf-2.0.15/${SDL2_PLATFORM_TARGET}/include/SDL2
     PARENT_SCOPE
 )
 
 set(SDL2_PACKED_LINK_DIRS
-    ${PREFIX}/SDL2-2.0.9/x86_64-w64-mingw32/lib
-    ${PREFIX}/SDL2_image-2.0.4/x86_64-w64-mingw32/lib
-    ${PREFIX}/SDL2_ttf-2.0.15/x86_64-w64-mingw32/lib
+    ${PREFIX}/SDL2-2.0.9/${SDL2_PLATFORM_TARGET}/lib
+    ${PREFIX}/SDL2_image-2.0.4/${SDL2_PLATFORM_TARGET}/lib
+    ${PREFIX}/SDL2_ttf-2.0.15/${SDL2_PLATFORM_TARGET}/lib
     PARENT_SCOPE
 )
 
@@ -29,8 +31,8 @@ set(SDL2_PACKED_LINK_LIBS
 )
 
 set(SDL2_PACKED_DLL_DIRS
-    ${PREFIX}/SDL2-2.0.9/x86_64-w64-mingw32/bin
-    ${PREFIX}/SDL2_image-2.0.4/x86_64-w64-mingw32/bin
-    ${PREFIX}/SDL2_ttf-2.0.15/x86_64-w64-mingw32/bin
+    ${PREFIX}/SDL2-2.0.9/${SDL2_PLATFORM_TARGET}/bin
+    ${PREFIX}/SDL2_image-2.0.4/${SDL2_PLATFORM_TARGET}/bin
+    ${PREFIX}/SDL2_ttf-2.0.15/${SDL2_PLATFORM_TARGET}/bin
     PARENT_SCOPE
 )
