@@ -5,31 +5,32 @@
 #include <memory>
 #include "MemoryContainer.hpp"
 
-namespace asa {
+namespace asa
+{
 
-    class Surface : public SharedContainerBase<SDL_Surface, SDL_FreeSurface> {
+class Surface : public SharedContainerBase<SDL_Surface, SDL_FreeSurface>
+{
 
-    public:
-        Surface(SDL_Surface *surface);
-        Surface();
+public:
+    Surface(SDL_Surface *surface);
+    Surface();
 
-        void loadBMP(std::string filename);
-        void loadPNG(std::string filename);
+    void loadBMP(std::string filename);
+    void loadPNG(std::string filename);
 
-        int setKeyColor(int flags, uint32_t color);
+    int setKeyColor(int flags, uint32_t color);
 
-        int getHeight() const;
-        int getWidth() const;
+    int getHeight() const;
+    int getWidth() const;
 
-        /**
+    /**
          * Convert the internal surface pixel format to the other surface's pixelformat
          */
-        void convertToFormat(const Surface &other);
+    void convertToFormat(const Surface &other);
 
-        const SDL_PixelFormat *pixelFormat() const;
-        void fill(int r, int g, int b);
-        uint32_t rgbColor(int r, int g, int b) const;
+    const SDL_PixelFormat *pixelFormat() const;
+    void fill(int r, int g, int b);
+    uint32_t rgbColor(int r, int g, int b) const;
+};
 
-    };
-
-}
+} // namespace asa

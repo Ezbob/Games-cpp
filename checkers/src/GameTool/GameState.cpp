@@ -1,6 +1,6 @@
 #include "GameState.hpp"
 #include <iostream>
-#include "sdl.h"
+#include "SDL.h"
 
 using namespace asa;
 

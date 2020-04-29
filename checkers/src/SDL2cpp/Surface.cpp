@@ -1,65 +1,80 @@
 #include <iostream>
-#include "SDL2/SDL_image.h"
+#include "SDL_image.h"
 #include "ErrorCheck.hpp"
 #include "Surface.hpp"
 
 using namespace asa;
 
-Surface::Surface(SDL_Surface *surface) {
+Surface::Surface(SDL_Surface *surface)
+{
     m_contained = std::shared_ptr<SDL_Surface>(surface, SDL_FreeSurface);
 }
 
 Surface::Surface() {}
 
-int Surface::getHeight() const {
+int Surface::getHeight() const
+{
     return m_contained->h;
 }
 
-int Surface::getWidth() const {
+int Surface::getWidth() const
+{
     return m_contained->w;
 }
 
-void Surface::loadBMP(std::string filename) {
+void Surface::loadBMP(std::string filename)
+{
     m_contained = std::shared_ptr<SDL_Surface>(SDL_LoadBMP(filename.c_str()), Surface::freeingFunction);
-    if (m_contained == nullptr) {
+    if (m_contained == nullptr)
+    {
         std::cerr << "Error: Surface could not be initialize: " << SDL_GetError() << std::endl;
         return;
     }
 }
 
-void Surface::loadPNG(std::string filename) {
+void Surface::loadPNG(std::string filename)
+{
     m_contained = std::shared_ptr<SDL_Surface>(IMG_Load(filename.c_str()), Surface::freeingFunction);
-    if ( !m_contained ) {
+    if (!m_contained)
+    {
         std::cerr << "Error: Surface could not be initialize: " << SDL_GetError() << std::endl;
         return;
     }
 }
 
-void Surface::convertToFormat(const Surface &other) {
+void Surface::convertToFormat(const Surface &other)
+{
 
     std::shared_ptr<SDL_Surface> optimizedSurface = nullptr;
     optimizedSurface = std::shared_ptr<SDL_Surface>(SDL_ConvertSurface(m_contained.get(), other.pixelFormat(), 0), SDL_FreeSurface);
-    if (optimizedSurface == nullptr) {
+    if (optimizedSurface == nullptr)
+    {
         std::cerr << "Error: Surface replace could not be initialized; convertion failed" << std::endl;
-    } else {
+    }
+    else
+    {
         m_contained.swap(optimizedSurface);
         //m_contained = optimizedSurface;
     }
 }
 
-const SDL_PixelFormat *Surface::pixelFormat() const {
+const SDL_PixelFormat *Surface::pixelFormat() const
+{
     return m_contained->format;
 }
 
-void Surface::fill(int r, int g, int b) {
+void Surface::fill(int r, int g, int b)
+{
     SDL_FillRect(m_contained.get(), nullptr, rgbColor(r, g, b));
 }
 
-uint32_t Surface::rgbColor(int r, int g, int b) const {
+uint32_t Surface::rgbColor(int r, int g, int b) const
+{
     const SDL_PixelFormat *mapper = pixelFormat();
     return SDL_MapRGB(mapper, r, g, b);
 }
 
-int Surface::setKeyColor(int flags, uint32_t color) {
+int Surface::setKeyColor(int flags, uint32_t color)
+{
     return CheckError<SDL_GetError>(SDL_SetColorKey(m_contained.get(), flags, color), "Could not set key color");
 }

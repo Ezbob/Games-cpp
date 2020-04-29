@@ -5,19 +5,19 @@
 
 using namespace asa;
 
-
-GameStateProcessor::GameStateProcessor(unsigned int targetFps) {
-    double msPerFrame = (1. / ((double) targetFps)) * 1000.;
+GameStateProcessor::GameStateProcessor(unsigned int targetFps)
+{
+    double msPerFrame = (1. / ((double)targetFps)) * 1000.;
     clock.msPerUpdate(msPerFrame);
 }
-
 
 void GameStateProcessor::initStates(std::function<void(GameStateStack &)> initFunction)
 {
     initFunction(gameStates);
 }
 
-asa::GameClock const &GameStateProcessor::getClock() const {
+asa::GameClock const &GameStateProcessor::getClock() const
+{
     return clock;
 }
 
@@ -51,7 +51,7 @@ void GameStateProcessor::processStates()
         {
             state->load();
 #if !_STATS && _DEBUG
-    std::cout << "State not loaded. Load successful: " << (state->isLoaded() ? "true" : "false") << "\n";
+            std::cout << "State not loaded. Load successful: " << (state->isLoaded() ? "true" : "false") << "\n";
 #endif
         }
 

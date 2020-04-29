@@ -74,11 +74,9 @@ private:
     SDL_Point mouseClick;
     int nRedCheckers = 0, nGreenCheckers = 0;
 
-
 #if _DEBUG
     std::vector<asa::Texture> debugText;
 #endif
-
 
     GridCell *source = nullptr;
     GridCell *target = nullptr;

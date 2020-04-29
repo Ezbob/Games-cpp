@@ -28,14 +28,14 @@ void PauseState::handleEvent(const SDL_Event &event)
 bool PauseState::load()
 {
     pausedText = renderer.loadBlendedText(
-                                      "Game Paused",
-                                      font,
-                                      asColorStruct(asa::Colors::BLACK));
+        "Game Paused",
+        font,
+        asColorStruct(asa::Colors::BLACK));
 
     subText = renderer.loadBlendedText(
-                                   "(Press Enter to continue)",
-                                   font,
-                                   asColorStruct(asa::Colors::BLACK));
+        "(Press Enter to continue)",
+        font,
+        asColorStruct(asa::Colors::BLACK));
 
     return isLoaded(pausedText && subText);
 }

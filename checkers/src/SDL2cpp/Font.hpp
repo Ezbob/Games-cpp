@@ -4,11 +4,13 @@
 #include "sdl2cpp/MemoryContainer.hpp"
 #include <string>
 
-namespace asa {
+namespace asa
+{
 
-    class TTFFont : public ContainerBase<TTF_Font, TTF_CloseFont> {
-    public:
-        void loadTTF(const std::string filepath, int ptsize);
-    };
+class TTFFont : public ContainerBase<TTF_Font, TTF_CloseFont>
+{
+public:
+    void loadTTF(const std::string filepath, int ptsize);
+};
 
-}
+} // namespace asa

@@ -283,7 +283,7 @@ void BoardPlayState::render()
     renderer.updateScreen();
 }
 
-void BoardPlayState::update()
+void BoardPlayState::update(void)
 {
 
     // tweening/easing of checker movement
