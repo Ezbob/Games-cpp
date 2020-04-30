@@ -11,6 +11,7 @@
 #include <array>
 #include <vector>
 #include <iterator>
+#include <cmath>
 
 namespace asa
 {
@@ -37,21 +38,19 @@ public:
     bool drawRect(const SDL_Rect &fillRect);
 
     template <std::size_t N>
-    bool drawRects(const std::array<SDL_Rect, N> &rects)
+    bool drawRects(const std::array<SDL_Rect, N> &rects, std::size_t first = 0,  std::size_t last = N)
     {
-        return CheckError<SDL_GetError>(SDL_RenderDrawRects(m_contained.get(), rects.data(), N), "Could not fill rectangle");
+        static_assert(N != 0, "zero length array parsed to drawRects");
+        std::size_t distance = (last - first);
+        return CheckError<SDL_GetError>(SDL_RenderDrawRects(m_contained.get(), rects.data() + first, distance < 0 ? (-distance) : distance), "Could not fill rectangle");
     }
 
     template <std::size_t N>
-    bool drawRects(const SDL_Rect (&rects)[N])
+    bool drawRects(const SDL_Rect (&rects)[N], std::size_t first = 0,  std::size_t last = N)
     {
-        return CheckError<SDL_GetError>(SDL_RenderDrawRects(m_contained.get(), rects, N), "Could not fill rectangle");
-    }
-
-    template <typename Iter_t>
-    bool drawRects(Iter_t begin, Iter_t end)
-    {
-        return CheckError<SDL_GetError>(SDL_RenderDrawRects(m_contained.get(), begin, std::distance(begin, end)), "Could not fill rectangle");
+        static_assert(N != 0, "zero length array parsed to drawRects");
+        std::size_t distance = (last - first);
+        return CheckError<SDL_GetError>(SDL_RenderDrawRects(m_contained.get(), rects.data() + first, distance < 0 ? (-distance) : distance), "Could not fill rectangle");
     }
 
     bool drawRects(const std::vector<SDL_Rect> &);
@@ -60,23 +59,19 @@ public:
     bool fillRect(const SDL_Rect &);
     bool fillRects(const std::vector<SDL_Rect> &);
 
-    template <std::size_t N>
-    bool fillRects(const std::array<SDL_Rect, N> &fillRect)
-    {
-        return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), fillRect.data(), N), "Could not fill rectangles");
+    template<std::size_t N>
+    bool fillRects(const std::array<SDL_Rect, N> &filler, std::size_t first = 0,  std::size_t last = N) {
+        static_assert(N != 0, "zero length array parsed to fillRects");
+        std::size_t distance = (last - first);
+        return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), filler.data() + first, distance < 0 ? (-distance) : distance), "Could not fill rectangles");
     }
 
-    template <typename Iter_t>
-    bool fillRects(Iter_t begin, Iter_t end)
-    {
-        return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), begin, std::distance(begin, end)), "Could not fill rectangle");
-    }
-
-
     template <std::size_t N>
-    bool fillRects(const SDL_Rect (&rects)[N])
+    bool fillRects(const SDL_Rect (&filler)[N], std::size_t first = 0,  std::size_t last = N)
     {
-        return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), rects, N), "Could not fill rectangles");
+        static_assert(N != 0, "zero length array parsed to fillRects");
+        std::size_t distance = (last - first);
+        return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), filler.data() + first, distance < 0 ? (-distance) : distance), "Could not fill rectangles");
     }
 
     bool drawLine(int x1, int y1, int x2, int y2);

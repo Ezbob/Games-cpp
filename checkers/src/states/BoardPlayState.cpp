@@ -254,10 +254,10 @@ void BoardPlayState::render()
     }
 
     renderer.setColor(asa::Colors::GREEN);
-    renderer.fillRects(current_checker_dimensions.begin(), current_checker_dimensions.begin() + 12);
+    renderer.fillRects(current_checker_dimensions, 0, 12);
 
     renderer.setColor(asa::Colors::RED);
-    renderer.fillRects(current_checker_dimensions.begin() + 12, current_checker_dimensions.begin() + 24);
+    renderer.fillRects(current_checker_dimensions, 12, 24);
 
 
 #if _DEBUG
