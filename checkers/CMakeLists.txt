@@ -9,9 +9,9 @@ project("checkers"
 set(CMAKE_CXX_STANDARD 17)
 
 if(${ENABLE_STATS})
-    set(STATS_ENV "-D_STATS")
+    set(STATS_ENV "_STATS")
 elseif($ENV{ENABLE_STATS})
-    set(STATS_ENV "-D_STATS")
+    set(STATS_ENV "_STATS")
 else()
     set(STATS_ENV "")
 endif()
@@ -19,9 +19,16 @@ endif()
 # Also look for Find-cmake modules here
 set(CMAKE_MODULE_PATH  ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/sdl2")
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG=1 ${STATS_ENV} -Wall -Wextra -ggdb")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -D_DEBUG=0")
-set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_DEBUG=1 -D${STATS_ENV} -Wall -Wextra -pendantic -fsanitize=address,undefined")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3 -D_DEBUG=0")
+	set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc -static-libstdc++")
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Wall /D _DEBUG=1 /D ${STATS_ENV}")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /O2 /D _DEBUG=0")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+endif()
+
 
 set(SOURCES
     src/Main.cpp
@@ -61,8 +68,7 @@ if(WIN32)
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${SDL2_PACKED_DLL_DIRS} $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 
 else(WIN32)
-
-    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -fsanitize=address,undefined")
+    
     # on ubuntu we use the cmake modules to find the libraries and the header include dirs
 
     target_link_libraries(${PROJECT_NAME} PRIVATE "asan" "lsan")
