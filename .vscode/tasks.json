@@ -2,7 +2,7 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "build checkers.exe",
+            "label": "build checkers executable",
             "command": "ninja",
             "args": [],
             "options": {
@@ -15,6 +15,32 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "type": "shell",
+            "label": "run checkers",
+            "windows": {
+                "options": {
+                    "cwd": "${workspaceFolder}/build/checkers"
+                },
+                "command": ".\\checkers.exe"
+            },
+            "linux": {
+                "options": {
+                    "cwd": "${workspaceFolder}/build/checkers"
+                },
+                "command": "./checkers"
+            },
+            "osx": {
+                "options": {
+                    "cwd": "${workspaceFolder}/build/checkers"
+                },
+                "command": "./checkers"
+            },
+            "dependsOn": [
+                "build checkers executable"
+            ],
+            "problemMatcher": []
         }
     ],
     "version": "2.0.0"
