@@ -45,24 +45,17 @@ std::size_t chebyshev_distance(int ax, int ay, int bx, int by)
     return std::max(std::abs(ax - bx), std::abs(ay - by));
 }
 
-template <typename T>
-constexpr void vec2_add(T &outx, T &outy, const T ax, const T ay, const T bx, const T by) noexcept
+constexpr void vec2_add(int &outx, int &outy, const int ax, const int ay, const int bx, const int by) noexcept
 {
     outx = ax + bx;
     outy = ay + by;
 }
 
-template <typename T>
-constexpr void vec2_scale(T &outx, T &outy, const T ax, const T ay, const T bscale) noexcept
+
+constexpr void vec2_scale(int &outx, int &outy, const int ax, const int ay, const int bscale) noexcept
 {
     outx = ax * bscale;
     outy = ay * bscale;
-}
-
-template <typename T>
-constexpr T vec2_mag(const T ax, const T ay) noexcept
-{
-    return std::sqrt(ax * ax, ay * ay);
 }
 
 }; // namespace
@@ -314,6 +307,11 @@ void BoardPlayState::update(void)
             start_easing(target->occupant, target->container->x, target->container->y);
 
             switchTurn();
+
+            if (target->row == (BOARD_SIDE - 1) || target->row == 0) {
+                // first or last row
+                target->is_super = true;
+            }
         }
         else
         {
@@ -346,7 +344,6 @@ void BoardPlayState::update(void)
                     target->occupant = empty();
 
                     start_easing(next_postion.occupant, next_postion.container->x, next_postion.container->y);
-
                 }
             }
         }
