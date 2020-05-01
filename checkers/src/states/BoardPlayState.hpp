@@ -9,6 +9,7 @@
 #include "sdl2cpp/Renderer.hpp"
 #include "sdl2cpp/Texture.hpp"
 #include "sdl2cpp/Font.hpp"
+#include "gametool/Vector2d.hpp"
 #include "gametool/GameState.hpp"
 #include "gametool/GameStateProcessor.hpp"
 
@@ -29,6 +30,14 @@ public:
     {
         GREEN,
         RED
+    };
+
+    struct GridCell
+    {
+        SDL_Rect *container;
+        int occupant = -1;
+
+        asa::vector2d<int> position{0, 0};
     };
 
     BoardPlayState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, const asa::GameClock &clock, int swidth, int sheight);
@@ -54,15 +63,7 @@ private:
     std::array<double, BOARD_N_CHECKERS> easing_progress;
     std::array<SDL_Point, BOARD_N_CHECKERS> next_checker_position;
     std::array<SDL_Rect, BOARD_N_CHECKERS> current_checker_dimensions;
-
-    struct GridCell
-    {
-        SDL_Rect *container;
-        bool is_super = false;
-        int occupant = -1;
-        int column;
-        int row;
-    };
+    std::array<bool, BOARD_N_CHECKERS> super_checker_table;
 
     // these can be used to draw in batch
     std::array<SDL_Rect, BOARD_SIZE> boardContainers;
@@ -86,5 +87,6 @@ private:
 
     void switchTurn(void);
 
+    bool should_become_super_checker(const GridCell&) const;
     void start_easing(int occupant_index, int next_x, int next_y);
 };

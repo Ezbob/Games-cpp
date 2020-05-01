@@ -1,62 +1,50 @@
 
 #include "BoardPlayState.hpp"
 #include "gametool/Easers.hpp"
+
 #include <cmath>
 #include <algorithm>
 
 namespace
 {
 
-bool is_red(int i)
-{
-    return ((BOARD_N_CHECKERS / 2) < ((std::size_t)i) && ((std::size_t)i) < BOARD_N_CHECKERS);
-}
-
-bool is_green(int i)
-{
-    return (0 <= ((std::size_t)i) && ((std::size_t)i) < (BOARD_N_CHECKERS / 2));
-}
-
-bool is_same_color(int i, BoardPlayState::PlayingColor c)
-{
-    return (is_green(i) && c == BoardPlayState::PlayingColor::GREEN) || (is_red(i) && c == BoardPlayState::PlayingColor::RED);
-}
-
-bool is_in_bounds(int x, int y) {
-    return (0 <= x && x < ((int)BOARD_SIDE)) && (0 <= y && y < ((int) BOARD_SIDE));
-}
-
-bool is_occupied(int i)
-{
-    return i >= 0;
-}
-
-int empty(void)
-{
-    return -1;
-}
-
-/**
-     * Aka the chess distance. This asks how many turns a king piece must need in order to
-     * reach some other space on a chess board.
-     */
-std::size_t chebyshev_distance(int ax, int ay, int bx, int by)
-{
-    return std::max(std::abs(ax - bx), std::abs(ay - by));
-}
-
-constexpr void vec2_add(int &outx, int &outy, const int ax, const int ay, const int bx, const int by) noexcept
-{
-    outx = ax + bx;
-    outy = ay + by;
-}
+    bool is_green(int i)
+    {
+        return 0 <= i && i < ((int)BOARD_N_CHECKERS) / 2;
+    }
 
 
-constexpr void vec2_scale(int &outx, int &outy, const int ax, const int ay, const int bscale) noexcept
-{
-    outx = ax * bscale;
-    outy = ay * bscale;
-}
+    bool is_red(int i)
+    {
+        return i >= 0 && !is_green(i);
+    }
+
+
+    bool is_same_color(int i, BoardPlayState::PlayingColor c)
+    {
+        return (is_green(i) && c == BoardPlayState::PlayingColor::GREEN) || (is_red(i) && c == BoardPlayState::PlayingColor::RED);
+    }
+
+    bool is_in_bounds(int x, int y)
+    {
+        return (0 <= x && x < ((int)BOARD_SIDE)) && (0 <= y && y < ((int)BOARD_SIDE));
+    }
+
+    bool is_occupied(int i)
+    {
+        return i >= 0;
+    }
+
+    int empty(void)
+    {
+        return -1;
+    }
+
+    int get_flat_index(int y, int x) noexcept
+    {
+        return x + ((int)BOARD_SIDE) * y;
+    }
+
 
 }; // namespace
 
@@ -72,12 +60,24 @@ void BoardPlayState::switchTurn()
     }
 }
 
-void BoardPlayState::start_easing(int occupant_index, int next_x, int next_y) {
+void BoardPlayState::start_easing(int occupant_index, int next_x, int next_y)
+{
     auto &next_checker = next_checker_position[occupant_index];
     next_checker.x = next_x + PADDING;
     next_checker.y = next_y + PADDING;
 
     easing_progress[occupant_index] = 0.0;
+}
+
+
+bool BoardPlayState::should_become_super_checker(const GridCell &cell) const {
+    bool is_last_line = cell.position.y() == (BOARD_SIDE - 1);
+    bool is_first_line = cell.position.y() == 0;
+
+    bool is_already_super = super_checker_table[cell.occupant];
+
+    bool result = (is_last_line && is_green(cell.occupant)) || (is_first_line && is_red(cell.occupant)) || is_already_super;
+    return result;
 }
 
 /* === PUBLIC INTERFACE === */
@@ -99,32 +99,46 @@ void BoardPlayState::handleEvent(const SDL_Event &event)
         {
             if (source == nullptr)
             {
-                for (auto &gridCell : cells)
+                for (GridCell &gridCell : cells)
                 {
-                    bool intersects_with_mouse = SDL_PointInRect(&mouseClick, gridCell.container);
-                    bool is_occupied_cell = is_occupied(gridCell.occupant);
-                    bool is_playing_color = is_same_color(gridCell.occupant, playingColor);
-                    if (intersects_with_mouse && is_occupied_cell && is_playing_color)
+                    if (SDL_PointInRect(&mouseClick, gridCell.container))
                     {
-                        source = &gridCell;
-                        return;
+                        bool is_occupied_cell = is_occupied(gridCell.occupant);
+                        bool is_playing_color = is_same_color(gridCell.occupant, playingColor);
+
+                        if(is_occupied_cell && is_playing_color) {
+                            source = &gridCell;
+                            return;
+                        }
                     }
                 }
             }
             else
             {
-                for (auto &gridCell : cells)
+                std::size_t max_distance = super_checker_table[source->occupant] ? BOARD_SIDE : 1;
+
+                for (GridCell &gridCell : cells)
                 {
+
                     bool intersects_with_mouse = SDL_PointInRect(&mouseClick, gridCell.container);
                     bool is_not_occupied_by_same_color = !(is_occupied(gridCell.occupant) && is_same_color(gridCell.occupant, playingColor));
-                    bool is_on_diagonal = (gridCell.row != source->row && gridCell.column != source->column);
-                    bool is_constrained_by_super_constraint = (chebyshev_distance(gridCell.row, gridCell.column, source->row, source->column) == 1 && !source->is_super);
 
-                    if (intersects_with_mouse && is_not_occupied_by_same_color && is_on_diagonal && is_constrained_by_super_constraint)
+                    if (
+                        intersects_with_mouse &&
+                        is_not_occupied_by_same_color
+                    )
                     {
-                        target = &gridCell;
-                        return;
-                    } else if (intersects_with_mouse && gridCell.occupant == source->occupant) {
+                        auto v = (gridCell.position - source->position).normalized();
+                        auto distance = source->position.chebyshev_distance(gridCell.position);
+
+                        if (std::abs(v.x()) == std::abs(v.y()) && distance <= max_distance)
+                        {
+                            target = &gridCell;
+                            return;
+                        }
+                    }
+                    else if (intersects_with_mouse && gridCell.occupant == source->occupant)
+                    {
                         source = nullptr;
                         return;
                     }
@@ -161,38 +175,40 @@ bool BoardPlayState::load()
                                          asa::asColorStruct(asa::Colors::GREEN));
 
     easing_progress.fill(-1.0);
+    super_checker_table.fill(false);
 
     size_t currentBlackTileIndex = 0;
     size_t currentCheckerIndex = 0;
 
-    for (size_t i = 0; i < BOARD_SIDE; ++i)
+    for (size_t y = 0; y < BOARD_SIDE; ++y)
     {
-        for (size_t j = 0; j < BOARD_SIDE; ++j)
+        for (size_t x = 0; x < BOARD_SIDE; ++x)
         {
 
-            auto flatindex = i * BOARD_SIDE + j;
+            auto flatindex = y * BOARD_SIDE + x;
             auto &boardContainer = boardContainers[flatindex];
 
             boardContainer.h = CHECKER_CELL_DIM;
             boardContainer.w = CHECKER_CELL_DIM;
 
-            boardContainer.x = CHECKER_CELL_DIM * j + PADDING;
-            boardContainer.y = CHECKER_CELL_DIM * i + PADDING;
+            boardContainer.x = CHECKER_CELL_DIM * x + PADDING;
+            boardContainer.y = CHECKER_CELL_DIM * y + PADDING;
 
             auto &current_cell = cells[flatindex];
             current_cell.container = &boardContainer;
-            current_cell.column = j;
-            current_cell.row = i;
+
+            current_cell.position.x(x);
+            current_cell.position.y(y);
 
 #if _DEBUG
             // + std::to_string(i) + ", " + std::to_string(j)
             debugText.emplace_back(renderer.loadSolidText(
-                "(" + std::to_string(i * BOARD_SIDE + j) + ")",
+                "(" + std::to_string(current_cell.position.y()) + ", " + std::to_string(current_cell.position.x()) + ")",
                 font,
                 asa::asColorStruct(asa::Colors::BLACK)));
 #endif
 
-            if (i % 2 != j % 2)
+            if (x % 2 != y % 2)
             {
                 // back tiles
                 auto &bbt = boardBlackTiles[currentBlackTileIndex];
@@ -203,7 +219,7 @@ bool BoardPlayState::load()
 
                 currentBlackTileIndex++;
             }
-            else if (i < (BOARD_SIDE / 2 - 1) || i > (BOARD_SIDE / 2))
+            else if (y < (BOARD_SIDE / 2 - 1) || y > (BOARD_SIDE / 2)) // split at the median
             {
                 // all current_checker_dimensions
                 auto &checker_rect = current_checker_dimensions[currentCheckerIndex];
@@ -252,14 +268,13 @@ void BoardPlayState::render()
     renderer.setColor(asa::Colors::RED);
     renderer.fillRects(current_checker_dimensions, 12, 24);
 
-
 #if _DEBUG
-    for (std::size_t i = 0; i < BOARD_SIDE; ++i)
+    for (std::size_t y = 0; y < BOARD_SIDE; ++y)
     {
-        for (std::size_t j = 0; j < BOARD_SIDE; ++j)
+        for (std::size_t x = 0; x < BOARD_SIDE; ++x)
         {
-            auto &t = debugText[i * BOARD_SIDE + j];
-            t.render(j * 100 + 22, i * 100 + 20);
+            auto &t = debugText[y * BOARD_SIDE + x];
+            t.render(y * 100 + 22, x * 100 + 20);
         }
     }
 #endif
@@ -308,24 +323,32 @@ void BoardPlayState::update(void)
 
             switchTurn();
 
-            if (target->row == (BOARD_SIDE - 1) || target->row == 0) {
-                // first or last row
-                target->is_super = true;
+            if (should_become_super_checker(*target))
+            {
+                // first or last y
+                super_checker_table[target->occupant] = true;
             }
         }
         else
         {
             // computing overtake
-            int xn = 0, yn = 0;
-            vec2_add(xn, yn, -source->column, -source->row, target->column, target->row);
-            vec2_scale(xn, yn, xn, yn, 2);
-            vec2_add(xn, yn, source->column, source->row, xn, yn);
 
-            if ( is_in_bounds(xn, yn) ) {
-                int flat_index = xn + BOARD_SIDE * yn;
+            auto next_v = (target->position - source->position).normalized();
+
+            next_v += target->position;
+
+            // we're turned around ?? :D our basis is [[0, 1], [1, 0]] not [[1,0], [0, 1]]
+            auto x = next_v.x();
+            next_v.x(next_v.y());
+            next_v.y(x);
+
+            if (is_in_bounds(next_v.x(), next_v.y()))
+            {
+                int flat_index = get_flat_index(next_v.x(), next_v.y());
                 auto &next_postion = cells[flat_index];
 
-                if ( !is_occupied(next_postion.occupant) ) {
+                if (!is_occupied(next_postion.occupant))
+                {
                     // I FEEL THE CHAOS OVERTAKING ME; IT IS A GOOD PAIN
                     next_postion.occupant = source->occupant;
 
@@ -334,9 +357,12 @@ void BoardPlayState::update(void)
                     target_checker.h = 0;
                     target_checker.w = 0;
 
-                    if (is_green(target->occupant)) {
+                    if (is_green(target->occupant))
+                    {
                         nGreenCheckers--;
-                    } else {
+                    }
+                    else
+                    {
                         nRedCheckers--;
                     }
 
@@ -344,6 +370,12 @@ void BoardPlayState::update(void)
                     target->occupant = empty();
 
                     start_easing(next_postion.occupant, next_postion.container->x, next_postion.container->y);
+
+                    if (should_become_super_checker(next_postion))
+                    {
+                        // first or last y
+                        super_checker_table[next_postion.occupant] = true;
+                    }
                 }
             }
         }
