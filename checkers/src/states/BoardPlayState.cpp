@@ -13,12 +13,10 @@ namespace
         return 0 <= i && i < ((int)BOARD_N_CHECKERS) / 2;
     }
 
-
     bool is_red(int i)
     {
         return i >= 0 && !is_green(i);
     }
-
 
     bool is_same_color(int i, BoardPlayState::PlayingColor c)
     {
@@ -45,7 +43,6 @@ namespace
         return x + ((int)BOARD_SIDE) * y;
     }
 
-
 }; // namespace
 
 void BoardPlayState::switchTurn()
@@ -69,8 +66,8 @@ void BoardPlayState::start_easing(int occupant_index, int next_x, int next_y)
     easing_progress[occupant_index] = 0.0;
 }
 
-
-bool BoardPlayState::should_become_super_checker(const GridCell &cell) const {
+bool BoardPlayState::should_become_super_checker(const GridCell &cell) const
+{
     bool is_last_line = cell.position.y() == (BOARD_SIDE - 1);
     bool is_first_line = cell.position.y() == 0;
 
@@ -106,7 +103,8 @@ void BoardPlayState::handleEvent(const SDL_Event &event)
                         bool is_occupied_cell = is_occupied(gridCell.occupant);
                         bool is_playing_color = is_same_color(gridCell.occupant, playingColor);
 
-                        if(is_occupied_cell && is_playing_color) {
+                        if (is_occupied_cell && is_playing_color)
+                        {
                             source = &gridCell;
                             return;
                         }
@@ -115,7 +113,7 @@ void BoardPlayState::handleEvent(const SDL_Event &event)
             }
             else
             {
-                std::size_t max_distance = super_checker_table[source->occupant] ? BOARD_SIDE : 1;
+                int max_distance = super_checker_table[source->occupant] ? ((int) BOARD_SIDE) : 1;
 
                 for (GridCell &gridCell : cells)
                 {
@@ -125,8 +123,7 @@ void BoardPlayState::handleEvent(const SDL_Event &event)
 
                     if (
                         intersects_with_mouse &&
-                        is_not_occupied_by_same_color
-                    )
+                        is_not_occupied_by_same_color)
                     {
                         auto v = (gridCell.position - source->position).normalized();
                         auto distance = source->position.chebyshev_distance(gridCell.position);
@@ -165,14 +162,14 @@ void BoardPlayState::handleKeyState(const uint8_t *state [[maybe_unused]])
 
 bool BoardPlayState::load()
 {
-    redTurn = renderer.loadBlendedText(
+    red_turn_text = renderer.loadBlendedText(
         "Red's turn",
         font,
         asa::asColorStruct(asa::Colors::RED));
 
-    greenTurn = renderer.loadBlendedText("Green's turn",
-                                         font,
-                                         asa::asColorStruct(asa::Colors::GREEN));
+    green_turn_text = renderer.loadBlendedText("Green's turn",
+                                               font,
+                                               asa::asColorStruct(asa::Colors::GREEN));
 
     easing_progress.fill(-1.0);
     super_checker_table.fill(false);
@@ -239,8 +236,8 @@ bool BoardPlayState::load()
         }
     }
 
-    nGreenCheckers = current_checker_dimensions.size() / 2;
-    nRedCheckers = current_checker_dimensions.size() / 2;
+    green_checkers = current_checker_dimensions.size() / 2;
+    red_checkers = current_checker_dimensions.size() / 2;
 
     return isLoaded(true);
 }
@@ -281,11 +278,11 @@ void BoardPlayState::render()
 
     if (playingColor == PlayingColor::GREEN)
     {
-        greenTurn->render(screen_width / 2 - 85, screen_height - 32);
+        green_turn_text->render(screen_width / 2 - 85, screen_height - 32);
     }
     else
     {
-        redTurn->render(screen_width / 2 - 85, screen_height - 32);
+        red_turn_text->render(screen_width / 2 - 85, screen_height - 32);
     }
 
     renderer.updateScreen();
@@ -359,11 +356,11 @@ void BoardPlayState::update(void)
 
                     if (is_green(target->occupant))
                     {
-                        nGreenCheckers--;
+                        green_checkers--;
                     }
                     else
                     {
-                        nRedCheckers--;
+                        red_checkers--;
                     }
 
                     source->occupant = empty();
@@ -383,7 +380,7 @@ void BoardPlayState::update(void)
         target = nullptr;
     }
 
-    if (nRedCheckers <= 0 || nGreenCheckers <= 0)
+    if (red_checkers <= 0 || green_checkers <= 0)
     {
         isPlaying(false);
     }

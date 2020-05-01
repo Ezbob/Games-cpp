@@ -73,7 +73,7 @@ private:
     PlayingColor playingColor = PlayingColor::GREEN;
 
     SDL_Point mouseClick;
-    int nRedCheckers = 0, nGreenCheckers = 0;
+    int red_checkers = 0, green_checkers = 0;
 
 #if _DEBUG
     std::vector<asa::Texture> debugText;
@@ -82,11 +82,11 @@ private:
     GridCell *source = nullptr;
     GridCell *target = nullptr;
 
-    std::optional<asa::Texture> greenTurn;
-    std::optional<asa::Texture> redTurn;
+    std::optional<asa::Texture> green_turn_text;
+    std::optional<asa::Texture> red_turn_text;
 
     void switchTurn(void);
 
-    bool should_become_super_checker(const GridCell&) const;
+    bool should_become_super_checker(const GridCell &) const;
     void start_easing(int occupant_index, int next_x, int next_y);
 };
