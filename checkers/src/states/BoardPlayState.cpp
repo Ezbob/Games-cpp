@@ -77,7 +77,7 @@ bool BoardPlayState::should_become_super_checker(const GridCell &cell) const
     return result;
 }
 
-bool BoardPlayState::is_a_checker_in_the_way(void) const
+bool BoardPlayState::no_checker_in_the_way(void) const
 {
     auto direction_v = (target->position - source->position);
     auto distance = target->position.chebyshev_distance(source->position);
@@ -95,13 +95,13 @@ bool BoardPlayState::is_a_checker_in_the_way(void) const
 
         if (is_occupied(cell.occupant))
         {
-            return true;
+            return false;
         }
 
         current_v += direction_v;
     }
 
-    return false;
+    return true;
 }
 
 /* === PUBLIC INTERFACE === */
@@ -337,7 +337,7 @@ void BoardPlayState::update(void)
 
     if (source && target)
     {
-        if (!is_a_checker_in_the_way())
+        if (no_checker_in_the_way())
         {
             if (!is_occupied(target->occupant))
             {
@@ -378,7 +378,7 @@ void BoardPlayState::update(void)
 
                     if (!is_occupied(next_postion.occupant))
                     {
-                        // I FEEL THE CHAOS OVERTAKING ME; IT IS A GOOD PAIN
+                        // I FEEL THE WARP OVERTAKING ME; IT IS A GOOD PAIN
                         next_postion.occupant = source->occupant;
 
                         auto &target_checker = current_checker_dimensions[target->occupant];
