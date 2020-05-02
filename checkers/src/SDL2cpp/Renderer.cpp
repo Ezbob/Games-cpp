@@ -228,7 +228,6 @@ bool Renderer::drawCircle(int centerX, int centerY, int radius) {
 }
 
 bool Renderer::fillCircle(int centerX, int centerY, int radius) {
-    //static std::array<SDL_Rect, 2> rects;
     const int diameter = (radius * 2);
 
     int x = (radius - 1);
@@ -271,3 +270,6 @@ bool Renderer::fillCircle(int centerX, int centerY, int radius) {
     return true;
 }
 
+std::string Renderer::getBasePath(void) {
+    return SDL_GetBasePath();
+}

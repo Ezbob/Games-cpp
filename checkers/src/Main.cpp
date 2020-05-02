@@ -51,7 +51,7 @@ bool sdlInit()
 
 bool loadGlobalAssets()
 {
-    font.loadTTF("assets/consola.ttf", 24);
+    font.loadTTF(renderer.getBasePath() + "/assets/consola.ttf", 24);
     return font.isLoaded();
 }
 

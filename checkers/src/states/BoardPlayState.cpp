@@ -198,11 +198,12 @@ bool BoardPlayState::load(void)
                                                font,
                                                asa::asColorStruct(asa::Colors::GREEN));
 
-    white_tile = renderer.loadPNG("assets/white_tile.png");
-    black_tile = renderer.loadPNG("assets/black_tile.png");
+    auto path = renderer.getBasePath();
+    white_tile = renderer.loadPNG(path + "/assets/white_tile.png");
+    black_tile = renderer.loadPNG(path + "/assets/black_tile.png");
 
-    green_checker_texture = renderer.loadPNG("assets/green_checker.png");
-    red_checker_texture = renderer.loadPNG("assets/red_checker.png");
+    green_checker_texture = renderer.loadPNG(path + "/assets/green_checker.png");
+    red_checker_texture = renderer.loadPNG(path + "/assets/red_checker.png");
 
     easing_progress.fill(-1.0);
     super_checker_table.fill(false);

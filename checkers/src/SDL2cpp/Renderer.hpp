@@ -115,6 +115,9 @@ public:
 
     bool fillCircle(int centerX, int centerY, int radius);
 
+
+    std::string getBasePath(void);
+
 private:
     SDL_Window *m_window_parent = nullptr;
 };
