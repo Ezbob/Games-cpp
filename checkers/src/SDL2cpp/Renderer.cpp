@@ -38,7 +38,7 @@ SDL_Texture *Renderer::createTextureFromSurface(SDL_Surface *surface)
     return SDL_CreateTextureFromSurface(m_contained.get(), surface);
 }
 
-bool Renderer::clear()
+bool Renderer::clear(void)
 {
     return CheckError<SDL_GetError>(SDL_RenderClear(m_contained.get()), "Could not clear renderer");
 }
@@ -99,19 +99,9 @@ bool Renderer::setColor(asa::Colors color)
     return CheckError<SDL_GetError>(SDL_SetRenderDrawColor(m_contained.get(), r, g, b, 0xff), "Could not set renderer color");
 }
 
-bool Renderer::drawRect(const SDL_Rect *fillRect)
-{
-    return CheckError<SDL_GetError>(SDL_RenderDrawRect(m_contained.get(), fillRect), "Could not draw rectangle");
-}
-
 bool Renderer::drawRect(const SDL_Rect &fillRect)
 {
     return CheckError<SDL_GetError>(SDL_RenderDrawRect(m_contained.get(), &fillRect), "Could not draw rectangle");
-}
-
-bool Renderer::fillRect(const SDL_Rect *fillRect)
-{
-    return CheckError<SDL_GetError>(SDL_RenderFillRect(m_contained.get(), fillRect), "Could not fill rectangle");
 }
 
 bool Renderer::fillRect(const SDL_Rect &fillRect)
@@ -195,3 +185,89 @@ Texture Renderer::createTexture() const
 {
     return Texture(m_contained.get());
 }
+
+bool Renderer::drawCircle(int centerX, int centerY, int radius) {
+    // midpoint algorithm
+    const int diameter = (radius * 2);
+    bool result = false;
+
+    int x = (radius - 1);
+    int y = 0;
+    int tx = 1;
+    int ty = 1;
+    int error = (tx - diameter);
+
+    while (x >= y)
+    {
+      //  Each of the following renders an octant of the circle
+      drawPoint(centerX + x, centerY - y);
+      drawPoint(centerX + x, centerY + y);
+      drawPoint(centerX - x, centerY - y);
+      drawPoint(centerX - x, centerY + y);
+
+      drawPoint(centerX + y, centerY - x);
+      drawPoint(centerX + y, centerY + x);
+      drawPoint(centerX - y, centerY - x);
+      drawPoint(centerX - y, centerY + x);
+
+      if (error <= 0)
+      {
+        ++y;
+        error += ty;
+        ty += 2;
+      }
+
+      if (error > 0)
+      {
+        --x;
+        tx += 2;
+        error += (tx - diameter);
+      }
+   }
+    return result;
+}
+
+bool Renderer::fillCircle(int centerX, int centerY, int radius) {
+    //static std::array<SDL_Rect, 2> rects;
+    const int diameter = (radius * 2);
+
+    int x = (radius - 1);
+    int y = 0;
+    int tx = 1;
+    int ty = 1;
+    int error = (tx - diameter);
+
+    while (x >= y)
+    {
+        // the hamburger
+
+        // top bun
+        drawLine(centerX - y, centerY - x, centerX + y, centerY - x);
+
+        // cheese
+        drawLine(centerX - x, centerY - y, centerX + x, centerY - y);
+
+        // meat
+        drawLine(centerX - x, centerY + y, centerX + x, centerY + y);
+
+        // lower bun
+        drawLine(centerX - y, centerY + x, centerX + y, centerY + x);
+
+        if (error <= 0)
+        {
+        ++y;
+        error += ty;
+        ty += 2;
+        }
+
+        if (error > 0)
+        {
+        --x;
+        tx += 2;
+        error += (tx - diameter);
+        }
+    }
+
+    return true;
+}
+
