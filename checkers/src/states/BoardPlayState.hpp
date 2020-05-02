@@ -89,4 +89,5 @@ private:
 
     bool should_become_super_checker(const GridCell &) const;
     void start_easing(int occupant_index, int next_x, int next_y);
+    bool is_a_checker_in_the_way(void) const;
 };

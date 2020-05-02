@@ -77,6 +77,33 @@ bool BoardPlayState::should_become_super_checker(const GridCell &cell) const
     return result;
 }
 
+bool BoardPlayState::is_a_checker_in_the_way(void) const
+{
+    auto direction_v = (target->position - source->position);
+    auto distance = target->position.chebyshev_distance(source->position);
+
+    direction_v /= distance;
+    // integer space so we use chebyshev distance instead of euclidean to avoid double
+    // casting and truncation of decimals
+
+    auto destination_v = target->position;
+    auto current_v = source->position + direction_v;
+
+    while (is_in_bounds(current_v.x(), current_v.y()) && current_v != destination_v)
+    {
+        GridCell const &cell = cells[get_flat_index(current_v.y(), current_v.x())];
+
+        if (is_occupied(cell.occupant))
+        {
+            return true;
+        }
+
+        current_v += direction_v;
+    }
+
+    return false;
+}
+
 /* === PUBLIC INTERFACE === */
 
 BoardPlayState::BoardPlayState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, const asa::GameClock &clock, int swidth, int sheight)
@@ -113,7 +140,7 @@ void BoardPlayState::handleEvent(const SDL_Event &event)
             }
             else
             {
-                int max_distance = super_checker_table[source->occupant] ? ((int) BOARD_SIDE) : 1;
+                int max_distance = super_checker_table[source->occupant] ? ((int)BOARD_SIDE) : 1;
 
                 for (GridCell &gridCell : cells)
                 {
@@ -310,68 +337,74 @@ void BoardPlayState::update(void)
 
     if (source && target)
     {
-        if (!is_occupied(target->occupant))
+        if (!is_a_checker_in_the_way())
         {
-            // Move to empty place
-            target->occupant = source->occupant;
-            source->occupant = empty();
-
-            start_easing(target->occupant, target->container->x, target->container->y);
-
-            switchTurn();
-
-            if (should_become_super_checker(*target))
+            if (!is_occupied(target->occupant))
             {
-                // first or last y
-                super_checker_table[target->occupant] = true;
-            }
-        }
-        else
-        {
-            // computing overtake
+                // Move to empty place
+                target->occupant = source->occupant;
+                source->occupant = empty();
 
-            auto next_v = (target->position - source->position).normalized();
+                start_easing(target->occupant, target->container->x, target->container->y);
 
-            next_v += target->position;
+                switchTurn();
 
-            // we're turned around ?? :D our basis is [[0, 1], [1, 0]] not [[1,0], [0, 1]]
-            auto x = next_v.x();
-            next_v.x(next_v.y());
-            next_v.y(x);
-
-            if (is_in_bounds(next_v.x(), next_v.y()))
-            {
-                int flat_index = get_flat_index(next_v.x(), next_v.y());
-                auto &next_postion = cells[flat_index];
-
-                if (!is_occupied(next_postion.occupant))
+                if (should_become_super_checker(*target))
                 {
-                    // I FEEL THE CHAOS OVERTAKING ME; IT IS A GOOD PAIN
-                    next_postion.occupant = source->occupant;
+                    // first or last y
+                    super_checker_table[target->occupant] = true;
+                }
+            }
+            else
+            {
+                // computing overtake
 
-                    auto &target_checker = current_checker_dimensions[target->occupant];
+                // first check whether some other checker is on our path
+                auto direction_v = (target->position - source->position);
+                auto distance = target->position.chebyshev_distance(source->position);
 
-                    target_checker.h = 0;
-                    target_checker.w = 0;
+                direction_v /= distance;
+                // integer space so we use chebyshev distance instead of euclidean to avoid double
+                // casting and truncation of decimals
 
-                    if (is_green(target->occupant))
+                auto destination_v = target->position + direction_v;
+
+                // we're turned around ?? :D our basis is [[0, 1], [1, 0]] not [[1,0], [0, 1]]
+
+                if (is_in_bounds(destination_v.y(), destination_v.x()))
+                {
+                    int flat_index = get_flat_index(destination_v.y(), destination_v.x());
+                    auto &next_postion = cells[flat_index];
+
+                    if (!is_occupied(next_postion.occupant))
                     {
-                        green_checkers--;
-                    }
-                    else
-                    {
-                        red_checkers--;
-                    }
+                        // I FEEL THE CHAOS OVERTAKING ME; IT IS A GOOD PAIN
+                        next_postion.occupant = source->occupant;
 
-                    source->occupant = empty();
-                    target->occupant = empty();
+                        auto &target_checker = current_checker_dimensions[target->occupant];
 
-                    start_easing(next_postion.occupant, next_postion.container->x, next_postion.container->y);
+                        target_checker.h = 0;
+                        target_checker.w = 0;
 
-                    if (should_become_super_checker(next_postion))
-                    {
-                        // first or last y
-                        super_checker_table[next_postion.occupant] = true;
+                        if (is_green(target->occupant))
+                        {
+                            green_checkers--;
+                        }
+                        else
+                        {
+                            red_checkers--;
+                        }
+
+                        source->occupant = empty();
+                        target->occupant = empty();
+
+                        start_easing(next_postion.occupant, next_postion.container->x, next_postion.container->y);
+
+                        if (should_become_super_checker(next_postion))
+                        {
+                            // first or last y
+                            super_checker_table[next_postion.occupant] = true;
+                        }
                     }
                 }
             }

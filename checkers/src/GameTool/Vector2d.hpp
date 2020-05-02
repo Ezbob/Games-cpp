@@ -72,8 +72,8 @@ namespace asa {
         }
 
         void operator /=(T a) noexcept {
-            this->m_x *= a.m_x;
-            this->m_y *= a.m_y;
+            this->m_x /= a;
+            this->m_y /= a;
         }
 
         T magnitude(void) const noexcept {
@@ -102,6 +102,14 @@ namespace asa {
 
         T dot(const vector2d &other) const noexcept {
             return m_x * other.m_x + m_y * other.m_y;
+        }
+
+        bool operator ==(const vector2d &other) const noexcept {
+            return m_x == other.m_x && m_y == other.m_y;
+        }
+
+        bool operator !=(const vector2d &other) const noexcept {
+            return !((*this) == other);
         }
 
     };
