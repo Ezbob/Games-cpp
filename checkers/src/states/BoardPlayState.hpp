@@ -85,6 +85,9 @@ private:
     std::optional<asa::Texture> green_turn_text;
     std::optional<asa::Texture> red_turn_text;
 
+    std::optional<asa::Texture> white_tile;
+    std::optional<asa::Texture> black_tile;
+
     void switchTurn(void);
 
     bool should_become_super_checker(const GridCell &) const;

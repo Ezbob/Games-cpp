@@ -187,7 +187,7 @@ void BoardPlayState::handleKeyState(const uint8_t *state [[maybe_unused]])
     }
 }
 
-bool BoardPlayState::load()
+bool BoardPlayState::load(void)
 {
     red_turn_text = renderer.loadBlendedText(
         "Red's turn",
@@ -197,6 +197,9 @@ bool BoardPlayState::load()
     green_turn_text = renderer.loadBlendedText("Green's turn",
                                                font,
                                                asa::asColorStruct(asa::Colors::GREEN));
+
+    white_tile = renderer.loadPNG("assets/white_tile.png");
+    black_tile = renderer.loadPNG("assets/black_tile.png");
 
     easing_progress.fill(-1.0);
     super_checker_table.fill(false);
@@ -269,22 +272,28 @@ bool BoardPlayState::load()
     return isLoaded(true);
 }
 
-void BoardPlayState::render()
+void BoardPlayState::render(void)
 {
     renderer.setColor(asa::Colors::WHITE);
     renderer.clear();
 
-    renderer.setColor(asa::Colors::BLACK);
-    renderer.fillRects(boardBlackTiles);
+    for (auto& r : boardContainers) {
+        renderer.copyTexture(*white_tile, nullptr, &r);
+    }
 
-    renderer.setColor(asa::Colors::BLACK);
-    renderer.drawRects(boardContainers);
+    for (auto& r : boardBlackTiles) {
+        renderer.copyTexture(*black_tile, nullptr, &r);
+    }
+
+    SDL_SetRenderDrawBlendMode((SDL_Renderer *)renderer, SDL_BLENDMODE_ADD);
 
     if (source)
     {
         renderer.setColor(asa::Colors::BLUE);
-        renderer.fillRect(source->container);
+        renderer.fillRect(*source->container);
     }
+
+    SDL_SetRenderDrawBlendMode((SDL_Renderer *)renderer, SDL_BLENDMODE_NONE);
 
     renderer.setColor(asa::Colors::GREEN);
     renderer.fillRects(current_checker_dimensions, 0, 12);
