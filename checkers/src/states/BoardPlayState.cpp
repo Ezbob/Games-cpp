@@ -201,6 +201,9 @@ bool BoardPlayState::load(void)
     white_tile = renderer.loadPNG("assets/white_tile.png");
     black_tile = renderer.loadPNG("assets/black_tile.png");
 
+    green_checker_texture = renderer.loadPNG("assets/green_checker.png");
+    red_checker_texture = renderer.loadPNG("assets/red_checker.png");
+
     easing_progress.fill(-1.0);
     super_checker_table.fill(false);
 
@@ -295,11 +298,15 @@ void BoardPlayState::render(void)
 
     SDL_SetRenderDrawBlendMode((SDL_Renderer *)renderer, SDL_BLENDMODE_NONE);
 
-    renderer.setColor(asa::Colors::GREEN);
-    renderer.fillRects(current_checker_dimensions, 0, 12);
+    for (int i = 0; i < 12; ++i) {
+        auto &position = current_checker_dimensions[i];
+        renderer.copyTexture(*green_checker_texture, nullptr, &position);
+    }
 
-    renderer.setColor(asa::Colors::RED);
-    renderer.fillRects(current_checker_dimensions, 12, 24);
+    for (int i = 12; i < 24; ++i) {
+        auto &position = current_checker_dimensions[i];
+        renderer.copyTexture(*red_checker_texture, nullptr, &position);
+    }
 
 #if _DEBUG
     for (std::size_t y = 0; y < BOARD_SIDE; ++y)
