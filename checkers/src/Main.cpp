@@ -42,6 +42,7 @@ bool sdlInit()
             SCREEN_HEIGHT,
             SDL_WINDOW_SHOWN);
 
+        SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
         renderer = window.getRenderer();
         renderer.setColor(asa::Colors::WHITE);
     }

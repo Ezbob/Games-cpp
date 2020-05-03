@@ -306,26 +306,12 @@ void BoardPlayState::render(void)
     for (int i = 0; i < 12; ++i)
     {
         auto &position = current_checker_dimensions[i];
-        SDL_Rect w = position;
-
-        w.x -= 2;
-        w.y += 2;
-
-        checker_shadow_texture->alphaMod(255 - 130);
-
-        checker_shadow_texture->render(w);
         green_checker_texture->render(position);
     }
 
     for (int i = 12; i < 24; ++i)
     {
         auto &position = current_checker_dimensions[i];
-        SDL_Rect w = position;
-
-        w.x -= 2;
-        w.y += 2;
-
-        checker_shadow_texture->render(w);
         red_checker_texture->render(position);
     }
 
