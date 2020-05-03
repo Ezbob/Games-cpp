@@ -198,12 +198,13 @@ bool BoardPlayState::load(void)
                                                font,
                                                asa::asColorStruct(asa::Colors::GREEN));
 
-    auto path = renderer.getBasePath();
-    white_tile = renderer.loadPNG(path + "/assets/white_tile.png");
-    black_tile = renderer.loadPNG(path + "/assets/black_tile.png");
+    auto path = renderer.getBasePath() + "/assets";
+    white_tile = renderer.loadPNG(path + "/white_tile.png");
+    black_tile = renderer.loadPNG(path + "/black_tile.png");
 
-    green_checker_texture = renderer.loadPNG(path + "/assets/checker_green3.png");
-    red_checker_texture = renderer.loadPNG(path + "/assets/checker_red3.png");
+    green_checker_texture = renderer.loadPNG(path + "/checker_green3.png");
+    red_checker_texture = renderer.loadPNG(path + "/checker_red3.png");
+    checker_shadow_texture = renderer.loadPNG(path + "/checker_shadow.png");
 
     bool is_loaded = green_checker_texture->isLoaded() && red_checker_texture->isLoaded();
 
@@ -283,36 +284,49 @@ void BoardPlayState::render(void)
     renderer.setColor(asa::Colors::WHITE);
     renderer.clear();
 
-    for (auto &r : boardContainers)
+    for (SDL_Rect &r : boardContainers)
     {
-        renderer.copyTexture(*white_tile, nullptr, &r);
+        white_tile->render(r);
     }
 
     for (auto &r : boardBlackTiles)
     {
-        renderer.copyTexture(*black_tile, nullptr, &r);
+        black_tile->render(r);
     }
 
-    SDL_SetRenderDrawBlendMode((SDL_Renderer *)renderer, SDL_BLENDMODE_ADD);
+    renderer.drawBlendMode(SDL_BLENDMODE_ADD);
 
     if (source)
     {
         renderer.setColor(asa::Colors::BLUE);
         renderer.fillRect(*source->container);
     }
-
-    SDL_SetRenderDrawBlendMode((SDL_Renderer *)renderer, SDL_BLENDMODE_NONE);
+    renderer.drawBlendMode(SDL_BLENDMODE_NONE);
 
     for (int i = 0; i < 12; ++i)
     {
         auto &position = current_checker_dimensions[i];
-        renderer.copyTexture(*green_checker_texture, nullptr, &position);
+        SDL_Rect w = position;
+
+        w.x -= 2;
+        w.y += 2;
+
+        checker_shadow_texture->alphaMod(255 - 130);
+
+        checker_shadow_texture->render(w);
+        green_checker_texture->render(position);
     }
 
     for (int i = 12; i < 24; ++i)
     {
         auto &position = current_checker_dimensions[i];
-        renderer.copyTexture(*red_checker_texture, nullptr, &position);
+        SDL_Rect w = position;
+
+        w.x -= 2;
+        w.y += 2;
+
+        checker_shadow_texture->render(w);
+        red_checker_texture->render(position);
     }
 
 #if _DEBUG

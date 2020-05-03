@@ -115,8 +115,12 @@ public:
 
     bool fillCircle(int centerX, int centerY, int radius);
 
-
     std::string getBasePath(void);
+
+    SDL_BlendMode drawBlendMode(void);
+
+    void drawBlendMode(SDL_BlendMode);
+
 
 private:
     SDL_Window *m_window_parent = nullptr;

@@ -77,6 +77,11 @@ void Texture::load(asa::Texture &&texture)
     m_width = texture.getWidth();
 }
 
+void Texture::render(const SDL_Rect &quad)
+{
+    CheckError<SDL_GetError>(SDL_RenderCopy(m_renderer, m_contained.get(), nullptr, &quad), "Cloud not render texture");
+}
+
 void Texture::render(const int x, const int y)
 {
     SDL_Rect quad = {x, y, m_width, m_height};
@@ -99,4 +104,24 @@ void Texture::render(const int x, const int y, SDL_RendererFlip &flip)
 {
     SDL_Rect quad = {x, y, m_width, m_height};
     CheckError<SDL_GetError>(SDL_RenderCopyEx(m_renderer, m_contained.get(), nullptr, &quad, 0, nullptr, flip), "Cloud not render clip texture");
+}
+
+void Texture::blendMode(SDL_BlendMode mode) {
+    CheckError<SDL_GetError>(SDL_SetTextureBlendMode(m_contained.get(), mode), "Cloud not set texture blend mode");
+}
+
+SDL_BlendMode Texture::blendMode(void) {
+    SDL_BlendMode result;
+    CheckError<SDL_GetError>(SDL_GetTextureBlendMode(m_contained.get(), &result), "Cloud not get texture blend mode");
+    return result;
+}
+
+void Texture::alphaMod(uint8_t mod) {
+    CheckError<SDL_GetError>(SDL_SetTextureAlphaMod(m_contained.get(), mod), "Could not set texture alpha mod");
+}
+
+uint8_t Texture::alphaMod(void) {
+    uint8_t result;
+    CheckError<SDL_GetError>(SDL_GetTextureAlphaMod(m_contained.get(), &result), "Could not set texture alpha mod");
+    return result;
 }

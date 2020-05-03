@@ -273,3 +273,15 @@ bool Renderer::fillCircle(int centerX, int centerY, int radius) {
 std::string Renderer::getBasePath(void) {
     return SDL_GetBasePath();
 }
+
+SDL_BlendMode Renderer::drawBlendMode(void) {
+    SDL_BlendMode result;
+    int rc = SDL_GetRenderDrawBlendMode(m_contained.get(), &result);
+    CheckError<SDL_GetError>(rc, "Could not get render draw blend mode");
+    return result;
+}
+
+void Renderer::drawBlendMode(SDL_BlendMode mode) {
+    int rc = SDL_SetRenderDrawBlendMode(m_contained.get(), mode);
+    CheckError<SDL_GetError>(rc, "Could not set render draw blend mode");
+}
