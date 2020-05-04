@@ -450,6 +450,7 @@ void BoardPlayState::update(void)
 
     if (red_checkers <= 0 || green_checkers <= 0)
     {
+        m_comms.offer(std::make_shared<std::any>(green_checkers > 0));
         isPlaying(false);
     }
 }

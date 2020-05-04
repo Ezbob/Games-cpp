@@ -25,6 +25,11 @@ void Window::load(SDL_Window *wind)
 {
     m_contained = CheckNullError<SDL_Window, SDL_GetError>(wind,
                                                            "Window could not be loaded");
+
+    auto surf = getSurface();
+
+    m_width = surf.getWidth();
+    m_height = surf.getHeight();
 }
 
 Surface Window::getSurface() const
@@ -41,6 +46,8 @@ void Window::loadWindow(std::string windowName, int x, int y, int width, int hei
 {
     m_contained = CheckNullError<SDL_Window, SDL_GetError>(SDL_CreateWindow(windowName.c_str(), x, y, width, height, flags),
                                                            "Window could not be loaded");
+    m_height = height;
+    m_width = width;
 }
 
 Renderer Window::getRenderer(uint32_t rendererFlags, int index)

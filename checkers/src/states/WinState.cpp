@@ -41,6 +41,10 @@ void WinState::handleKeyState(const uint8_t *state)
     {
         processor.quitGame();
     }
+
+    if (m_comms.size() > 0) {
+        has_green_won = std::any_cast<bool>(*m_comms.poll());
+    }
 }
 
 void WinState::render(void)
