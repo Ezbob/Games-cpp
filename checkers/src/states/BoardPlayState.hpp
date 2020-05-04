@@ -9,9 +9,11 @@
 #include "sdl2cpp/Renderer.hpp"
 #include "sdl2cpp/Texture.hpp"
 #include "sdl2cpp/Font.hpp"
+#include "sdl2cpp/Window.hpp"
 #include "gametool/Vector2d.hpp"
 #include "gametool/GameState.hpp"
 #include "gametool/GameStateProcessor.hpp"
+#include "gametool/MessageQueueInterface.hpp"
 
 #include <iostream>
 
@@ -40,7 +42,11 @@ public:
         asa::vector2d<int> position{0, 0};
     };
 
-    BoardPlayState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, const asa::GameClock &clock, int swidth, int sheight);
+    BoardPlayState(asa::Renderer &,
+                    asa::GameStateProcessor &,
+                    asa::TTFFont &,
+                    asa::Window &,
+                    asa::MessageQueueInterface &);
 
     void handleEvent(const SDL_Event &event) override;
     void handleKeyState(const uint8_t *state) override;
@@ -53,12 +59,12 @@ private:
     asa::TTFFont &font;
     asa::GameStateProcessor &processor;
     asa::GameClock const &clock;
+    int screen_width, screen_height;
+    const double sec_per_frame;
+
+    asa::MessageQueueInterface &m_comms;
 
     std::shared_ptr<asa::GameState> pauseState;
-
-    int screen_width, screen_height;
-
-    const double sec_per_frame;
 
     std::array<double, BOARD_N_CHECKERS> easing_progress;
     std::array<SDL_Point, BOARD_N_CHECKERS> next_checker_position;

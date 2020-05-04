@@ -7,22 +7,32 @@
 #include "SDL_ttf.h"
 #include "gametool/GameState.hpp"
 #include "gametool/GameStateProcessor.hpp"
+#include "gametool/MessageQueueInterface.hpp"
 
 class WinState : public asa::GameState
 {
-    std::optional<asa::Texture> winnerText;
+private:
+    std::optional<asa::Texture> red_winner_text;
+    std::optional<asa::Texture> green_winner_text;
     asa::Renderer &renderer;
     asa::GameStateProcessor &processor;
     asa::TTFFont &font;
-    int screen_width;
-    int screen_height;
+    asa::Window &m_window;
+    asa::MessageQueueInterface &m_comms;
+
+    int window_width = 0, window_height = 0;
+    bool has_green_won = false;
 
 public:
-    WinState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, const int sw, const int sh);
+    WinState(asa::Renderer &,
+            asa::GameStateProcessor &,
+            asa::TTFFont &,
+            asa::Window &,
+            asa::MessageQueueInterface &);
 
-    bool load() override;
+    bool load(void) override;
 
     void handleKeyState(const uint8_t *state) override;
 
-    void render() override;
+    void render(void) override;
 };

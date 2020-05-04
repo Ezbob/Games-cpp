@@ -6,14 +6,22 @@
 using namespace asa;
 
 GameStateProcessor::GameStateProcessor(unsigned int targetFps)
+    : comm_queue(std::make_unique<SingleThreadedMessageQueue>())
 {
     double msPerFrame = (1. / ((double)targetFps)) * 1000.;
     clock.msPerUpdate(msPerFrame);
 }
 
-void GameStateProcessor::initStates(std::function<void(GameStateStack &)> initFunction)
+GameStateProcessor::GameStateProcessor(unsigned int fps, std::unique_ptr<MessageQueueInterface> q) 
+    : comm_queue(std::move(q))
 {
-    initFunction(gameStates);
+    double msPerFrame = (1. / ((double)fps)) * 1000.;
+    clock.msPerUpdate(msPerFrame);
+}
+
+void GameStateProcessor::initStates(std::function<void(GameStateStack &, MessageQueueInterface&)> initFunction)
+{
+    initFunction(gameStates, *comm_queue.get());
 }
 
 asa::GameClock const &GameStateProcessor::getClock() const

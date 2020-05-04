@@ -50,6 +50,7 @@ set(SOURCES
     src/states/AllStates.cpp
     src/GameTool/GameState.cpp
     src/GameTool/GameClock.cpp
+    src/GameTool/SingleThreadedMessageQueue.cpp
     src/GameTool/GameStateProcessor.cpp
     src/GameTool/Easers.cpp
     src/SDL2cpp/Renderer.cpp

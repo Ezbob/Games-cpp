@@ -60,7 +60,8 @@
         "map": "cpp",
         "memory_resource": "cpp",
         "cfloat": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "any": "cpp"
     },
     "C_Cpp.dimInactiveRegions": true,
     "cmake.configureOnOpen": true,

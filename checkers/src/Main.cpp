@@ -1,8 +1,4 @@
 #include <iostream>
-#include <stack>
-#include <vector>
-#include <array>
-#include <optional>
 #include "sdl2cpp/Renderer.hpp"
 #include "sdl2cpp/Window.hpp"
 #include "sdl2cpp/Globals.hpp"
@@ -64,9 +60,11 @@ int MAIN_NAME()
         return 1;
     }
 
-    gameStateProcessor.initStates([](auto &stack) {
-        stack.emplace(new WinState(renderer, gameStateProcessor, font, SCREEN_WIDTH, SCREEN_HEIGHT));
-        stack.emplace(new BoardPlayState(renderer, gameStateProcessor, font, gameStateProcessor.getClock(), SCREEN_WIDTH, SCREEN_HEIGHT));
+    int has_green_won = 0;
+
+    gameStateProcessor.initStates([&has_green_won](auto &stack, auto &comm) {
+        stack.emplace(new WinState(renderer, gameStateProcessor, font, window, comm));
+        stack.emplace(new BoardPlayState(renderer, gameStateProcessor, font, window, comm));
     });
 
     gameStateProcessor.processStates();

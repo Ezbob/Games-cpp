@@ -106,8 +106,20 @@ bool BoardPlayState::no_checker_in_the_way(void) const
 
 /* === PUBLIC INTERFACE === */
 
-BoardPlayState::BoardPlayState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, const asa::GameClock &clock, int swidth, int sheight)
-    : renderer(r), font(f), processor(p), clock(clock), screen_width(swidth), screen_height(sheight), sec_per_frame(clock.msPerUpdate() / 1000.)
+BoardPlayState::BoardPlayState(
+    asa::Renderer &r, 
+    asa::GameStateProcessor &p, 
+    asa::TTFFont &f, 
+    asa::Window &win,
+    asa::MessageQueueInterface &comms)
+    : renderer(r),
+      font(f),
+      processor(p),
+      clock(p.getClock()),
+      screen_width(win.width()),
+      screen_height(win.height()),
+      sec_per_frame(clock.msPerUpdate() / 1000.0),
+      m_comms(comms)
 {
     pauseState = std::make_shared<PauseState>(renderer, processor, font, screen_width, screen_height);
 }
