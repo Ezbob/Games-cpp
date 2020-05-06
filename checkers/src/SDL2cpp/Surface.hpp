@@ -4,12 +4,12 @@
 #include "SDL_ttf.h"
 #include <memory>
 #include "MemoryContainer.hpp"
-#include "SizedEntity.hpp"
+#include "Sized2DEntity.hpp"
 
 namespace asa
 {
 
-    class Surface : public SharedContainerBase<SDL_Surface, SDL_FreeSurface>, public SizedEntity<Surface>
+    class Surface : public SharedContainerBase<SDL_Surface, SDL_FreeSurface>, public Sized2DEntity<Surface>
     {
 
     public:

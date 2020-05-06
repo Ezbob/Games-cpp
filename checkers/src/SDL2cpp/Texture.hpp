@@ -4,12 +4,12 @@
 #include "sdl_render.h"
 #include "MemoryContainer.hpp"
 #include "Surface.hpp"
-#include "SizedEntity.hpp"
+#include "Sized2DEntity.hpp"
 
 namespace asa
 {
 
-    class Texture : public SharedContainerBase<SDL_Texture, SDL_DestroyTexture>, public SizedEntity<Texture>
+    class Texture : public SharedContainerBase<SDL_Texture, SDL_DestroyTexture>, public Sized2DEntity<Texture>
     {
 
     public:
