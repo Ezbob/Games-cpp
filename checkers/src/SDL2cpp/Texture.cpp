@@ -4,23 +4,13 @@
 
 using namespace asa;
 
-Texture::Texture(SDL_Renderer *renderer) : m_renderer(renderer), m_width(0), m_height(0) {}
+Texture::Texture(SDL_Renderer *renderer) : m_renderer(renderer) {}
 
-int Texture::getHeight() const
-{
-    return m_height;
-}
-
-int Texture::getWidth() const
-{
-    return m_width;
-}
-
-void Texture::load(SDL_Texture *texture, int width, int height)
+void Texture::load(SDL_Texture *texture, int w, int h)
 {
     m_contained = std::shared_ptr<SDL_Texture>(texture, SDL_DestroyTexture);
-    m_height = height;
-    m_width = width;
+    height(h);
+    width(w);
     if (m_contained == nullptr)
     {
         std::cerr << "Error: Could not load texture: " << SDL_GetError() << std::endl;
@@ -36,7 +26,10 @@ void Texture::load(SDL_Texture *texture)
         std::cerr << "Error: Could not load texture: " << SDL_GetError() << std::endl;
         return;
     }
-    SDL_QueryTexture(texture, nullptr, nullptr, &m_width, &m_height);
+    int w, h;
+    SDL_QueryTexture(texture, nullptr, nullptr, &w, &h);
+    height(h);
+    width(w);
 }
 
 void Texture::load(SDL_Surface *surface)
@@ -48,8 +41,8 @@ void Texture::load(SDL_Surface *surface)
         std::cerr << "Error: Could not load texture: " << SDL_GetError() << std::endl;
         return;
     }
-    m_height = surface->h;
-    m_width = surface->w;
+    height(surface->h);
+    width(surface->w);
 }
 
 void Texture::load(Surface &surface)
@@ -61,8 +54,8 @@ void Texture::load(Surface &surface)
         std::cerr << "Error: Could not load texture: " << SDL_GetError() << std::endl;
         return;
     }
-    m_height = surface.getHeight();
-    m_width = surface.getWidth();
+    height(surface.height());
+    width(surface.width());
 }
 
 void Texture::load(asa::Texture &&texture)
@@ -73,8 +66,8 @@ void Texture::load(asa::Texture &&texture)
         std::cerr << "Error: Could not load texture: " << SDL_GetError() << std::endl;
         return;
     }
-    m_height = texture.getHeight();
-    m_width = texture.getWidth();
+    height(texture.height());
+    width(texture.width());
 }
 
 void Texture::render(const SDL_Rect &quad)
@@ -84,7 +77,7 @@ void Texture::render(const SDL_Rect &quad)
 
 void Texture::render(const int x, const int y)
 {
-    SDL_Rect quad = {x, y, m_width, m_height};
+    SDL_Rect quad = {x, y, width(), height()};
     CheckError<SDL_GetError>(SDL_RenderCopy(m_renderer, m_contained.get(), nullptr, &quad), "Cloud not render texture");
 }
 
@@ -102,25 +95,29 @@ void Texture::render(const int x, const int y, const SDL_Rect &clip, SDL_Rendere
 
 void Texture::render(const int x, const int y, SDL_RendererFlip &flip)
 {
-    SDL_Rect quad = {x, y, m_width, m_height};
+    SDL_Rect quad = {x, y, width(), height()};
     CheckError<SDL_GetError>(SDL_RenderCopyEx(m_renderer, m_contained.get(), nullptr, &quad, 0, nullptr, flip), "Cloud not render clip texture");
 }
 
-void Texture::blendMode(SDL_BlendMode mode) {
+void Texture::blendMode(SDL_BlendMode mode)
+{
     CheckError<SDL_GetError>(SDL_SetTextureBlendMode(m_contained.get(), mode), "Cloud not set texture blend mode");
 }
 
-SDL_BlendMode Texture::blendMode(void) {
+SDL_BlendMode Texture::blendMode(void)
+{
     SDL_BlendMode result;
     CheckError<SDL_GetError>(SDL_GetTextureBlendMode(m_contained.get(), &result), "Cloud not get texture blend mode");
     return result;
 }
 
-void Texture::alphaMod(uint8_t mod) {
+void Texture::alphaMod(uint8_t mod)
+{
     CheckError<SDL_GetError>(SDL_SetTextureAlphaMod(m_contained.get(), mod), "Could not set texture alpha mod");
 }
 
-uint8_t Texture::alphaMod(void) {
+uint8_t Texture::alphaMod(void)
+{
     uint8_t result;
     CheckError<SDL_GetError>(SDL_GetTextureAlphaMod(m_contained.get(), &result), "Could not set texture alpha mod");
     return result;

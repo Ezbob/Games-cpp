@@ -32,6 +32,8 @@ public:
 
     bool load(void) override;
 
+    void update(void) override;
+
     void handleKeyState(const uint8_t *state) override;
 
     void render(void) override;

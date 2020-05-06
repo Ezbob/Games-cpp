@@ -8,19 +8,11 @@ using namespace asa;
 Surface::Surface(SDL_Surface *surface)
 {
     m_contained = std::shared_ptr<SDL_Surface>(surface, SDL_FreeSurface);
+    height(m_contained->h);
+    width(m_contained->w);
 }
 
 Surface::Surface() {}
-
-int Surface::getHeight() const
-{
-    return m_contained->h;
-}
-
-int Surface::getWidth() const
-{
-    return m_contained->w;
-}
 
 void Surface::loadBMP(std::string filename)
 {
@@ -30,16 +22,22 @@ void Surface::loadBMP(std::string filename)
         std::cerr << "Error: Surface could not be initialize: " << SDL_GetError() << std::endl;
         return;
     }
+
+    height(m_contained->h);
+    width(m_contained->w);
 }
 
 void Surface::loadPNG(std::string filename)
 {
     m_contained = std::shared_ptr<SDL_Surface>(IMG_Load(filename.c_str()), Surface::freeingFunction);
-    if (!m_contained)
+    if (m_contained == nullptr)
     {
         std::cerr << "Error: Surface could not be initialize: " << SDL_GetError() << std::endl;
         return;
     }
+
+    height(m_contained->h);
+    width(m_contained->w);
 }
 
 void Surface::convertToFormat(const Surface &other)
@@ -54,7 +52,6 @@ void Surface::convertToFormat(const Surface &other)
     else
     {
         m_contained.swap(optimizedSurface);
-        //m_contained = optimizedSurface;
     }
 }
 

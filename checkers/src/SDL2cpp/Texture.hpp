@@ -4,39 +4,36 @@
 #include "sdl_render.h"
 #include "MemoryContainer.hpp"
 #include "Surface.hpp"
+#include "SizedEntity.hpp"
 
 namespace asa
 {
 
-class Texture : public SharedContainerBase<SDL_Texture, SDL_DestroyTexture>
-{
+    class Texture : public SharedContainerBase<SDL_Texture, SDL_DestroyTexture>, public SizedEntity<Texture>
+    {
 
-public:
-    Texture(SDL_Renderer *renderer);
+    public:
+        Texture(SDL_Renderer *renderer);
 
-    void load(SDL_Texture *texture, int w, int h);
-    void load(SDL_Texture *texture);
-    void load(SDL_Surface *surface);
-    void load(Texture &&texture);
-    void load(Surface &surface);
+        void load(SDL_Texture *texture, int w, int h);
+        void load(SDL_Texture *texture);
+        void load(SDL_Surface *surface);
+        void load(Texture &&texture);
+        void load(Surface &surface);
 
-    int getHeight() const;
-    int getWidth() const;
+        void render(const SDL_Rect &quad);
+        void render(const int x = 0, const int y = 0);
+        void render(const int x, const int y, const SDL_Rect &clip);
+        void render(const int x, const int y, const SDL_Rect &clip, SDL_RendererFlip &flip);
+        void render(const int x, const int y, SDL_RendererFlip &flip);
 
-    void render(const SDL_Rect &quad);
-    void render(const int x = 0, const int y = 0);
-    void render(const int x, const int y, const SDL_Rect &clip);
-    void render(const int x, const int y, const SDL_Rect &clip, SDL_RendererFlip &flip);
-    void render(const int x, const int y, SDL_RendererFlip &flip);
+        void blendMode(SDL_BlendMode mode);
+        SDL_BlendMode blendMode(void);
 
-    void blendMode(SDL_BlendMode mode);
-    SDL_BlendMode blendMode(void);
+        void alphaMod(uint8_t mod);
+        uint8_t alphaMod(void);
 
-    void alphaMod(uint8_t mod);
-    uint8_t alphaMod(void);
-private:
-    SDL_Renderer *m_renderer = nullptr;
-    int m_width;
-    int m_height;
-};
+    private:
+        SDL_Renderer *m_renderer = nullptr;
+    };
 } // namespace asa

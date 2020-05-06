@@ -315,13 +315,13 @@ void BoardPlayState::render(void)
     }
     renderer.drawBlendMode(SDL_BLENDMODE_NONE);
 
-    for (int i = 0; i < 12; ++i)
+    for (std::size_t i = 0; i < BOARD_N_CHECKERS / 2; ++i)
     {
         auto &position = current_checker_dimensions[i];
         green_checker_texture->render(position);
     }
 
-    for (int i = 12; i < 24; ++i)
+    for (std::size_t i = (BOARD_N_CHECKERS / 2); i < BOARD_N_CHECKERS; ++i)
     {
         auto &position = current_checker_dimensions[i];
         red_checker_texture->render(position);
@@ -450,6 +450,7 @@ void BoardPlayState::update(void)
 
     if (red_checkers <= 0 || green_checkers <= 0)
     {
+        std::cout << "greens left: " << green_checkers << "\n";
         m_comms.offer(std::make_shared<std::any>(green_checkers > 0));
         isPlaying(false);
     }

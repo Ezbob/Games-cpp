@@ -8,23 +8,17 @@ WinState::WinState(
     asa::TTFFont &f,
     asa::Window &w,
     asa::MessageQueueInterface &mq)
-    : renderer(r)
-    , processor(p)
-    , font(f)
-    , m_window(w)
-    , m_comms(mq)
+    : renderer(r), processor(p), font(f), m_window(w), m_comms(mq)
 {
 }
 
 bool WinState::load(void)
 {
-    renderer.setColor(asa::Colors::WHITE);
-    renderer.clear();
     red_winner_text = renderer.loadBlendedText(
         "Red won!",
         font,
         asa::asColorStruct(asa::Colors::RED));
-    red_winner_text = renderer.loadBlendedText(
+    green_winner_text = renderer.loadBlendedText(
         "Green won!",
         font,
         asa::asColorStruct(asa::Colors::GREEN));
@@ -41,17 +35,28 @@ void WinState::handleKeyState(const uint8_t *state)
     {
         processor.quitGame();
     }
+}
 
-    if (m_comms.size() > 0) {
+void WinState::update(void)
+{
+    if (m_comms.size() > 0)
+    {
         has_green_won = std::any_cast<bool>(*m_comms.poll());
     }
 }
 
 void WinState::render(void)
 {
-    if (has_green_won) {
+    renderer.setColor(asa::Colors::WHITE);
+    renderer.clear();
+
+    if (has_green_won)
+    {
+        
         green_winner_text->render(window_width / 2 - 100, window_height / 2 - 12);
-    } else {
+    }
+    else
+    {
         red_winner_text->render(window_width / 2 - 100, window_height / 2 - 12);
     }
 
