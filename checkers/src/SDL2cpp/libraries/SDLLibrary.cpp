@@ -1,24 +1,20 @@
 
 #include "SDLLibrary.hpp"
-#include <stdexcept>
-#include <string>
+#include "SDL.h"
+#include "sdl2cpp/ErrorCheck.hpp"
+
+using namespace asa;
 
 SDLLibrary::SDLLibrary(uint32_t flags)
 {
-    if (SDL_init(flags) != 0)
-    {
-        throw std::runtime_error("SDL library could not be initialized: " + SDL_GetError());
-    }
-    else
-    {
-        m_is_initialized = true;
-    }
+    ThrowOnError<SDL_GetError>(SDL_Init(flags), "Could not initialize SDL2");
+    m_is_initialized = true;
 }
 
 SDLLibrary::~SDLLibrary()
 {
     if (m_is_initialized)
     {
-        SQL_Quit();
+        SDL_Quit();
     }
 }

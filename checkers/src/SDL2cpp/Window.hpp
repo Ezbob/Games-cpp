@@ -15,12 +15,11 @@ namespace asa
     class Window : public ContainerBase<SDL_Window, SDL_DestroyWindow>, public Sized2DEntity<Window>
     {
     public:
-        Window(const char *title, int x, int y, int width, int height, uint32_t flags = SDL_WINDOW_SHOWN);
-        Window(const char *title, int xy, int width, int height, uint32_t flags = SDL_WINDOW_SHOWN);
-        Window(void);
+        Window(const char *title, int width, int height,
+               int x = SDL_WINDOWPOS_UNDEFINED, 
+               int y = SDL_WINDOWPOS_UNDEFINED, 
+               uint32_t flags = SDL_WINDOW_SHOWN);
 
-        void loadWindow(std::string windowName, int x, int y, int width, int height, uint32_t flags);
-        void load(SDL_Window *wind);
         Surface getSurface() const;
         bool updateScreen() const;
 

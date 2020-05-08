@@ -2,17 +2,14 @@
 #include "TTFLibrary.hpp"
 #include "SDL_ttf.h"
 #include <stdexcept>
+#include "sdl2cpp/ErrorCheck.hpp"
+
+using namespace asa;
 
 TTFLibrary::TTFLibrary(void)
 {
-    if (TTF_Init() != 0)
-    {
-        throw std::runtime_error("TTF library could not be initialized");
-    }
-    else
-    {
-        m_is_initialized = true;
-    }
+    ThrowOnError<NoErrorGetter>(TTF_Init(), "TTF library could not be initialized");
+    m_is_initialized = true;
 }
 
 TTFLibrary::~TTFLibrary(void)

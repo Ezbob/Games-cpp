@@ -4,6 +4,7 @@
 
 using namespace asa;
 
-void TTFFont::loadTTF(const std::string filepath, int ptsize) {
-    m_contained = CheckNullError<TTF_Font, TTF_GetError>(TTF_OpenFont(filepath.c_str(), ptsize), "Could not initialze font");
+TTFFont::TTFFont(const std::string filepath, int ptsize) : m_ptsize(ptsize) {
+    TTF_Font *rc = TTF_OpenFont(filepath.c_str(), ptsize);
+    m_contained = CheckNullError<TTF_Font, TTF_GetError>(rc, "Could not initialize font");
 }

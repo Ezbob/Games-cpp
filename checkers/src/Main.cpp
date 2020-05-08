@@ -16,13 +16,8 @@
 const int SCREEN_WIDTH = 840;
 const int SCREEN_HEIGHT = 860;
 
-asa::Globals globals;
-asa::Window window;
-asa::Renderer renderer;
-asa::TTFFont font;
 
-asa::GameStateProcessor gameStateProcessor(60);
-
+/*
 bool sdlInit()
 {
     if (globals.init(SDL_INIT_VIDEO | SDL_INIT_TIMER))
@@ -32,10 +27,10 @@ bool sdlInit()
 
         window.loadWindow(
             "Checkers game",
-            SDL_WINDOWPOS_UNDEFINED,
-            SDL_WINDOWPOS_UNDEFINED,
             SCREEN_WIDTH,
             SCREEN_HEIGHT,
+            SDL_WINDOWPOS_UNDEFINED,
+            SDL_WINDOWPOS_UNDEFINED,
             SDL_WINDOW_SHOWN);
 
         SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
@@ -51,14 +46,23 @@ bool loadGlobalAssets()
     font.loadTTF(renderer.getBasePath() + "/assets/consola.ttf", 24);
     return font.isLoaded();
 }
+*/
+
 
 int MAIN_NAME()
 {
 
+    /*
     if (!sdlInit() || !loadGlobalAssets())
     {
         return 1;
     }
+    
+    asa::GameStateProcessor gameStateProcessor(60);
+    asa::Globals globals;
+    asa::Window window;
+    asa::Renderer renderer;
+    asa::TTFFont font;
 
     int has_green_won = 0;
 
@@ -68,6 +72,6 @@ int MAIN_NAME()
     });
 
     gameStateProcessor.processStates();
-
+    */
     return 0;
 }

@@ -53,6 +53,8 @@ set(SOURCES
     src/GameTool/SingleThreadedMessageQueue.cpp
     src/GameTool/GameStateProcessor.cpp
     src/GameTool/Easers.cpp
+
+    src/SDL2cpp/ErrorCheck.cpp
     src/SDL2cpp/Renderer.cpp
     src/SDL2cpp/Texture.cpp
     src/SDL2cpp/Window.cpp
@@ -60,6 +62,11 @@ set(SOURCES
     src/SDL2cpp/Globals.cpp
     src/SDL2cpp/Color.cpp
     src/SDL2cpp/Font.cpp
+
+    src/SDL2cpp/libraries/SDLLibrary.cpp
+    src/SDL2cpp/libraries/ImageLibrary.cpp
+    src/SDL2cpp/libraries/TTFLibrary.cpp
+
 )
 
 set(INCLUDE_DIRS
