@@ -2,6 +2,10 @@
 
 using namespace asa;
 
+GameClock::GameClock(int targetFps) {
+    m_msPerUpdate = (1. / ((double)targetFps)) * 1000.;
+}
+
 double GameClock::msPerUpdate(void) const
 {
     return m_msPerUpdate;

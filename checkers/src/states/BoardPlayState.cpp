@@ -111,11 +111,12 @@ BoardPlayState::BoardPlayState(
     asa::GameStateProcessor &p, 
     asa::TTFFont &f, 
     asa::Window &win,
+    asa::GameClock const& clock,
     asa::MessageQueueInterface &comms)
     : renderer(r),
       font(f),
       processor(p),
-      clock(p.getClock()),
+      clock(clock),
       screen_width(win.width()),
       screen_height(win.height()),
       sec_per_frame(clock.msPerUpdate() / 1000.0),

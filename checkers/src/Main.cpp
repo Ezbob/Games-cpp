@@ -52,27 +52,22 @@ bool loadGlobalAssets()
 
 int MAIN_NAME()
 {
-    asa::SDLLibrary sdl(SDL_INIT_VIDEO | SDL_INIT_TIMER);
+    asa::SDLLibrary sdl;
     asa::ImageLibrary image(IMG_INIT_PNG);
     asa::TTFLibrary ttf;
-    /*
-    if (!sdlInit() || !loadGlobalAssets())
-    {
-        return 1;
-    }
-    
-    asa::GameStateProcessor gameStateProcessor(60);
-    asa::Globals globals;
-    asa::Window window;
-    asa::Renderer renderer;
-    asa::TTFFont font;
 
-    gameStateProcessor.initStates([&has_green_won](auto &stack, auto &comm) {
-        stack.emplace(new WinState(renderer, gameStateProcessor, font, window, comm));
-        stack.emplace(new BoardPlayState(renderer, gameStateProcessor, font, window, comm));
-    });
+    asa::GameClock clock(60);
+    asa::Window window("Checkers game", SCREEN_WIDTH, SCREEN_HEIGHT);
+    asa::Renderer renderer = window.getRenderer();
 
-    gameStateProcessor.processStates();
-    */
+    asa::SingleThreadedMessageQueue communications;
+
+    asa::GameStateProcessor gameStateProcessor;
+
+    asa::TTFFont font(renderer.getBasePath() + "/assets/consola.ttf", 24);
+
+    gameStateProcessor.addState(std::make_shared<WinState>(renderer, gameStateProcessor, font, window, communications));
+
+    gameStateProcessor.processStates(clock);
     return 0;
 }

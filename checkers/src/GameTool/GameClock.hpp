@@ -9,6 +9,8 @@ namespace asa
 class GameClock
 {
 public:
+    GameClock(int targetFps);
+
     void tick(void);
 
     double msPerUpdate(void) const;

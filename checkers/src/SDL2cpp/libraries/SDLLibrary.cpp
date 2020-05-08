@@ -1,6 +1,5 @@
 
 #include "SDLLibrary.hpp"
-#include "SDL.h"
 #include "sdl2cpp/ErrorCheck.hpp"
 
 using namespace asa;

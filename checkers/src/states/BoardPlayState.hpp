@@ -46,6 +46,7 @@ public:
                     asa::GameStateProcessor &,
                     asa::TTFFont &,
                     asa::Window &,
+                    asa::GameClock const&,
                     asa::MessageQueueInterface &);
 
     void handleEvent(const SDL_Event &event) override;

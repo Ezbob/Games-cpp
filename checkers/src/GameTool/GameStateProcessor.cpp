@@ -5,31 +5,11 @@
 
 using namespace asa;
 
-GameStateProcessor::GameStateProcessor(unsigned int targetFps)
-    : comm_queue(std::make_unique<SingleThreadedMessageQueue>())
-{
-    double msPerFrame = (1. / ((double)targetFps)) * 1000.;
-    clock.msPerUpdate(msPerFrame);
+void GameStateProcessor::addState(std::shared_ptr<GameState> state) {
+    gameStates.push(state);
 }
 
-GameStateProcessor::GameStateProcessor(unsigned int fps, std::unique_ptr<MessageQueueInterface> q) 
-    : comm_queue(std::move(q))
-{
-    double msPerFrame = (1. / ((double)fps)) * 1000.;
-    clock.msPerUpdate(msPerFrame);
-}
-
-void GameStateProcessor::initStates(std::function<void(GameStateStack &, MessageQueueInterface&)> initFunction)
-{
-    initFunction(gameStates, *comm_queue.get());
-}
-
-asa::GameClock const &GameStateProcessor::getClock() const
-{
-    return clock;
-}
-
-void GameStateProcessor::quitGame()
+void GameStateProcessor::quitGame(void)
 {
     m_isPlaying = false;
 }
@@ -38,7 +18,7 @@ void GameStateProcessor::quitGame()
 #define _STATS_MS_DIFF(starttime) static_cast<double>(((SDL_GetPerformanceCounter() - starttime) * 1000) / static_cast<double>(SDL_GetPerformanceFrequency()))
 #endif
 
-void GameStateProcessor::processStates()
+void GameStateProcessor::processStates(GameClock &clock)
 {
 #if _STATS
     double rtime = 0.0;
