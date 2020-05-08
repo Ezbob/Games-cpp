@@ -1,8 +1,10 @@
 #include <iostream>
+
 #include "sdl2cpp/Renderer.hpp"
 #include "sdl2cpp/Window.hpp"
-#include "sdl2cpp/Globals.hpp"
 #include "sdl2cpp/Font.hpp"
+#include "sdl2cpp/libraries/Libraries.hpp"
+
 #include "states/PauseState.hpp"
 #include "states/WinState.hpp"
 #include "states/BoardPlayState.hpp"
@@ -15,7 +17,6 @@
 
 const int SCREEN_WIDTH = 840;
 const int SCREEN_HEIGHT = 860;
-
 
 /*
 bool sdlInit()
@@ -51,7 +52,9 @@ bool loadGlobalAssets()
 
 int MAIN_NAME()
 {
-
+    asa::SDLLibrary sdl(SDL_INIT_VIDEO | SDL_INIT_TIMER);
+    asa::ImageLibrary image(IMG_INIT_PNG);
+    asa::TTFLibrary ttf;
     /*
     if (!sdlInit() || !loadGlobalAssets())
     {
@@ -63,8 +66,6 @@ int MAIN_NAME()
     asa::Window window;
     asa::Renderer renderer;
     asa::TTFFont font;
-
-    int has_green_won = 0;
 
     gameStateProcessor.initStates([&has_green_won](auto &stack, auto &comm) {
         stack.emplace(new WinState(renderer, gameStateProcessor, font, window, comm));
