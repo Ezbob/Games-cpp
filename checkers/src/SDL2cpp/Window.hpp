@@ -23,6 +23,5 @@ namespace asa
         Surface getSurface() const;
         bool updateScreen() const;
 
-        Renderer getRenderer(uint32_t rendererFlags = SDL_RENDERER_ACCELERATED, int index = -1);
     };
 } // namespace asa

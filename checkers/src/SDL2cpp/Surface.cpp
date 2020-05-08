@@ -12,8 +12,7 @@ Surface::Surface(SDL_Surface *surface)
     width(m_contained->w);
 }
 
-Surface::Surface() {}
-
+/*
 void Surface::loadBMP(std::string filename)
 {
     m_contained = std::shared_ptr<SDL_Surface>(SDL_LoadBMP(filename.c_str()), Surface::freeingFunction);
@@ -39,6 +38,7 @@ void Surface::loadPNG(std::string filename)
     height(m_contained->h);
     width(m_contained->w);
 }
+*/
 
 void Surface::convertToFormat(const Surface &other)
 {
@@ -71,7 +71,7 @@ uint32_t Surface::rgbColor(int r, int g, int b) const
     return SDL_MapRGB(mapper, r, g, b);
 }
 
-int Surface::setKeyColor(int flags, uint32_t color)
+int Surface::setKeyColor(uint32_t color, int flags)
 {
     return CheckError<SDL_GetError>(SDL_SetColorKey(m_contained.get(), flags, color), "Could not set key color");
 }

@@ -25,6 +25,11 @@ namespace asa {
             return m_contained.get();
         }
 
+        ContainedType *get_ptr() const noexcept
+        {
+            return m_contained.get();
+        }
+
         bool isLoaded() const {
             return m_contained != nullptr;
         }

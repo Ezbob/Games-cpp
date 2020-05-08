@@ -47,13 +47,14 @@ endif()
 
 set(SOURCES
     src/Main.cpp
-    src/states/AllStates.cpp
+    #src/states/AllStates.cpp
     src/GameTool/GameState.cpp
     src/GameTool/GameClock.cpp
     src/GameTool/SingleThreadedMessageQueue.cpp
     src/GameTool/GameStateProcessor.cpp
     src/GameTool/Easers.cpp
 
+    src/SDL2cpp/AssetsLoading.cpp
     src/SDL2cpp/ErrorCheck.cpp
     src/SDL2cpp/Renderer.cpp
     src/SDL2cpp/Texture.cpp

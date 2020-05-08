@@ -21,13 +21,7 @@ namespace asa
     {
 
     public:
-        Renderer(SDL_Window *window, int index, uint32_t rendererFlags);
-        Renderer() = default;
-
-        void load(SDL_Window *window, int index, uint32_t rendererFlags);
-        void load(Window &window, int index, uint32_t rendererFlags);
-        SDL_Texture *createTextureFromSurface(SDL_Surface &surface);
-        SDL_Texture *createTextureFromSurface(SDL_Surface *surface);
+        Renderer(Window &window, int index = -1, uint32_t rendererFlags = SDL_RENDERER_ACCELERATED);
 
         bool clear(void);
         bool copyTexture(Texture &texture, SDL_Rect *src = nullptr, SDL_Rect *dest = nullptr);
@@ -35,16 +29,7 @@ namespace asa
 
         bool setViewPort(SDL_Rect &rect);
 
-        /**
-     * Factory method for creating new textures
-     */
-        Texture createTexture() const;
-
-        Texture loadPNG(const std::string &path, uint8_t r = 0, uint8_t g = 0xFF, uint8_t b = 0xFF) const;
-
-        Texture loadSolidText(const std::string &text, TTFFont &font, SDL_Color textColor) const;
-
-        Texture loadBlendedText(const std::string &text, TTFFont &font, SDL_Color textColor) const;
+        Texture createTextureFromSurface(Surface const&);
 
         bool setColor(int r, int g, int b, int a = 0xFF);
         bool setColor(asa::Colors);
@@ -115,14 +100,12 @@ namespace asa
 
         bool fillCircle(int centerX, int centerY, int radius);
 
-        std::string getBasePath(void);
-
         SDL_BlendMode drawBlendMode(void);
 
         void drawBlendMode(SDL_BlendMode);
 
     private:
-        SDL_Window *m_window_parent = nullptr;
+        Window &m_window;
     };
 
 } // namespace asa

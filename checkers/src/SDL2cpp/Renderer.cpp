@@ -5,36 +5,15 @@
 
 using namespace asa;
 
-Renderer::Renderer(SDL_Window *window, int index, uint32_t rendererFlags)
+Renderer::Renderer(Window &window, int index, uint32_t rendererFlags) : m_window(window)
 {
-    m_contained = std::shared_ptr<SDL_Renderer>(SDL_CreateRenderer(window, index, rendererFlags), SDL_DestroyRenderer);
-    m_window_parent = window;
+    m_contained = std::shared_ptr<SDL_Renderer>(SDL_CreateRenderer(window.get_ptr(), index, rendererFlags), SDL_DestroyRenderer);
 
     CheckNullError<SDL_Renderer, SDL_GetError>(m_contained.get(), "Could not initialize renderer");
 }
 
-void Renderer::load(SDL_Window *window, int index, uint32_t rendererFlags)
-{
-    m_contained = std::shared_ptr<SDL_Renderer>(SDL_CreateRenderer(window, index, rendererFlags), SDL_DestroyRenderer);
-    m_window_parent = window;
-    CheckNullError<SDL_Renderer, SDL_GetError>(m_contained.get(), "Could not initialize renderer");
-}
-
-void Renderer::load(Window &window, int index, uint32_t rendererFlags)
-{
-    m_contained = std::shared_ptr<SDL_Renderer>(SDL_CreateRenderer((SDL_Window *)window, index, rendererFlags), SDL_DestroyRenderer);
-    m_window_parent = (SDL_Window *)window;
-    CheckNullError<SDL_Renderer, SDL_GetError>(m_contained.get(), "Could not initialize renderer");
-}
-
-SDL_Texture *Renderer::createTextureFromSurface(SDL_Surface &surface)
-{
-    return SDL_CreateTextureFromSurface(m_contained.get(), &surface);
-}
-
-SDL_Texture *Renderer::createTextureFromSurface(SDL_Surface *surface)
-{
-    return SDL_CreateTextureFromSurface(m_contained.get(), surface);
+Texture Renderer::createTextureFromSurface(Surface const& surface) {
+    return SDL_CreateTextureFromSurface(get_ptr(), surface.get_ptr());
 }
 
 bool Renderer::clear(void)
@@ -59,43 +38,8 @@ bool Renderer::setColor(int r, int g, int b, int a)
 
 bool Renderer::setColor(asa::Colors color)
 {
-    uint8_t r = 0x0, g = 0x0, b = 0x0;
-
-    switch (color)
-    {
-    case Colors::WHITE:
-        r = 0xff;
-        g = 0xff;
-        b = 0xff;
-        break;
-
-    case Colors::RED:
-        r = 0xff;
-        break;
-
-    case Colors::BLUE:
-        b = 0xff;
-        break;
-
-    case Colors::GREEN:
-        g = 0xff;
-        break;
-
-    case Colors::YELLOW:
-        r = 0xff;
-        g = 0xff;
-        break;
-
-    case Colors::CYAN:
-        g = 0xff;
-        b = 0xff;
-        break;
-
-    case Colors::BLACK:
-        break;
-    }
-
-    return CheckError<SDL_GetError>(SDL_SetRenderDrawColor(m_contained.get(), r, g, b, 0xff), "Could not set renderer color");
+    SDL_Color c = asColorStruct(color);
+    return CheckError<SDL_GetError>(SDL_SetRenderDrawColor(m_contained.get(), c.r, c.g, c.b, 0xff), "Could not set renderer color");
 }
 
 bool Renderer::drawRect(const SDL_Rect &fillRect)
@@ -133,6 +77,7 @@ bool Renderer::fillRects(const std::vector<SDL_Rect> &fillRect)
     return CheckError<SDL_GetError>(SDL_RenderFillRects(m_contained.get(), fillRect.data(), fillRect.size()), "Could not fill rectangle");
 }
 
+/*
 Texture Renderer::loadPNG(const std::string &path, uint8_t r, uint8_t g, uint8_t b) const
 {
     Texture texture = createTexture();
@@ -152,9 +97,7 @@ Texture Renderer::loadSolidText(const std::string &text, TTFFont &font, SDL_Colo
 {
     Texture texture = createTexture();
 
-    Surface surface;
-
-    surface.load(TTF_RenderText_Solid((TTF_Font *)font, text.c_str(), textColor));
+    Surface surface(TTF_RenderText_Solid((TTF_Font *)font, text.c_str(), textColor));
 
     if (surface.isLoaded())
     {
@@ -175,15 +118,13 @@ Texture Renderer::loadBlendedText(const std::string &text, TTFFont &font, SDL_Co
     if (surface.isLoaded())
     {
         texture.load(surface);
+    } else {
+        std::cout << "Could not render text '" << text << "'";
     }
 
     return texture;
 }
-
-Texture Renderer::createTexture() const
-{
-    return Texture(m_contained.get());
-}
+*/
 
 bool Renderer::drawCircle(int centerX, int centerY, int radius) {
     // midpoint algorithm
@@ -267,10 +208,6 @@ bool Renderer::fillCircle(int centerX, int centerY, int radius) {
     }
 
     return true;
-}
-
-std::string Renderer::getBasePath(void) {
-    return SDL_GetBasePath();
 }
 
 SDL_BlendMode Renderer::drawBlendMode(void) {

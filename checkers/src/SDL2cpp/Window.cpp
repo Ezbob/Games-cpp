@@ -23,7 +23,3 @@ bool Window::updateScreen() const
     return SDL_UpdateWindowSurface(m_contained) == 0;
 }
 
-Renderer Window::getRenderer(uint32_t rendererFlags, int index)
-{
-    return Renderer(m_contained, index, rendererFlags);
-}

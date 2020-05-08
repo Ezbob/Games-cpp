@@ -1,6 +1,7 @@
 
 #include "WinState.hpp"
 #include "SDL.h"
+#include <iostream>
 
 WinState::WinState(
     asa::Renderer &r,
@@ -50,15 +51,19 @@ void WinState::render(void)
     renderer.setColor(asa::Colors::WHITE);
     renderer.clear();
 
+    //std::cout << std::boolalpha << "Is loaded? " << (((bool) green_winner_text) && green_winner_text->isLoaded() ) << "\n"; 
+
+    auto r = SDL_Rect {0, 0, 100, 100};
+    renderer.copyTexture(*green_winner_text, nullptr, &r);
+/*
     if (has_green_won)
     {
-        
         green_winner_text->render(window_width / 2 - 100, window_height / 2 - 12);
     }
     else
     {
         red_winner_text->render(window_width / 2 - 100, window_height / 2 - 12);
     }
-
+*/
     renderer.updateScreen();
 }

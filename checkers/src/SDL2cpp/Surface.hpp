@@ -14,12 +14,13 @@ namespace asa
 
     public:
         Surface(SDL_Surface *surface);
-        Surface();
 
+        /*
         void loadBMP(std::string filename);
         void loadPNG(std::string filename);
+        */
 
-        int setKeyColor(int flags, uint32_t color);
+        int setKeyColor(uint32_t color, int flags = SDL_TRUE);
 
         /**
          * Convert the internal surface pixel format to the other surface's pixelformat

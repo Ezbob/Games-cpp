@@ -5,6 +5,5 @@
 using namespace asa;
 
 TTFFont::TTFFont(const std::string filepath, int ptsize) : m_ptsize(ptsize) {
-    TTF_Font *rc = TTF_OpenFont(filepath.c_str(), ptsize);
-    m_contained = CheckNullError<TTF_Font, TTF_GetError>(rc, "Could not initialize font");
+    m_contained = ThrowOnNullError<TTF_GetError>(TTF_OpenFont(filepath.c_str(), ptsize), "Could not initialize font at" + filepath);
 }

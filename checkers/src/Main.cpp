@@ -4,6 +4,7 @@
 #include "sdl2cpp/Window.hpp"
 #include "sdl2cpp/Font.hpp"
 #include "sdl2cpp/libraries/Libraries.hpp"
+#include "sdl2cpp/AssetsLoading.hpp"
 
 #include "states/PauseState.hpp"
 #include "states/WinState.hpp"
@@ -58,15 +59,14 @@ int MAIN_NAME()
 
     asa::GameClock clock(60);
     asa::Window window("Checkers game", SCREEN_WIDTH, SCREEN_HEIGHT);
-    asa::Renderer renderer = window.getRenderer();
+    asa::Renderer renderer(window);
 
     asa::SingleThreadedMessageQueue communications;
-
     asa::GameStateProcessor gameStateProcessor;
 
-    asa::TTFFont font(renderer.getBasePath() + "/assets/consola.ttf", 24);
+    asa::TTFFont font(std::string(SDL_GetBasePath()) + "/assets/consola.ttf", 24);
 
-    gameStateProcessor.addState(std::make_shared<WinState>(renderer, gameStateProcessor, font, window, communications));
+    //gameStateProcessor.addState(std::make_shared<WinState>(renderer, gameStateProcessor, font, window, communications));
 
     gameStateProcessor.processStates(clock);
     return 0;
