@@ -2,7 +2,7 @@
 
 #include "Surface.hpp"
 #include "sdl_render.h"
-#include "MemoryContainer.hpp"
+#include "container_bases/SharedContainerBase.hpp"
 #include "Surface.hpp"
 #include "Sized2DEntity.hpp"
 

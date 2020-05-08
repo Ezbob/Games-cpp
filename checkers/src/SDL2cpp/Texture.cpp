@@ -1,6 +1,7 @@
 #include "SDL_render.h"
 #include "Texture.hpp"
 #include <memory>
+#include "ErrorCheck.hpp"
 
 using namespace asa;
 

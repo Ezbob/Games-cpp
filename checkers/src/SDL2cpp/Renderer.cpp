@@ -1,6 +1,5 @@
 #include "Renderer.hpp"
 #include "Texture.hpp"
-#include "ErrorCheck.hpp"
 #include "SDL.h"
 #include <memory>
 

@@ -3,7 +3,7 @@
 #include "SDL_surface.h"
 #include "SDL_ttf.h"
 #include <memory>
-#include "MemoryContainer.hpp"
+#include "container_bases/SharedContainerBase.hpp"
 #include "Sized2DEntity.hpp"
 
 namespace asa

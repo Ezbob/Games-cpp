@@ -4,16 +4,16 @@
 
 namespace asa
 {
-enum class Colors
-{
-    BLACK,
-    WHITE,
-    RED,
-    GREEN,
-    YELLOW,
-    BLUE,
-    CYAN
-};
+    enum class Colors
+    {
+        BLACK,
+        WHITE,
+        RED,
+        GREEN,
+        YELLOW,
+        BLUE,
+        CYAN
+    };
 
-SDL_Color asColorStruct(asa::Colors color);
+    SDL_Color asColorStruct(asa::Colors color);
 } // namespace asa
