@@ -42,6 +42,12 @@ namespace asa
         }
     };
 
+    using SurfaceDeleter = Deleter<SDL_Surface, NoDeletionOperation>;
+    using TextureDeleter = Deleter<SDL_Texture, SDL_DestroyTexture>;
+    using WindowDeleter = Deleter<SDL_Window, SDL_DestroyWindow>;
+    using RendererDeleter = Deleter<SDL_Renderer, SDL_DestroyRenderer>;
+    using FontDeleter = Deleter<TTF_Font, TTF_CloseFont>;
+
     template <typename T>
     struct sdl_deleter
     {
@@ -51,31 +57,31 @@ namespace asa
     template <>
     struct sdl_deleter<SDL_Surface>
     {
-        using value = Deleter<SDL_Surface, NoDeletionOperation>;
+        using value = SurfaceDeleter;
     };
 
     template <>
     struct sdl_deleter<SDL_Texture>
     {
-        using value = Deleter<SDL_Texture, SDL_DestroyTexture>;
+        using value = TextureDeleter;
     };
 
     template <>
     struct sdl_deleter<SDL_Window>
     {
-        using value = Deleter<SDL_Window, SDL_DestroyWindow>;
+        using value = WindowDeleter;
     };
 
     template <>
     struct sdl_deleter<SDL_Renderer>
     {
-        using value = Deleter<SDL_Renderer, SDL_DestroyRenderer>;
+        using value = RendererDeleter;
     };
 
     template <>
     struct sdl_deleter<TTF_Font>
     {
-        using value = Deleter<TTF_Font, TTF_CloseFont>;
+        using value = FontDeleter;
     };
 
 }; // namespace asa

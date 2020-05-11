@@ -1,25 +1,32 @@
 #pragma once
 
-#include <optional>
 #include "SDL.h"
+#include "SDL_ttf.h"
+#include "Deleter.hpp"
 #include "gametool/GameStateProcessor.hpp"
-#include "sdl2cpp/Font.hpp"
-#include "sdl2cpp/Renderer.hpp"
-#include "sdl2cpp/Texture.hpp"
+#include <memory>
 
 class PauseState : public asa::GameState
 {
-    std::optional<asa::Texture> pausedText;
-    std::optional<asa::Texture> subText;
+    std::unique_ptr<SDL_Texture, asa::TextureDeleter> pausedText;
+    std::unique_ptr<SDL_Texture, asa::TextureDeleter> subText;
 
-    asa::Renderer &renderer;
-    asa::TTFFont &font;
+    SDL_Rect pausedPos;
+    SDL_Rect subPos;
+
+    SDL_Color textColor;
+
+    std::shared_ptr<SDL_Renderer> renderer;
+    std::shared_ptr<TTF_Font> font;
     asa::GameStateProcessor &processor;
     int screen_width;
     int screen_height;
 
 public:
-    PauseState(asa::Renderer &r, asa::GameStateProcessor &p, asa::TTFFont &f, int swidth, int sheight);
+    PauseState(
+        std::shared_ptr<SDL_Renderer> r,
+        asa::GameStateProcessor &p,
+        std::shared_ptr<TTF_Font> f, int swidth, int sheight);
 
     void handleKeyState(const uint8_t *state) override;
 
