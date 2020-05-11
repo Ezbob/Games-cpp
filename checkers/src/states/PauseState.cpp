@@ -39,19 +39,14 @@ bool PauseState::load(void)
         0x0,
         0x0};
 
-    SDL_Surface *a = asa::ThrowOnNull(TTF_RenderText_Blended(font.get(), "Game Paused", textColor),
-                                      "Text not rendered");
-    SDL_Surface *b = asa::ThrowOnNull(TTF_RenderText_Blended(font.get(), "(Press Enter to continue)", textColor),
-                                      "Text not rendered");
+    auto a = asa::createUnique(TTF_RenderText_Blended(font.get(), "Game Paused", textColor));
+    auto b = asa::createUnique(TTF_RenderText_Blended(font.get(), "(Press Enter to continue)", textColor));
 
-    auto pause_ptr = asa::createUnique(SDL_CreateTextureFromSurface(renderer.get(), a));
-    auto sub_ptr = asa::createUnique(SDL_CreateTextureFromSurface(renderer.get(), b));
+    auto pause_ptr = asa::createUnique(SDL_CreateTextureFromSurface(renderer.get(), a.get()));
+    auto sub_ptr = asa::createUnique(SDL_CreateTextureFromSurface(renderer.get(), b.get()));
 
     pausedText = std::move(pause_ptr);
     subText = std::move(sub_ptr);
-
-    SDL_free(a);
-    SDL_free(b);
 
     SDL_QueryTexture(pausedText.get(), nullptr, nullptr, &pausedPos.w, &pausedPos.h);
     SDL_QueryTexture(subText.get(), nullptr, nullptr, &subPos.w, &subPos.h);
