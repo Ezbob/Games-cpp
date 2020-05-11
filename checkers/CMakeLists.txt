@@ -47,19 +47,14 @@ endif()
 
 set(SOURCES
     src/Main.cpp
-    src/states/AllStates.cpp
-    src/GameTool/GameState.cpp
-    src/GameTool/GameClock.cpp
-    src/GameTool/SingleThreadedMessageQueue.cpp
-    src/GameTool/GameStateProcessor.cpp
-    src/GameTool/Easers.cpp
-    src/SDL2cpp/Renderer.cpp
-    src/SDL2cpp/Texture.cpp
-    src/SDL2cpp/Window.cpp
-    src/SDL2cpp/Surface.cpp
-    src/SDL2cpp/Globals.cpp
-    src/SDL2cpp/Color.cpp
-    src/SDL2cpp/Font.cpp
+    #src/states/AllStates.cpp
+    #src/states/WinState.cpp
+    src/gametool/GameState.cpp
+    src/gametool/GameClock.cpp
+    src/gametool/SingleThreadedMessageQueue.cpp
+    src/gametool/GameStateProcessor.cpp
+    src/gametool/Easers.cpp
+    src/ErrorCheck.cpp
 )
 
 set(INCLUDE_DIRS

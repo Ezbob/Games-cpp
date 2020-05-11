@@ -1,34 +1,34 @@
 #pragma once
 
 #include <optional>
-#include "sdl2cpp/Renderer.hpp"
-#include "sdl2cpp/Texture.hpp"
-#include "sdl2cpp/Font.hpp"
+#include "SDL.h"
 #include "SDL_ttf.h"
 #include "gametool/GameState.hpp"
 #include "gametool/GameStateProcessor.hpp"
 #include "gametool/MessageQueueInterface.hpp"
+#include <memory>
 
 class WinState : public asa::GameState
 {
 private:
-    std::optional<asa::Texture> red_winner_text;
-    std::optional<asa::Texture> green_winner_text;
-    asa::Renderer &renderer;
+    std::unique_ptr<SDL_Texture> red_winner_text;
+    std::unique_ptr<SDL_Texture> green_winner_text;
+    std::shared_ptr<TTF_Font> font;
+    std::shared_ptr<SDL_Renderer> renderer;
+
     asa::GameStateProcessor &processor;
-    asa::TTFFont &font;
-    asa::Window &m_window;
     asa::MessageQueueInterface &m_comms;
 
     int window_width = 0, window_height = 0;
     bool has_green_won = false;
 
 public:
-    WinState(asa::Renderer &,
-            asa::GameStateProcessor &,
-            asa::TTFFont &,
-            asa::Window &,
-            asa::MessageQueueInterface &);
+    WinState(
+        std::shared_ptr<SDL_Renderer>,
+        std::shared_ptr<TTF_Font>,
+        asa::GameStateProcessor &,
+        asa::MessageQueueInterface &
+    );
 
     bool load(void) override;
 

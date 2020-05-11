@@ -1,19 +1,21 @@
 
 #include "WinState.hpp"
 #include "SDL.h"
+#include "ErrorCheck.hpp"
 
 WinState::WinState(
-    asa::Renderer &r,
-    asa::GameStateProcessor &p,
-    asa::TTFFont &f,
-    asa::Window &w,
-    asa::MessageQueueInterface &mq)
-    : renderer(r), processor(p), font(f), m_window(w), m_comms(mq)
+        std::shared_ptr<SDL_Renderer> renderer,
+        std::shared_ptr<TTF_Font> font,
+        asa::GameStateProcessor & p,
+        asa::MessageQueueInterface & mq
+    ) : renderer(r), processor(p), font(f), m_comms(mq)
 {
 }
 
 bool WinState::load(void)
 {
+
+    SDL_CreateTexture()
     red_winner_text = renderer.loadBlendedText(
         "Red won!",
         font,

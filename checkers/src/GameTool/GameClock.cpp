@@ -2,6 +2,8 @@
 
 using namespace asa;
 
+GameClock::GameClock(unsigned int targetFPS) : m_msPerUpdate((1.0 / ((double)targetFPS)) * 1000.0) {}
+
 double GameClock::msPerUpdate(void) const
 {
     return m_msPerUpdate;
@@ -30,6 +32,7 @@ void GameClock::tick(void)
     m_updateLag += m_frameElapsed;
 }
 
-auto GameClock::getDeltaTime(void) const -> double {
+auto GameClock::getDeltaTime(void) const -> double
+{
     return m_frameElapsed;
 }

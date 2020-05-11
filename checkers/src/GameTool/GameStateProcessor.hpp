@@ -4,36 +4,28 @@
 #include "GameClock.hpp"
 #include "GameState.hpp"
 #include "SingleThreadedMessageQueue.hpp"
-#include <functional>
 #include <memory>
 
 namespace asa
 {
-using GameStateStack = std::stack<std::shared_ptr<GameState>>;
 
 class GameStateProcessor
 {
-    GameStateStack gameStates;
-    GameClock clock;
-
-    std::unique_ptr<MessageQueueInterface> comm_queue;
+    std::stack<std::shared_ptr<GameState>> m_gameStates;
 
     bool m_isPlaying = true;
     bool m_shouldReload = false;
 
 public:
-    GameStateProcessor(unsigned int targetFps);
-    GameStateProcessor(unsigned int, std::unique_ptr<MessageQueueInterface>);
+    GameStateProcessor(void) = default;
 
-    void initStates(std::function<void(GameStateStack &, MessageQueueInterface&)> initFunction);
+    void addState(std::shared_ptr<GameState> state);
 
-    void processStates();
+    void processStates(GameClock &clock);
 
     void startFromNewState(const std::shared_ptr<GameState> state);
 
-    asa::GameClock const &getClock() const;
-
-    void quitGame();
+    void quitGame(void);
 };
 
 } // namespace asa
