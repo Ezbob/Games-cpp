@@ -4,6 +4,7 @@
 #include "SDL_ttf.h"
 #include "Creators.hpp"
 #include "ErrorCheck.hpp"
+#include "Shortcuts.hpp"
 
 PauseState::PauseState(
     std::shared_ptr<SDL_Renderer> r,
@@ -39,23 +40,19 @@ bool PauseState::load(void)
         0x0,
         0x0};
 
-    auto a = asa::createUnique(TTF_RenderText_Blended(font.get(), "Game Paused", textColor));
-    auto b = asa::createUnique(TTF_RenderText_Blended(font.get(), "(Press Enter to continue)", textColor));
-
-    auto pause_ptr = asa::createUnique(SDL_CreateTextureFromSurface(renderer.get(), a.get()));
-    auto sub_ptr = asa::createUnique(SDL_CreateTextureFromSurface(renderer.get(), b.get()));
-
-    pausedText = std::move(pause_ptr);
-    subText = std::move(sub_ptr);
+    pausedText = std::move(asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), "Game Paused", textColor)));
+    subText = std::move(asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), "(Press Enter to continue)", textColor)));
 
     SDL_QueryTexture(pausedText.get(), nullptr, nullptr, &pausedPos.w, &pausedPos.h);
     SDL_QueryTexture(subText.get(), nullptr, nullptr, &subPos.w, &subPos.h);
 
-    pausedPos.x = screen_width / 2 - 50;
-    pausedPos.y = screen_height / 2 - 12;
+    int font_height = TTF_FontHeight(font.get());
 
-    subPos.x = screen_width / 2 - 140;
-    subPos.y = screen_height / 2 + 14;
+    pausedPos.x = screen_width / 2 - pausedPos.w / 2;
+    pausedPos.y = screen_height / 2 - font_height / 2;
+
+    subPos.x = screen_width / 2 - subPos.w / 2;
+    subPos.y = screen_height / 2 + font_height / 2;
 
     return isLoaded(pausedText && subText);
 }

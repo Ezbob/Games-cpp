@@ -13,7 +13,7 @@ namespace asa
     template <typename T>
     auto createShared(T *w)
     {
-        using Deleter_t = typename sdl_deleter<T>::value;
+        using Deleter_t = typename sdl_deleter<T>::type;
         auto ptr = asa::ThrowOnNull(w, "Could not create shared_ptr");
         return std::shared_ptr<T>(ptr, Deleter_t());
     }
@@ -21,7 +21,7 @@ namespace asa
     template <typename T>
     auto createUnique(T *w)
     {
-        using Deleter_t = typename sdl_deleter<T>::value;
+        using Deleter_t = typename sdl_deleter<T>::type;
         auto ptr = asa::ThrowOnNull(w, "Could not create unique_ptr");
         return std::unique_ptr<T, Deleter_t>(ptr, Deleter_t());
     }

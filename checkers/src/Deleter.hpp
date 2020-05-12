@@ -3,6 +3,7 @@
 
 #include "SDL.h"
 #include "SDL_ttf.h"
+#include <memory>
 
 namespace asa
 {
@@ -11,13 +12,6 @@ namespace asa
     using Deleter_Func_t = void (*)(T *);
 
     using Lib_Deleter_Func_t = void (*)(void);
-
-
-    template <typename T>
-    void NoDeletionOperation(T *)
-    {
-        /*Do nothing*/
-    }
 
     /**
      * Functor that patches in deleter/close functions defined as
@@ -42,7 +36,6 @@ namespace asa
         }
     };
 
-    using SurfaceDeleter = Deleter<SDL_Surface, NoDeletionOperation>;
     using TextureDeleter = Deleter<SDL_Texture, SDL_DestroyTexture>;
     using WindowDeleter = Deleter<SDL_Window, SDL_DestroyWindow>;
     using RendererDeleter = Deleter<SDL_Renderer, SDL_DestroyRenderer>;
@@ -51,37 +44,31 @@ namespace asa
     template <typename T>
     struct sdl_deleter
     {
-        using value = void;
-    };
-
-    template <>
-    struct sdl_deleter<SDL_Surface>
-    {
-        using value = SurfaceDeleter;
+        using type = std::default_delete<T>;
     };
 
     template <>
     struct sdl_deleter<SDL_Texture>
     {
-        using value = TextureDeleter;
+        using type = TextureDeleter;
     };
 
     template <>
     struct sdl_deleter<SDL_Window>
     {
-        using value = WindowDeleter;
+        using type = WindowDeleter;
     };
 
     template <>
     struct sdl_deleter<SDL_Renderer>
     {
-        using value = RendererDeleter;
+        using type = RendererDeleter;
     };
 
     template <>
     struct sdl_deleter<TTF_Font>
     {
-        using value = FontDeleter;
+        using type = FontDeleter;
     };
 
 }; // namespace asa
