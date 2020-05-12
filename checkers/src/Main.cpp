@@ -11,9 +11,9 @@
 #include "gametool/GameState.hpp"
 
 #include "states/PauseState.hpp"
-/*
-#include "states/PauseState.hpp"
 #include "states/WinState.hpp"
+
+/*
 #include "states/BoardPlayState.hpp"
 */
 
@@ -48,10 +48,13 @@ int MAIN_NAME()
 
     asa::GameClock clock(60);
     asa::GameStateProcessor processor;
+    asa::SingleThreadedMessageQueue message_queue;
 
     auto font = asa::createShared(TTF_OpenFont((std::string(std::move(SDL_GetBasePath())) + "/assets/consola.ttf").c_str(), 24));
 
-    processor.addState(std::make_shared<PauseState>(renderer, processor, font, SCREEN_WIDTH, SCREEN_HEIGHT));
+
+    processor.addState(std::make_shared<WinState>(renderer, processor, font, window, message_queue));
+    processor.addState(std::make_shared<PauseState>(renderer, processor, font, window));
 
     processor.processStates(clock);
 

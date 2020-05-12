@@ -3,6 +3,7 @@
 #include <optional>
 #include "SDL.h"
 #include "SDL_ttf.h"
+#include "Deleter.hpp"
 #include "gametool/GameState.hpp"
 #include "gametool/GameStateProcessor.hpp"
 #include "gametool/MessageQueueInterface.hpp"
@@ -11,24 +12,29 @@
 class WinState : public asa::GameState
 {
 private:
-    std::unique_ptr<SDL_Texture> red_winner_text;
-    std::unique_ptr<SDL_Texture> green_winner_text;
-    std::shared_ptr<TTF_Font> font;
+    std::unique_ptr<SDL_Texture, asa::TextureDeleter> red_winner_text;
+    std::unique_ptr<SDL_Texture, asa::TextureDeleter> green_winner_text;
+    
     std::shared_ptr<SDL_Renderer> renderer;
 
+    SDL_Rect red_pos;
+    SDL_Rect green_pos;
+
     asa::GameStateProcessor &processor;
+    std::shared_ptr<TTF_Font> font;
+    std::shared_ptr<SDL_Window> m_win;
+
     asa::MessageQueueInterface &m_comms;
 
-    int window_width = 0, window_height = 0;
     bool has_green_won = false;
 
 public:
     WinState(
-        std::shared_ptr<SDL_Renderer>,
-        std::shared_ptr<TTF_Font>,
-        asa::GameStateProcessor &,
-        asa::MessageQueueInterface &
-    );
+        std::shared_ptr<SDL_Renderer> r,
+        asa::GameStateProcessor &p,
+        std::shared_ptr<TTF_Font> f,
+        std::shared_ptr<SDL_Window> win,
+        asa::MessageQueueInterface &mq);
 
     bool load(void) override;
 

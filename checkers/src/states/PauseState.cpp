@@ -9,8 +9,9 @@
 PauseState::PauseState(
     std::shared_ptr<SDL_Renderer> r,
     asa::GameStateProcessor &p,
-    std::shared_ptr<TTF_Font> f, int swidth, int sheight)
-    : renderer(r), font(f), processor(p), screen_width(swidth), screen_height(sheight) {}
+    std::shared_ptr<TTF_Font> f,
+    std::shared_ptr<SDL_Window> win)
+    : renderer(r), font(f), processor(p), m_win(win) {}
 
 void PauseState::handleKeyState(const uint8_t *state)
 {
@@ -34,25 +35,27 @@ void PauseState::handleEvent(const SDL_Event &event)
 
 bool PauseState::load(void)
 {
-    textColor = SDL_Color{
-        0x0,
-        0x0,
-        0x0,
-        0x0};
 
-    pausedText = std::move(asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), "Game Paused", textColor)));
-    subText = std::move(asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), "(Press Enter to continue)", textColor)));
+    auto ptext = "Game Paused";
+    auto stext = "(Press Enter to continue)";
 
-    SDL_QueryTexture(pausedText.get(), nullptr, nullptr, &pausedPos.w, &pausedPos.h);
-    SDL_QueryTexture(subText.get(), nullptr, nullptr, &subPos.w, &subPos.h);
+    int screen_width = 0;
+    int screen_height = 0;
 
-    int font_height = TTF_FontHeight(font.get());
+    SDL_GetWindowSize(m_win.get(), &screen_width, &screen_height);
+
+    pausedText = std::move(asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), ptext, SDL_Color{0x0, 0x0, 0x0, 0x0})));
+    subText = std::move(asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), stext, SDL_Color{0x0, 0x0, 0x0, 0x0})));
+
+    TTF_SizeText(font.get(), ptext, &pausedPos.w, &pausedPos.h);
 
     pausedPos.x = screen_width / 2 - pausedPos.w / 2;
-    pausedPos.y = screen_height / 2 - font_height / 2;
+    pausedPos.y = screen_height / 2 - pausedPos.h / 2;
+
+    TTF_SizeText(font.get(), stext, &subPos.w, &subPos.h);
 
     subPos.x = screen_width / 2 - subPos.w / 2;
-    subPos.y = screen_height / 2 + font_height / 2;
+    subPos.y = screen_height / 2 + subPos.h / 2;
 
     return isLoaded(pausedText && subText);
 }

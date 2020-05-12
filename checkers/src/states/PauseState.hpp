@@ -14,19 +14,17 @@ class PauseState : public asa::GameState
     SDL_Rect pausedPos;
     SDL_Rect subPos;
 
-    SDL_Color textColor;
-
     std::shared_ptr<SDL_Renderer> renderer;
     std::shared_ptr<TTF_Font> font;
     asa::GameStateProcessor &processor;
-    int screen_width;
-    int screen_height;
+    std::shared_ptr<SDL_Window> m_win;
 
 public:
     PauseState(
         std::shared_ptr<SDL_Renderer> r,
         asa::GameStateProcessor &p,
-        std::shared_ptr<TTF_Font> f, int swidth, int sheight);
+        std::shared_ptr<TTF_Font> f,
+        std::shared_ptr<SDL_Window> win);
 
     void handleKeyState(const uint8_t *state) override;
 

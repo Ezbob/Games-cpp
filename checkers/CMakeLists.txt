@@ -48,7 +48,7 @@ endif()
 set(SOURCES
     src/Main.cpp
     #src/states/AllStates.cpp
-    #src/states/WinState.cpp
+    src/states/WinState.cpp
     src/Shortcuts.cpp
     src/states/PauseState.cpp
     src/gametool/GameState.cpp
