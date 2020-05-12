@@ -20,6 +20,8 @@ bool WinState::load(void)
     auto redtxt = "Red won!";
     auto greentxt = "Green won!";
 
+    SDL_GetWindowSize(m_win.get(), &window_width, &window_height);
+
     red_winner_text = std::move(asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), redtxt, SDL_Color{0xff, 0, 0, 0xff})));
     green_winner_text = std::move(asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), greentxt, SDL_Color{0, 0xff, 0, 0xff})));
 
@@ -53,7 +55,7 @@ void WinState::update(void)
 
 void WinState::render(void)
 {
-    SDL_SetRenderDrawColor(renderer.get(), 0x0, 0x0, 0x0, 0xff);
+    SDL_SetRenderDrawColor(renderer.get(), 0xff, 0xff, 0xff, 0xff);
     SDL_RenderClear(renderer.get());
 
     if (has_green_won)
