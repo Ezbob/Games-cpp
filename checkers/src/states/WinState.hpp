@@ -3,7 +3,7 @@
 #include <optional>
 #include "SDL.h"
 #include "SDL_ttf.h"
-#include "Deleter.hpp"
+#include "SmartPointers.hpp"
 #include "gametool/GameState.hpp"
 #include "gametool/GameStateProcessor.hpp"
 #include "gametool/MessageQueueInterface.hpp"
@@ -12,9 +12,9 @@
 class WinState : public asa::GameState
 {
 private:
-    std::unique_ptr<SDL_Texture, asa::TextureDeleter> red_winner_text;
-    std::unique_ptr<SDL_Texture, asa::TextureDeleter> green_winner_text;
-    
+    asa::sdl_unique_ptr<SDL_Texture> red_winner_text;
+    asa::sdl_unique_ptr<SDL_Texture> green_winner_text;
+
     std::shared_ptr<SDL_Renderer> renderer;
 
     SDL_Rect red_pos;
