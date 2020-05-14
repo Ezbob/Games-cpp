@@ -107,21 +107,17 @@ bool BoardPlayState::no_checker_in_the_way(void) const
 /* === PUBLIC INTERFACE === */
 
 BoardPlayState::BoardPlayState(
-    asa::Renderer &r, 
-    asa::GameStateProcessor &p, 
-    asa::TTFFont &f, 
-    asa::Window &win,
-    asa::MessageQueueInterface &comms)
+    asa::sdl_shared_ptr<SDL_Renderer> r,
+    asa::sdl_shared_ptr<TTF_Font> f,
+    asa::GameStateProcessor &p,
+    asa::MessageQueueInterface &comms,
+    asa::GameClock &clock)
     : renderer(r),
       font(f),
       processor(p),
-      clock(p.getClock()),
-      screen_width(win.width()),
-      screen_height(win.height()),
       sec_per_frame(clock.msPerUpdate() / 1000.0),
       m_comms(comms)
 {
-    pauseState = std::make_shared<PauseState>(renderer, processor, font, screen_width, screen_height);
 }
 
 void BoardPlayState::handleEvent(const SDL_Event &event)
@@ -201,6 +197,9 @@ void BoardPlayState::handleKeyState(const uint8_t *state [[maybe_unused]])
 
 bool BoardPlayState::load(void)
 {
+    auto base_path = std::make_unique(SDL_GetBasePath());
+    std::string basePath(base_path);
+
     red_turn_text = renderer.loadBlendedText(
         "Red's turn",
         font,

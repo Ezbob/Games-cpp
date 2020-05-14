@@ -44,8 +44,11 @@ bool PauseState::load(void)
 
     SDL_GetWindowSize(m_win.get(), &screen_width, &screen_height);
 
-    pausedText = std::move(asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), ptext, SDL_Color{0x0, 0x0, 0x0, 0x0})));
-    subText = std::move(asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), stext, SDL_Color{0x0, 0x0, 0x0, 0x0})));
+    auto pause_ptr = asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), ptext, SDL_Color{0x0, 0x0, 0x0, 0x0}));
+    pausedText = std::move(pausedText);
+
+    auto sub_ptr = asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), stext, SDL_Color{0x0, 0x0, 0x0, 0x0}));
+    subText = std::move(sub_ptr);
 
     TTF_SizeText(font.get(), ptext, &pausedPos.w, &pausedPos.h);
 

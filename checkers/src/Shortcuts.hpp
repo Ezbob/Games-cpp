@@ -3,10 +3,12 @@
 
 #include <memory>
 #include "SDL.h"
-#include "Deleter.hpp"
+#include "SmartPointers.hpp"
 
 namespace asa {
 
-    std::unique_ptr<SDL_Texture, asa::TextureDeleter> intoTexture(std::shared_ptr<SDL_Renderer> , SDL_Surface *);
+    asa::sdl_unique_ptr<SDL_Texture> intoTexture(std::shared_ptr<SDL_Renderer>, SDL_Surface *);
+
+    std::string getBasePath(void);
 
 }; // namespace asa

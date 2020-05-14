@@ -1,7 +1,7 @@
 #include <iostream>
 #include "ErrorCheck.hpp"
-#include "Deleter.hpp"
-#include "Creators.hpp"
+#include "SmartPointers.hpp"
+#include "Shortcuts.hpp"
 
 #include <memory>
 #include "SDL.h"
@@ -49,7 +49,7 @@ int MAIN_NAME()
     asa::GameStateProcessor processor;
     asa::SingleThreadedMessageQueue message_queue;
 
-    auto font = asa::make_sdl_shared(TTF_OpenFont((std::string(std::move(SDL_GetBasePath())) + "/assets/consola.ttf").c_str(), 24));
+    auto font = asa::make_sdl_shared(TTF_OpenFont((asa::getBasePath() + "/assets/consola.ttf").c_str(), 24));
 
     processor.addState(std::make_shared<WinState>(renderer, processor, font, window, message_queue));
     processor.addState(std::make_shared<PauseState>(renderer, processor, font, window));

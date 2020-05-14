@@ -14,6 +14,7 @@
 #include "gametool/GameState.hpp"
 #include "gametool/GameStateProcessor.hpp"
 #include "gametool/MessageQueueInterface.hpp"
+#include "SmartPointers.hpp"
 
 #include <iostream>
 
@@ -42,11 +43,12 @@ public:
         asa::vector2d<int> position{0, 0};
     };
 
-    BoardPlayState(asa::Renderer &,
-                    asa::GameStateProcessor &,
-                    asa::TTFFont &,
-                    asa::Window &,
-                    asa::MessageQueueInterface &);
+    BoardPlayState(
+        asa::sdl_shared_ptr<SDL_Renderer>,
+        asa::sdl_shared_ptr<TTF_Font>,
+        asa::GameStateProcessor &,
+        asa::MessageQueueInterface &,
+        asa::GameClock &);
 
     void handleEvent(const SDL_Event &event) override;
     void handleKeyState(const uint8_t *state) override;
@@ -55,16 +57,13 @@ public:
     void update(void) override;
 
 private:
-    asa::Renderer &renderer;
-    asa::TTFFont &font;
+    asa::sdl_shared_ptr<SDL_Renderer> renderer;
+    asa::sdl_shared_ptr<TTF_Font> font;
     asa::GameStateProcessor &processor;
-    asa::GameClock const &clock;
-    int screen_width, screen_height;
-    const double sec_per_frame;
-
     asa::MessageQueueInterface &m_comms;
 
-    std::shared_ptr<asa::GameState> pauseState;
+    int screen_width, screen_height;
+    const double sec_per_frame;
 
     std::array<double, BOARD_N_CHECKERS> easing_progress;
     std::array<SDL_Point, BOARD_N_CHECKERS> next_checker_position;
@@ -88,16 +87,16 @@ private:
     GridCell *source = nullptr;
     GridCell *target = nullptr;
 
-    std::optional<asa::Texture> green_turn_text;
-    std::optional<asa::Texture> red_turn_text;
+    asa::sdl_unique_ptr<SDL_Texture> green_turn_text;
+    asa::sdl_unique_ptr<SDL_Texture> red_turn_text;
 
-    std::optional<asa::Texture> white_tile;
-    std::optional<asa::Texture> black_tile;
+    asa::sdl_unique_ptr<SDL_Texture> white_tile;
+    asa::sdl_unique_ptr<SDL_Texture> black_tile;
 
-    std::optional<asa::Texture> green_checker_texture;
-    std::optional<asa::Texture> red_checker_texture;
+    asa::sdl_unique_ptr<SDL_Texture> green_checker_texture;
+    asa::sdl_unique_ptr<SDL_Texture> red_checker_texture;
 
-    std::optional<asa::Texture> checker_shadow_texture;
+    asa::sdl_unique_ptr<SDL_Texture> checker_shadow_texture;
 
     void switchTurn(void);
 
