@@ -194,35 +194,48 @@ void BoardPlayState::handleKeyState(const uint8_t *state [[maybe_unused]])
 {
     if (state[SDL_SCANCODE_ESCAPE])
     {
-        processor.startFromNewState(pauseState);
+        //processor.startFromNewState(pauseState);
     }
 }
 
 bool BoardPlayState::load(void)
 {
-    auto base_path = asa::getBasePath();
+    auto asset_path = asa::getBasePath() + "/assets";
 
-    auto red_text = "Red's turn";
-    red_turn_text = std::move(asa::intoTexture(
+    int screen_width, screen_height;
+    SDL_GetWindowSize(m_win.get(), &screen_width, &screen_height);
+
+    red_turn_text = asa::createTextureBundle(
         renderer, 
-        TTF_RenderText_Blended(font.get(), red_text, SDL_Color{0xff, 0x0, 0x0, 0xff})
-    ));
+        TTF_RenderText_Blended(font.get(), "Red's turn", SDL_Color{0xff, 0x0, 0x0, 0xff})
+    );
 
-    auto green_text = "Green's turn";
-    green_turn_text = std::move(asa::intoTexture(
+    green_turn_text = asa::createTextureBundle(
         renderer, 
-        TTF_RenderText_Blended(font.get(), green_text, SDL_Color{0x0, 0xff, 0x0, 0xff})
-    ));
+        TTF_RenderText_Blended(font.get(), "Green's turn", SDL_Color{0x0, 0xff, 0x0, 0xff})
+    );
 
-    auto path = base_path + "/assets";
-    white_tile = renderer.loadPNG(path + "/white_tile.png");
-    black_tile = renderer.loadPNG(path + "/black_tile.png");
+    green_turn_text.position.x = screen_width / 2 - 85;
+    green_turn_text.position.y = screen_height - 32;
+    red_turn_text.position.x = green_turn_text.position.x;
+    red_turn_text.position.y = green_turn_text.position.y;
 
-    green_checker_texture = renderer.loadPNG(path + "/checker_green3.png");
-    red_checker_texture = renderer.loadPNG(path + "/checker_red3.png");
-    checker_shadow_texture = renderer.loadPNG(path + "/checker_shadow.png");
+#define INCLUDE_PNG_FILE__(p) std::move(asa::intoTexture(renderer, IMG_Load(p)))
+    white_tile = INCLUDE_PNG_FILE__((asset_path + "/white_tile.png").c_str());
+    black_tile = INCLUDE_PNG_FILE__((asset_path + "/black_tile.png").c_str());
 
-    bool is_loaded = green_checker_texture->isLoaded() && red_checker_texture->isLoaded();
+    green_checker_texture = INCLUDE_PNG_FILE__((asset_path + "/checker_green3.png").c_str());
+    red_checker_texture = INCLUDE_PNG_FILE__((asset_path + "/checker_red3.png").c_str());
+    checker_shadow_texture = INCLUDE_PNG_FILE__((asset_path + "/checker_shadow.png").c_str());
+#undef INCLUDE_PNG_FILE__
+
+    bool is_loaded = green_checker_texture &&
+                     red_checker_texture &&
+                     checker_shadow_texture &&
+                     white_tile &&
+                     black_tile &&
+                     red_turn_text.texture &&
+                     green_turn_text.texture;
 
     easing_progress.fill(-1.0);
     super_checker_table.fill(false);
@@ -250,6 +263,7 @@ bool BoardPlayState::load(void)
             current_cell.position.x(x);
             current_cell.position.y(y);
 
+/*
 #if _DEBUG
             // + std::to_string(i) + ", " + std::to_string(j)
             debugText.emplace_back(renderer.loadSolidText(
@@ -257,6 +271,7 @@ bool BoardPlayState::load(void)
                 font,
                 asa::asColorStruct(asa::Colors::BLACK)));
 #endif
+*/
 
             if (x % 2 != y % 2)
             {
@@ -297,40 +312,41 @@ bool BoardPlayState::load(void)
 
 void BoardPlayState::render(void)
 {
-    renderer.setColor(asa::Colors::WHITE);
-    renderer.clear();
+    SDL_SetRenderDrawColor(renderer.get(), 0xff, 0xff, 0xff, 0xff);
+    SDL_RenderClear(renderer.get());
 
     for (SDL_Rect &r : boardContainers)
     {
-        white_tile->render(r);
+        SDL_RenderCopy(renderer.get(), white_tile.get(), nullptr, &r);
     }
 
     for (auto &r : boardBlackTiles)
     {
-        black_tile->render(r);
+        SDL_RenderCopy(renderer.get(), black_tile.get(), nullptr, &r);
     }
 
-    renderer.drawBlendMode(SDL_BLENDMODE_ADD);
+    SDL_SetRenderDrawBlendMode(renderer.get(), SDL_BLENDMODE_ADD);
 
     if (source)
     {
-        renderer.setColor(asa::Colors::BLUE);
-        renderer.fillRect(*source->container);
+        SDL_SetRenderDrawColor(renderer.get(), 0, 0, 0xff, 0xff);
+        SDL_RenderFillRect(renderer.get(), source->container);
     }
-    renderer.drawBlendMode(SDL_BLENDMODE_NONE);
+
+    SDL_SetRenderDrawBlendMode(renderer.get(), SDL_BLENDMODE_NONE);
+
 
     for (std::size_t i = 0; i < BOARD_N_CHECKERS / 2; ++i)
     {
-        auto &position = current_checker_dimensions[i];
-        green_checker_texture->render(position);
+        SDL_RenderCopy(renderer.get(), green_checker_texture.get(), nullptr, &current_checker_dimensions[i]);
     }
 
     for (std::size_t i = (BOARD_N_CHECKERS / 2); i < BOARD_N_CHECKERS; ++i)
     {
-        auto &position = current_checker_dimensions[i];
-        red_checker_texture->render(position);
+        SDL_RenderCopy(renderer.get(), red_checker_texture.get(), nullptr, &current_checker_dimensions[i]);
     }
 
+/*
 #if _DEBUG
     for (std::size_t y = 0; y < BOARD_SIDE; ++y)
     {
@@ -341,17 +357,20 @@ void BoardPlayState::render(void)
         }
     }
 #endif
+*/
 
     if (playingColor == PlayingColor::GREEN)
     {
-        green_turn_text->render(screen_width / 2 - 85, screen_height - 32);
+        SDL_RenderCopy(renderer.get(), green_turn_text.texture.get(), nullptr, &green_turn_text.position);
+        //green_turn_text->render(screen_width / 2 - 85, screen_height - 32);
     }
     else
     {
-        red_turn_text->render(screen_width / 2 - 85, screen_height - 32);
+        SDL_RenderCopy(renderer.get(), red_turn_text.texture.get(), nullptr, &red_turn_text.position);
+        //red_turn_text->render(screen_width / 2 - 85, screen_height - 32);
     }
 
-    renderer.updateScreen();
+    SDL_RenderPresent(renderer.get());
 }
 
 void BoardPlayState::update(void)
@@ -454,7 +473,6 @@ void BoardPlayState::update(void)
 
     if (red_checkers <= 0 || green_checkers <= 0)
     {
-        std::cout << "greens left: " << green_checkers << "\n";
         m_comms.offer(std::make_shared<std::any>(green_checkers > 0));
         isPlaying(false);
     }
