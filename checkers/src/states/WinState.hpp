@@ -4,6 +4,7 @@
 #include "SDL.h"
 #include "SDL_ttf.h"
 #include "SmartPointers.hpp"
+#include "Shortcuts.hpp"
 #include "gametool/GameState.hpp"
 #include "gametool/GameStateProcessor.hpp"
 #include "gametool/MessageQueueInterface.hpp"
@@ -12,13 +13,12 @@
 class WinState : public asa::GameState
 {
 private:
-    asa::sdl_unique_ptr<SDL_Texture> red_winner_text;
-    asa::sdl_unique_ptr<SDL_Texture> green_winner_text;
+    //asa::sdl_unique_ptr<SDL_Texture> red_winner_text;
+    asa::TextureBundle green_winner_text;
+
+    asa::TextureBundle red_winner_text;
 
     std::shared_ptr<SDL_Renderer> renderer;
-
-    SDL_Rect red_pos;
-    SDL_Rect green_pos;
 
     asa::GameStateProcessor &processor;
     std::shared_ptr<TTF_Font> font;

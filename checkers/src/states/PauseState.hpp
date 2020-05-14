@@ -2,17 +2,15 @@
 
 #include "SDL.h"
 #include "SDL_ttf.h"
-#include "Deleter.hpp"
+#include "SmartPointers.hpp"
+#include "Shortcuts.hpp"
 #include "gametool/GameStateProcessor.hpp"
 #include <memory>
 
 class PauseState : public asa::GameState
 {
-    std::unique_ptr<SDL_Texture, asa::TextureDeleter> pausedText;
-    std::unique_ptr<SDL_Texture, asa::TextureDeleter> subText;
-
-    SDL_Rect pausedPos;
-    SDL_Rect subPos;
+    asa::TextureBundle pausedText;
+    asa::TextureBundle subText;
 
     std::shared_ptr<SDL_Renderer> renderer;
     std::shared_ptr<TTF_Font> font;

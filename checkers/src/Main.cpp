@@ -12,10 +12,8 @@
 
 #include "states/PauseState.hpp"
 #include "states/WinState.hpp"
+//#include "states/BoardPlayState.hpp"
 
-/*
-#include "states/BoardPlayState.hpp"
-*/
 
 #if defined(_WIN32)
 #define MAIN_NAME WinMain
@@ -53,6 +51,7 @@ int MAIN_NAME()
 
     processor.addState(std::make_shared<WinState>(renderer, processor, font, window, message_queue));
     processor.addState(std::make_shared<PauseState>(renderer, processor, font, window));
+    //processor.addState(std::make_shared<BoardPlayState>(renderer, processor, font, window, message_queue, clock));
 
     processor.processStates(clock);
 

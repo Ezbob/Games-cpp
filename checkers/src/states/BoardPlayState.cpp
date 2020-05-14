@@ -1,6 +1,7 @@
 
 #include "BoardPlayState.hpp"
 #include "gametool/Easers.hpp"
+#include "Shortcuts.hpp"
 
 #include <cmath>
 #include <algorithm>
@@ -108,13 +109,15 @@ bool BoardPlayState::no_checker_in_the_way(void) const
 
 BoardPlayState::BoardPlayState(
     asa::sdl_shared_ptr<SDL_Renderer> r,
-    asa::sdl_shared_ptr<TTF_Font> f,
     asa::GameStateProcessor &p,
+    asa::sdl_shared_ptr<TTF_Font> f,
+    std::shared_ptr<SDL_Window> win,
     asa::MessageQueueInterface &comms,
     asa::GameClock &clock)
     : renderer(r),
-      font(f),
       processor(p),
+      font(f),
+      m_win(win),
       sec_per_frame(clock.msPerUpdate() / 1000.0),
       m_comms(comms)
 {
@@ -197,19 +200,21 @@ void BoardPlayState::handleKeyState(const uint8_t *state [[maybe_unused]])
 
 bool BoardPlayState::load(void)
 {
-    auto base_path = std::make_unique(SDL_GetBasePath());
-    std::string basePath(base_path);
+    auto base_path = asa::getBasePath();
 
-    red_turn_text = renderer.loadBlendedText(
-        "Red's turn",
-        font,
-        asa::asColorStruct(asa::Colors::RED));
+    auto red_text = "Red's turn";
+    red_turn_text = std::move(asa::intoTexture(
+        renderer, 
+        TTF_RenderText_Blended(font.get(), red_text, SDL_Color{0xff, 0x0, 0x0, 0xff})
+    ));
 
-    green_turn_text = renderer.loadBlendedText("Green's turn",
-                                               font,
-                                               asa::asColorStruct(asa::Colors::GREEN));
+    auto green_text = "Green's turn";
+    green_turn_text = std::move(asa::intoTexture(
+        renderer, 
+        TTF_RenderText_Blended(font.get(), green_text, SDL_Color{0x0, 0xff, 0x0, 0xff})
+    ));
 
-    auto path = renderer.getBasePath() + "/assets";
+    auto path = base_path + "/assets";
     white_tile = renderer.loadPNG(path + "/white_tile.png");
     black_tile = renderer.loadPNG(path + "/black_tile.png");
 

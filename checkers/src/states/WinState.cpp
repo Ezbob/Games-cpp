@@ -17,24 +17,18 @@ WinState::WinState(
 bool WinState::load(void)
 {
     int window_width = 0, window_height = 0;
-    auto redtxt = "Red won!";
-    auto greentxt = "Green won!";
-
     SDL_GetWindowSize(m_win.get(), &window_width, &window_height);
 
-    red_winner_text = std::move(asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), redtxt, SDL_Color{0xff, 0, 0, 0xff})));
-    green_winner_text = std::move(asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), greentxt, SDL_Color{0, 0xff, 0, 0xff})));
+    red_winner_text = asa::createTextureBundle(renderer, TTF_RenderText_Blended(font.get(), "Red won!", SDL_Color{0xff, 0, 0, 0xff}));
+    green_winner_text = asa::createTextureBundle(renderer, TTF_RenderText_Blended(font.get(), "Green won!", SDL_Color{0, 0xff, 0, 0xff}));
 
-    TTF_SizeText(font.get(), redtxt, &red_pos.w, &red_pos.h);
-    TTF_SizeText(font.get(), greentxt, &green_pos.w, &green_pos.h);
+    red_winner_text.position.x = window_width / 2 - red_winner_text.position.w / 2;
+    red_winner_text.position.y = window_height / 2 - red_winner_text.position.h / 2;
 
-    red_pos.x = window_width / 2 - red_pos.w / 2;
-    red_pos.y = window_height / 2 - red_pos.h / 2;
+    green_winner_text.position.x = window_width / 2 - green_winner_text.position.w / 2;
+    green_winner_text.position.y = window_height / 2 - green_winner_text.position.h / 2;
 
-    green_pos.x = window_width / 2 - green_pos.w / 2;
-    green_pos.y = window_height / 2 - green_pos.h / 2;
-
-    return isLoaded(red_winner_text && green_winner_text);
+    return isLoaded(red_winner_text.texture && green_winner_text.texture);
 }
 
 void WinState::handleKeyState(const uint8_t *state)
@@ -60,11 +54,19 @@ void WinState::render(void)
 
     if (has_green_won)
     {
-        SDL_RenderCopy(renderer.get(), green_winner_text.get(), nullptr, &green_pos);
+        SDL_RenderCopy(
+            renderer.get(),
+            green_winner_text.texture.get(),
+            nullptr,
+            &green_winner_text.position);
     }
     else
     {
-        SDL_RenderCopy(renderer.get(), red_winner_text.get(), nullptr, &red_pos);
+        SDL_RenderCopy(
+            renderer.get(),
+            red_winner_text.texture.get(),
+            nullptr,
+            &red_winner_text.position);
     }
 
     SDL_RenderPresent(renderer.get());

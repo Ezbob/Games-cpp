@@ -11,6 +11,18 @@ asa::sdl_unique_ptr<SDL_Texture> asa::intoTexture(std::shared_ptr<SDL_Renderer> 
     return texture;
 }
 
-std::string asa::getBasePath(void) {
+std::string asa::getBasePath(void)
+{
     return std::string(std::unique_ptr<const char[]>(SDL_GetBasePath()).get());
+}
+
+asa::TextureBundle asa::createTextureBundle(std::shared_ptr<SDL_Renderer> rend, SDL_Surface *s)
+{
+    auto texture = intoTexture(rend, s);
+    TextureBundle r;
+    ThrowOnNonZero<SDL_GetError>(
+        SDL_QueryTexture(texture.get(), nullptr, nullptr, &r.position.w, &r.position.h),
+        "Could not get texture dimensions");
+    r.texture = std::move(texture);
+    return r;
 }

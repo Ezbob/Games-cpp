@@ -4,7 +4,7 @@
 #include "SDL_ttf.h"
 #include "Creators.hpp"
 #include "ErrorCheck.hpp"
-#include "Shortcuts.hpp"
+
 
 PauseState::PauseState(
     std::shared_ptr<SDL_Renderer> r,
@@ -35,32 +35,21 @@ void PauseState::handleEvent(const SDL_Event &event)
 
 bool PauseState::load(void)
 {
-
-    auto ptext = "Game Paused";
-    auto stext = "(Press Enter to continue)";
-
     int screen_width = 0;
     int screen_height = 0;
 
     SDL_GetWindowSize(m_win.get(), &screen_width, &screen_height);
 
-    auto pause_ptr = asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), ptext, SDL_Color{0x0, 0x0, 0x0, 0x0}));
-    pausedText = std::move(pausedText);
+    pausedText = asa::createTextureBundle(renderer, TTF_RenderText_Blended(font.get(), "Game Paused", SDL_Color{0x0, 0x0, 0x0, 0xff}));
+    subText = asa::createTextureBundle(renderer, TTF_RenderText_Blended(font.get(), "(Press Enter to continue)", SDL_Color{0x0, 0x0, 0x0, 0xff}));
 
-    auto sub_ptr = asa::intoTexture(renderer, TTF_RenderText_Blended(font.get(), stext, SDL_Color{0x0, 0x0, 0x0, 0x0}));
-    subText = std::move(sub_ptr);
+    pausedText.position.x = screen_width / 2 - pausedText.position.w / 2;
+    pausedText.position.y = screen_height / 2 - pausedText.position.h / 2;
 
-    TTF_SizeText(font.get(), ptext, &pausedPos.w, &pausedPos.h);
+    subText.position.x = screen_width / 2 - subText.position.w / 2;
+    subText.position.y = screen_height / 2 + subText.position.h / 2;
 
-    pausedPos.x = screen_width / 2 - pausedPos.w / 2;
-    pausedPos.y = screen_height / 2 - pausedPos.h / 2;
-
-    TTF_SizeText(font.get(), stext, &subPos.w, &subPos.h);
-
-    subPos.x = screen_width / 2 - subPos.w / 2;
-    subPos.y = screen_height / 2 + subPos.h / 2;
-
-    return isLoaded(pausedText && subText);
+    return isLoaded(pausedText.texture && subText.texture);
 }
 
 void PauseState::render(void)
@@ -68,8 +57,8 @@ void PauseState::render(void)
     SDL_SetRenderDrawColor(renderer.get(), 0xff, 0xff, 0xff, 0xff);
     SDL_RenderClear(renderer.get());
 
-    SDL_RenderCopy(renderer.get(), pausedText.get(), nullptr, &pausedPos);
-    SDL_RenderCopy(renderer.get(), subText.get(), nullptr, &subPos);
+    SDL_RenderCopy(renderer.get(), pausedText.texture.get(), nullptr, &pausedText.position);
+    SDL_RenderCopy(renderer.get(), subText.texture.get(), nullptr, &subText.position);
 
     SDL_RenderPresent(renderer.get());
 }

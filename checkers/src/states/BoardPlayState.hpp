@@ -6,10 +6,6 @@
 #include <array>
 #include "SDL.h"
 #include "SDL_ttf.h"
-#include "sdl2cpp/Renderer.hpp"
-#include "sdl2cpp/Texture.hpp"
-#include "sdl2cpp/Font.hpp"
-#include "sdl2cpp/Window.hpp"
 #include "gametool/Vector2d.hpp"
 #include "gametool/GameState.hpp"
 #include "gametool/GameStateProcessor.hpp"
@@ -45,8 +41,9 @@ public:
 
     BoardPlayState(
         asa::sdl_shared_ptr<SDL_Renderer>,
-        asa::sdl_shared_ptr<TTF_Font>,
         asa::GameStateProcessor &,
+        asa::sdl_shared_ptr<TTF_Font>,
+        std::shared_ptr<SDL_Window>,
         asa::MessageQueueInterface &,
         asa::GameClock &);
 
@@ -58,8 +55,9 @@ public:
 
 private:
     asa::sdl_shared_ptr<SDL_Renderer> renderer;
-    asa::sdl_shared_ptr<TTF_Font> font;
     asa::GameStateProcessor &processor;
+    asa::sdl_shared_ptr<TTF_Font> font;
+    std::shared_ptr<SDL_Window> m_win;
     asa::MessageQueueInterface &m_comms;
 
     int screen_width, screen_height;
