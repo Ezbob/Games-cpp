@@ -206,14 +206,12 @@ bool BoardPlayState::load(void)
     SDL_GetWindowSize(m_win.get(), &screen_width, &screen_height);
 
     red_turn_text = asa::createTextureBundle(
-        renderer, 
-        TTF_RenderText_Blended(font.get(), "Red's turn", SDL_Color{0xff, 0x0, 0x0, 0xff})
-    );
+        renderer,
+        TTF_RenderText_Blended(font.get(), "Red's turn", SDL_Color{0xff, 0x0, 0x0, 0xff}));
 
     green_turn_text = asa::createTextureBundle(
-        renderer, 
-        TTF_RenderText_Blended(font.get(), "Green's turn", SDL_Color{0x0, 0xff, 0x0, 0xff})
-    );
+        renderer,
+        TTF_RenderText_Blended(font.get(), "Green's turn", SDL_Color{0x0, 0xff, 0x0, 0xff}));
 
     green_turn_text.position.x = screen_width / 2 - 85;
     green_turn_text.position.y = screen_height - 32;
@@ -267,7 +265,7 @@ bool BoardPlayState::load(void)
             current_cell.position.x(x);
             current_cell.position.y(y);
 
-/*
+            /*
 #if _DEBUG
             // + std::to_string(i) + ", " + std::to_string(j)
             debugText.emplace_back(renderer.loadSolidText(
@@ -339,26 +337,31 @@ void BoardPlayState::render(void)
 
     SDL_SetRenderDrawBlendMode(renderer.get(), SDL_BLENDMODE_NONE);
 
-
     for (std::size_t i = 0; i < BOARD_N_CHECKERS / 2; ++i)
     {
-        if (super_checker_table[i]) {
+        if (super_checker_table[i])
+        {
             SDL_RenderCopy(renderer.get(), green_super_texture.get(), nullptr, &current_checker_dimensions[i]);
-        } else {
+        }
+        else
+        {
             SDL_RenderCopy(renderer.get(), green_checker_texture.get(), nullptr, &current_checker_dimensions[i]);
         }
     }
 
     for (std::size_t i = (BOARD_N_CHECKERS / 2); i < BOARD_N_CHECKERS; ++i)
     {
-        if (super_checker_table[i]) {
+        if (super_checker_table[i])
+        {
             SDL_RenderCopy(renderer.get(), red_super_texture.get(), nullptr, &current_checker_dimensions[i]);
-        } else {
+        }
+        else
+        {
             SDL_RenderCopy(renderer.get(), red_checker_texture.get(), nullptr, &current_checker_dimensions[i]);
         }
     }
 
-/*
+    /*
 #if _DEBUG
     for (std::size_t y = 0; y < BOARD_SIDE; ++y)
     {
