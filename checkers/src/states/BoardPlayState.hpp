@@ -62,9 +62,6 @@ private:
     const double sec_per_frame;
     asa::MessageQueueInterface &m_comms;
 
-    
-    
-
     std::array<double, BOARD_N_CHECKERS> easing_progress;
     std::array<SDL_Point, BOARD_N_CHECKERS> next_checker_position;
     std::array<SDL_Rect, BOARD_N_CHECKERS> current_checker_dimensions;
@@ -97,6 +94,8 @@ private:
     asa::sdl_unique_ptr<SDL_Texture> green_checker_texture;
     asa::sdl_unique_ptr<SDL_Texture> red_checker_texture;
     asa::sdl_unique_ptr<SDL_Texture> checker_shadow_texture;
+    asa::sdl_unique_ptr<SDL_Texture> red_super_texture;
+    asa::sdl_unique_ptr<SDL_Texture> green_super_texture;
 
     void switchTurn(void);
 

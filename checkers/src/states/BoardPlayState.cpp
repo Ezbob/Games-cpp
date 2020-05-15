@@ -227,6 +227,8 @@ bool BoardPlayState::load(void)
     green_checker_texture = INCLUDE_PNG_FILE__((asset_path + "/checker_green3.png").c_str());
     red_checker_texture = INCLUDE_PNG_FILE__((asset_path + "/checker_red3.png").c_str());
     checker_shadow_texture = INCLUDE_PNG_FILE__((asset_path + "/checker_shadow.png").c_str());
+    green_super_texture = INCLUDE_PNG_FILE__((asset_path + "/checker_green_king.png").c_str());
+    red_super_texture = INCLUDE_PNG_FILE__((asset_path + "/checker_red_king.png").c_str());
 #undef INCLUDE_PNG_FILE__
 
     bool is_loaded = green_checker_texture &&
@@ -234,6 +236,8 @@ bool BoardPlayState::load(void)
                      checker_shadow_texture &&
                      white_tile &&
                      black_tile &&
+                     green_super_texture &&
+                     red_super_texture &&
                      red_turn_text.texture &&
                      green_turn_text.texture;
 
@@ -315,7 +319,7 @@ void BoardPlayState::render(void)
     SDL_SetRenderDrawColor(renderer.get(), 0xff, 0xff, 0xff, 0xff);
     SDL_RenderClear(renderer.get());
 
-    for (SDL_Rect &r : boardContainers)
+    for (auto &r : boardContainers)
     {
         SDL_RenderCopy(renderer.get(), white_tile.get(), nullptr, &r);
     }
@@ -338,12 +342,20 @@ void BoardPlayState::render(void)
 
     for (std::size_t i = 0; i < BOARD_N_CHECKERS / 2; ++i)
     {
-        SDL_RenderCopy(renderer.get(), green_checker_texture.get(), nullptr, &current_checker_dimensions[i]);
+        if (super_checker_table[i]) {
+            SDL_RenderCopy(renderer.get(), green_super_texture.get(), nullptr, &current_checker_dimensions[i]);
+        } else {
+            SDL_RenderCopy(renderer.get(), green_checker_texture.get(), nullptr, &current_checker_dimensions[i]);
+        }
     }
 
     for (std::size_t i = (BOARD_N_CHECKERS / 2); i < BOARD_N_CHECKERS; ++i)
     {
-        SDL_RenderCopy(renderer.get(), red_checker_texture.get(), nullptr, &current_checker_dimensions[i]);
+        if (super_checker_table[i]) {
+            SDL_RenderCopy(renderer.get(), red_super_texture.get(), nullptr, &current_checker_dimensions[i]);
+        } else {
+            SDL_RenderCopy(renderer.get(), red_checker_texture.get(), nullptr, &current_checker_dimensions[i]);
+        }
     }
 
 /*
