@@ -48,9 +48,9 @@ int MAIN_NAME()
 
     auto font = asa::make_sdl_shared(TTF_OpenFont((asa::getBasePath() + "/assets/consola.ttf").c_str(), 24));
 
-    processor.addState(std::make_shared<PauseState>(renderer, processor, font, window));
-    processor.addState(std::make_shared<WinState>(renderer, processor, font, window, message_queue));
-    processor.addState(std::make_shared<BoardPlayState>(renderer, processor, font, window, message_queue, clock));
+    processor.addState(std::make_shared<PauseState>(processor, renderer, font, window));
+    processor.addState(std::make_shared<WinState>(processor, message_queue, renderer, font, window));
+    processor.addState(std::make_shared<BoardPlayState>(processor, message_queue, clock, renderer, font, window));
 
     processor.processStates(clock);
 

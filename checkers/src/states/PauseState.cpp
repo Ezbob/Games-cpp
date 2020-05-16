@@ -5,10 +5,9 @@
 #include "Creators.hpp"
 #include "ErrorCheck.hpp"
 
-
 PauseState::PauseState(
-    std::shared_ptr<SDL_Renderer> r,
     asa::GameStateProcessor &p,
+    std::shared_ptr<SDL_Renderer> r,
     std::shared_ptr<TTF_Font> f,
     std::shared_ptr<SDL_Window> win)
     : renderer(r), font(f), processor(p), m_win(win) {}

@@ -19,8 +19,8 @@ class PauseState : public asa::GameState
 
 public:
     PauseState(
-        std::shared_ptr<SDL_Renderer> r,
         asa::GameStateProcessor &p,
+        std::shared_ptr<SDL_Renderer> r,
         std::shared_ptr<TTF_Font> f,
         std::shared_ptr<SDL_Window> win);
 

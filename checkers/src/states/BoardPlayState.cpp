@@ -108,12 +108,12 @@ bool BoardPlayState::no_checker_in_the_way(void) const
 /* === PUBLIC INTERFACE === */
 
 BoardPlayState::BoardPlayState(
-    asa::sdl_shared_ptr<SDL_Renderer> r,
     asa::GameStateProcessor &p,
-    asa::sdl_shared_ptr<TTF_Font> f,
-    std::shared_ptr<SDL_Window> win,
     asa::MessageQueueInterface &comms,
-    asa::GameClock &clock)
+    asa::GameClock &clock,
+    asa::sdl_shared_ptr<SDL_Renderer> r,
+    asa::sdl_shared_ptr<TTF_Font> f,
+    std::shared_ptr<SDL_Window> win)
     : renderer(r),
       processor(p),
       font(f),
@@ -377,12 +377,10 @@ void BoardPlayState::render(void)
     if (playingColor == PlayingColor::GREEN)
     {
         SDL_RenderCopy(renderer.get(), green_turn_text.texture.get(), nullptr, &green_turn_text.position);
-        //green_turn_text->render(screen_width / 2 - 85, screen_height - 32);
     }
     else
     {
         SDL_RenderCopy(renderer.get(), red_turn_text.texture.get(), nullptr, &red_turn_text.position);
-        //red_turn_text->render(screen_width / 2 - 85, screen_height - 32);
     }
 
     SDL_RenderPresent(renderer.get());

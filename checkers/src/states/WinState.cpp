@@ -6,11 +6,16 @@
 #include <memory>
 
 WinState::WinState(
-    std::shared_ptr<SDL_Renderer> r,
     asa::GameStateProcessor &p,
+    asa::MessageQueueInterface &mq,
+    std::shared_ptr<SDL_Renderer> r,
     std::shared_ptr<TTF_Font> f,
-    std::shared_ptr<SDL_Window> win,
-    asa::MessageQueueInterface &mq) : renderer(r), processor(p), font(f), m_win(win), m_comms(mq)
+    std::shared_ptr<SDL_Window> win)
+    : renderer(r)
+    , processor(p)
+    , font(f)
+    , m_win(win)
+    , m_comms(mq)
 {
 }
 
@@ -44,6 +49,18 @@ void WinState::update(void)
     if (m_comms.size() > 0)
     {
         has_green_won = std::any_cast<bool>(*m_comms.poll());
+    }
+}
+
+void WinState::handleEvent(const SDL_Event &event)
+{
+    switch (event.type)
+    {
+    case SDL_QUIT:
+        processor.quitGame();
+        break;
+    default:
+        break;
     }
 }
 

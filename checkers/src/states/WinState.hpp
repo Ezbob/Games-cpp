@@ -30,11 +30,12 @@ private:
 
 public:
     WinState(
-        std::shared_ptr<SDL_Renderer> r,
         asa::GameStateProcessor &p,
+        asa::MessageQueueInterface &mq,
+        std::shared_ptr<SDL_Renderer> r,
         std::shared_ptr<TTF_Font> f,
-        std::shared_ptr<SDL_Window> win,
-        asa::MessageQueueInterface &mq);
+        std::shared_ptr<SDL_Window> win
+    );
 
     bool load(void) override;
 
@@ -43,4 +44,6 @@ public:
     void handleKeyState(const uint8_t *state) override;
 
     void render(void) override;
+
+    void handleEvent(const SDL_Event &) override;
 };
