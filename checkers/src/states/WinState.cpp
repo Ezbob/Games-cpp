@@ -8,9 +8,9 @@
 WinState::WinState(
     asa::GameStateProcessor &p,
     asa::MessageQueueInterface &mq,
-    std::shared_ptr<SDL_Renderer> r,
-    std::shared_ptr<TTF_Font> f,
-    std::shared_ptr<SDL_Window> win)
+    asa::sdl_shared_ptr<SDL_Renderer> r,
+    asa::sdl_shared_ptr<TTF_Font> f,
+    asa::sdl_shared_ptr<SDL_Window> win)
     : renderer(r)
     , processor(p)
     , font(f)

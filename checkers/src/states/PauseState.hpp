@@ -12,17 +12,17 @@ class PauseState : public asa::GameState
     asa::TextureBundle pausedText;
     asa::TextureBundle subText;
 
-    std::shared_ptr<SDL_Renderer> renderer;
-    std::shared_ptr<TTF_Font> font;
+    asa::sdl_shared_ptr<SDL_Renderer> renderer;
+    asa::sdl_shared_ptr<TTF_Font> font;
     asa::GameStateProcessor &processor;
-    std::shared_ptr<SDL_Window> m_win;
+    asa::sdl_shared_ptr<SDL_Window> m_win;
 
 public:
     PauseState(
         asa::GameStateProcessor &p,
-        std::shared_ptr<SDL_Renderer> r,
-        std::shared_ptr<TTF_Font> f,
-        std::shared_ptr<SDL_Window> win);
+        asa::sdl_shared_ptr<SDL_Renderer> r,
+        asa::sdl_shared_ptr<TTF_Font> f,
+        asa::sdl_shared_ptr<SDL_Window> win);
 
     void handleKeyState(const uint8_t *state) override;
 

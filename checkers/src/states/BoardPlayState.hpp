@@ -46,7 +46,7 @@ public:
         asa::GameClock &,
         asa::sdl_shared_ptr<SDL_Renderer>,
         asa::sdl_shared_ptr<TTF_Font>,
-        std::shared_ptr<SDL_Window>);
+        asa::sdl_shared_ptr<SDL_Window>);
 
     void handleEvent(const SDL_Event &event) override;
     void handleKeyState(const uint8_t *state) override;

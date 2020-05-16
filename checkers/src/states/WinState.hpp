@@ -18,11 +18,11 @@ private:
 
     asa::TextureBundle red_winner_text;
 
-    std::shared_ptr<SDL_Renderer> renderer;
+    asa::sdl_shared_ptr<SDL_Renderer> renderer;
 
     asa::GameStateProcessor &processor;
-    std::shared_ptr<TTF_Font> font;
-    std::shared_ptr<SDL_Window> m_win;
+    asa::sdl_shared_ptr<TTF_Font> font;
+    asa::sdl_shared_ptr<SDL_Window> m_win;
 
     asa::MessageQueueInterface &m_comms;
 
@@ -32,9 +32,9 @@ public:
     WinState(
         asa::GameStateProcessor &p,
         asa::MessageQueueInterface &mq,
-        std::shared_ptr<SDL_Renderer> r,
-        std::shared_ptr<TTF_Font> f,
-        std::shared_ptr<SDL_Window> win
+        asa::sdl_shared_ptr<SDL_Renderer> r,
+        asa::sdl_shared_ptr<TTF_Font> f,
+        asa::sdl_shared_ptr<SDL_Window> win
     );
 
     bool load(void) override;

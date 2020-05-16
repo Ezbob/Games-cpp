@@ -113,13 +113,13 @@ BoardPlayState::BoardPlayState(
     asa::GameClock &clock,
     asa::sdl_shared_ptr<SDL_Renderer> r,
     asa::sdl_shared_ptr<TTF_Font> f,
-    std::shared_ptr<SDL_Window> win)
-    : renderer(r),
-      processor(p),
-      font(f),
-      m_win(win),
-      sec_per_frame(clock.msPerUpdate() / 1000.0),
-      m_comms(comms)
+    asa::sdl_shared_ptr<SDL_Window> win)
+    : renderer(r)
+    , processor(p)
+    , font(f)
+    , m_win(win)
+    , sec_per_frame(clock.msPerUpdate() / 1000.0)
+    , m_comms(comms)
 {
 }
 
