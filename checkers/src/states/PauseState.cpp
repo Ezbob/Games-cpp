@@ -16,7 +16,7 @@ void PauseState::handleKeyState(const uint8_t *state)
 {
     if (state[SDL_SCANCODE_RETURN])
     {
-        isPlaying(false);
+        processor.startFromState(processor.lastIndex());
     }
 }
 

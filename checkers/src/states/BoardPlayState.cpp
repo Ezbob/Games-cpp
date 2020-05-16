@@ -194,7 +194,7 @@ void BoardPlayState::handleKeyState(const uint8_t *state [[maybe_unused]])
 {
     if (state[SDL_SCANCODE_ESCAPE])
     {
-        //processor.startFromNewState(pauseState);
+        processor.startFromState(0);
     }
 }
 

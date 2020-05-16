@@ -2,16 +2,44 @@
 #include "GameStateProcessor.hpp"
 #include <iostream>
 #include "SDL_timer.h"
+#include <stdexcept>
 
 using namespace asa;
 
-void GameStateProcessor::addState(std::shared_ptr<GameState> state) {
-    m_gameStates.push(state);
+void GameStateProcessor::addState(std::shared_ptr<GameState> state)
+{
+    m_gameStates.push_back(state);
+    m_currentIndex = (m_gameStates.size() - 1);
 }
 
 void GameStateProcessor::quitGame(void)
 {
     m_isPlaying = false;
+}
+
+std::shared_ptr<GameState> GameStateProcessor::currentState(void) const
+{
+    if (m_currentIndex >= m_gameStates.size())
+    {
+        throw std::out_of_range("GameState index out of range");
+    }
+    return m_gameStates[m_currentIndex];
+}
+
+void GameStateProcessor::removeCurrentState(void)
+{
+    m_gameStates.pop_back();
+    m_currentIndex = (m_gameStates.size() - 1);
+}
+
+void GameStateProcessor::startFromState(const uint32_t index)
+{
+    m_currentIndex = index;
+    m_shouldReload = true;
+}
+
+uint32_t GameStateProcessor::lastIndex(void) const {
+    return m_gameStates.size() - 1;
 }
 
 #if _STATS
@@ -33,7 +61,7 @@ void GameStateProcessor::processStates(GameClock &clock)
     while (!m_gameStates.empty() && m_isPlaying)
     {
     gameloop_start:
-        auto state = m_gameStates.top();
+        auto state = currentState();
 
         if (!state->isLoaded())
         {
@@ -93,13 +121,13 @@ void GameStateProcessor::processStates(GameClock &clock)
             }
         }
 
-        m_gameStates.pop();
+        removeCurrentState();
     }
 }
 
 void GameStateProcessor::startFromNewState(const std::shared_ptr<GameState> state)
 {
     state->isPlaying(true);
-    m_gameStates.emplace(state);
+    m_gameStates.emplace_back(state);
     m_shouldReload = true;
 }

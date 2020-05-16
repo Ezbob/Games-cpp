@@ -28,7 +28,7 @@ public:
 
     void handleEvent(const SDL_Event &event) override;
 
-    bool load() override;
+    bool load(void) override;
 
-    void render() override;
+    void render(void) override;
 };
